@@ -1,14 +1,14 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .model import Themepark, ThemeparkGrid
+from .model import Attraction, Themepark
 
 
 def agent_draw(agent):
     portrayal = None
     if agent is None:
         pass
-    elif isinstance(agent, Themepark):
+    elif isinstance(agent, Attraction):
         print("Uid: {0}, Heading: {1}".format(agent.unique_id, agent.heading))
         portrayal = {
             "Shape": "arrowHead",
@@ -32,7 +32,7 @@ num_agents = 3
 pixel_ratio = 26
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 server = ModularServer(
-    ThemeparkGrid,
+    Themepark,
     [grid],
     "Theme Park Model",
     {"N": num_agents, "width": width, "height": height},
