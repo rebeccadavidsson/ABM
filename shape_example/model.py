@@ -3,12 +3,14 @@ from mesa.space import SingleGrid
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from collections import Counter
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
 import random
 
-x_list = [0, 13, 25]
+x_list = [1, 13, 25]
 y_list = [13, 25, 13]
-positions = [(0,13), (13,25), (25, 13)]
+positions = [(1,13), (13,25), (25, 13)]
 num_people = 100
 heading = (1, 0)
 
@@ -74,8 +76,8 @@ class Themepark(Model):
         for i in count:
             x.append(i[1])
 
-        y_pos = ['Attraction1','Attraction2','Attraction3']
+        y_pos = ['Attraction1', 'Attraction2', 'Attraction3']
         plt.bar(y_pos, x, align='center', alpha=0.5)
-        plt.xticks([0,1,2], y_pos)
+        plt.xticks([0, 1, 2], y_pos)
 
-        plt.show()
+        # plt.show()
