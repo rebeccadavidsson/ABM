@@ -4,9 +4,10 @@ import numpy as np
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
 
-from .model import Attraction, Themepark, Custumor
+from .model import Attraction, Themepark, Customer
 
 NUM_ATTRACTIONS = 3
+num_agents = 3
 
 
 def agent_draw(agent):
@@ -49,7 +50,8 @@ histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 200, 
 
 width = 26
 height = 26
-num_agents = 3
+N_attr = 3
+N_cust = 5
 pixel_ratio = 26
 
 # width = 10
@@ -63,7 +65,7 @@ server = ModularServer(
     # [grid],
     [grid, histogram],
     "Theme Park Model",
-    {"N": num_agents, "width": width, "height": height},
+    {"N_attr": num_agents, "N_cust": N_cust, "width": width, "height": height},
 )
 server.max_steps = 0
 server.port = 8521
