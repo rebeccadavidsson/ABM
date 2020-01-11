@@ -11,19 +11,29 @@ num_agents = 3
 
 
 def agent_draw(agent):
-    portrayal = None
     if agent is None:
-        pass
-    elif isinstance(agent, Attraction):
-        print("Uid: {0}, Heading: {1}".format(agent.unique_id, agent.heading))
-        portrayal = {"Shape": "circle",
-             "Color": "grey",
-             "Filled": "true",
-             "Layer": 0,
-             "r": 0.5}
+        return
+    portrayal = {}
+
+    if type(agent) is Attraction:
+        portrayal["Shape"] = "circle"
+        # https://icons8.com/web-app/433/sheep
+        portrayal["Color"] = "grey"
+        portrayal["Filled"] = "true"
+        portrayal["Layer"] = 0
+        portrayal["r"] = 0.5
+
+    elif type(agent) is Customer:
+        portrayal["Shape"] = "circle"
+        # https://icons8.com/web-app/433/sheep
+        portrayal["Color"] = "red"
+        portrayal["Filled"] = "true"
+        portrayal["Layer"] = 0
+        portrayal["r"] = 0.5
+
     return portrayal
 
-
+#
 class HistogramModule(VisualizationElement):
     package_includes = ["Chart.min.js"]
     local_includes = ["HistogramModule.js"]
@@ -39,14 +49,15 @@ class HistogramModule(VisualizationElement):
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):
+
         # TODO, dit moeten dan de echte waardes worden natuurlijk
         wealth_vals = [1, 2, 3]
         hist = np.histogram(wealth_vals, bins=self.bins)[0]
         print("Histogram wordt gemaakt")
         return [int(x) for x in hist]
-
+#
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 200, 500)
-
+#
 
 width = 26
 height = 26
@@ -54,16 +65,20 @@ N_attr = 3
 N_cust = 5
 pixel_ratio = 26
 
-# width = 10
-# height = 10
-# num_agents = 3
-# pixel_ratio = 10
-
+# # width = 10
+# # height = 10
+# # num_agents = 3
+# # pixel_ratio = 10
+#
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
+# chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
+#                              {"Label": "Sheep", "Color": "#666666"}])
 server = ModularServer(
     Themepark,
-    # [grid],
-    [grid, histogram],
+    [grid],
+
+    # om histogram aan te zetten, uncomment dit hier onder
+    # [grid, histogram],
     "Theme Park Model",
     {"N_attr": num_agents, "N_cust": N_cust, "width": width, "height": height},
 )

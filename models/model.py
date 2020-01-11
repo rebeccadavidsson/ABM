@@ -8,6 +8,9 @@ import matplotlib.pylab as plt
 import random
 import numpy as np
 
+
+
+
 # x_list = [1, 2, 3]
 # y_list = [1, 2, 3]
 # positions = [(1,1), (2, 2), (3, 3)]
@@ -31,6 +34,7 @@ class Customer(Agent):
         self.heading = heading
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
+
     def random_move(self):
         neigh_cells = self.model.grid.get_neighborhood(self.pos, True)
         # print("neighborhood: ", neigh_cells)
@@ -39,13 +43,14 @@ class Customer(Agent):
 
     def step(self):
         # The agent's step will go here.
-        # self.random_move()
+        self.random_move()
         pass
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, pos, heading=(1, 0)):
+    def __init__(self, unique_id, model, pos, name, heading=(1, 0)):
         super().__init__(unique_id, model)
+        self.name = name
         self.pos = pos
         self.model = model
         self.heading = heading
@@ -62,14 +67,14 @@ class Attraction(Agent):
             include_center=False
         )
         new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
+        # self.model.grid.move_agent(self, new_position)
 
     def step(self):
         '''
         TODO: Dit moet natuurlijk bij customer.
         This method should move the customer using the `random_move()` method.
         '''
-        self.move()
+        # self.move()
 
 
 class Themepark(Model):
@@ -83,34 +88,38 @@ class Themepark(Model):
 
         self.grid = MultiGrid(width, height, torus=False)
         self.schedule = BaseScheduler(self)
+        self.attractions = self.make_attractions()
         self.make_attractions()
-        # self.add_customers()
-        self.add_people()
+        self.add_customers()
+        # self.add_people()
 
         self.running = True
         # self.datacollector.collect(self)
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
-
+        attractions = {}
         for i in range(self.N_attr):
             pos = (x_list[i], y_list[i])
 
             if self.grid.is_cell_empty(pos):
                 print("Creating ATTRACTION agent {2} at ({0}, {1})"
                       .format(x_list[i], y_list[i], i))
-                a = Attraction(i, self, pos, heading)
+
+                # TODO vet leuke namen verzinnen voor de attracties
+                name = str(i)
+                a = Attraction(i, self, pos,name, heading)
+                attractions[i] = a
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
+        return attractions
 
     def add_customers(self):
         """ Initialize customers on random positions."""
-
         for i in range(self.N_cust):
             rand_x = random.choice(list(np.arange(0, self.width)))
             rand_y = random.choice(list(np.arange(0, self.height)))
             pos = (rand_x, rand_y)
-
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
             a = Customer(i, self, pos, heading)
