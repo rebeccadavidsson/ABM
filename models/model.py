@@ -7,22 +7,17 @@ from collections import Counter
 import matplotlib.pylab as plt
 import random
 import numpy as np
+from .route import get_coordinates
 
 
+WIDTH = 26
+HEIGHT = 26
 
+path_coordinates = get_coordinates(WIDTH, HEIGHT)
 
-# x_list = [1, 2, 3]
-# y_list = [1, 2, 3]
-# positions = [(1,1), (2, 2), (3, 3)]
-
-# TODO: Dit is nu gehardcode....
-x_list = [1, 13, 25]
-y_list = [13, 25, 13]
-positions = [(1,13), (13,25), (25, 13)]
-
-
-
-num_people = 100
+x_list = [1, int(WIDTH/2), WIDTH-1]
+y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
+positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 heading = (1, 0)
 
 
@@ -45,11 +40,15 @@ class Customer(Agent):
             include_center=False
         )
         new_position = self.random.choice(possible_steps)
+
+        # Restrict to path
+        while list(new_position) not in path_coordinates:
+            new_position = self.random.choice(possible_steps)
+
         self.model.grid.move_agent(self, new_position)
 
     def step(self):
         '''
-        TODO: Dit moet natuurlijk bij customer.
         This method should move the customer using the `random_move()` method.
         '''
         self.move()
@@ -76,8 +75,10 @@ class Themepark(Model):
 
         self.grid = MultiGrid(width, height, torus=False)
         self.schedule = BaseScheduler(self)
+
         self.attractions = self.make_attractions()
         self.make_attractions()
+        self.make_route()
         self.add_customers()
 
         self.running = True
@@ -104,8 +105,12 @@ class Themepark(Model):
     def add_customers(self):
         """ Initialize customers on random positions."""
         for i in range(self.N_cust):
-            rand_x = random.choice(list(np.arange(0, self.width)))
-            rand_y = random.choice(list(np.arange(0, self.height)))
+            # rand_x = random.choice(list(np.arange(0, self.width)))
+            # rand_y = random.choice(list(np.arange(0, self.height)))
+            pos_temp = random.choice(path_coordinates)
+            rand_x = pos_temp[0]
+            rand_y = pos_temp[1]
+
             pos = (rand_x, rand_y)
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
@@ -117,16 +122,24 @@ class Themepark(Model):
         """Calculate how many customers are in which attraction."""
         return [[x, self.position_counter.count(x)] for x in set(self.position_counter)]
 
+    def make_route(self):
+        """Draw coordinates of a possible path."""
+
+        for i in range(len(path_coordinates)):
+            pos = path_coordinates[i]
+
+            # Create path agent?
+            path = Route(i, self, pos)
+            self.schedule.add(path)
+            self.grid.place_agent(path, pos)
 
     def step(self):
         """Advance the model by one step."""
         self.schedule.step()
 
 
-        # x = []
-        # for i in count:
-        #     x.append(i[1])
-        #
-        # y_pos = ['Attraction1', 'Attraction2', 'Attraction3']
-        # plt.bar(y_pos, x, align='center', alpha=0.5)
-        # plt.xticks([0, 1, 2], y_pos)
+class Route(Agent):
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id, model)
+        self.pos = pos
+        self.model = model

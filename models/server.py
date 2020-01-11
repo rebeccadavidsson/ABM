@@ -4,7 +4,7 @@ import numpy as np
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
 
-from .model import Attraction, Themepark, Customer
+from .model import Attraction, Themepark, Customer, Route
 
 NUM_ATTRACTIONS = 3
 num_agents = 3
@@ -15,20 +15,25 @@ def agent_draw(agent):
         return
     portrayal = {}
 
-    if type(agent) is Attraction:
+    if type(agent) is Route:
         portrayal["Shape"] = "circle"
-        # https://icons8.com/web-app/433/sheep
-        portrayal["Color"] = "grey"
+        portrayal["Color"] = "blue"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 0
-        portrayal["r"] = 0.5
+        portrayal["r"] = 0.15
+
+    elif type(agent) is Attraction:
+        portrayal["Shape"] = "circle"
+        portrayal["Color"] = "grey"
+        portrayal["Filled"] = "true"
+        portrayal["Layer"] = 1
+        portrayal["r"] = 0.9
 
     elif type(agent) is Customer:
         portrayal["Shape"] = "circle"
-        # https://icons8.com/web-app/433/sheep
         portrayal["Color"] = "red"
         portrayal["Filled"] = "true"
-        portrayal["Layer"] = 0
+        portrayal["Layer"] = 2
         portrayal["r"] = 0.5
 
     return portrayal
