@@ -33,7 +33,7 @@ def agent_draw(agent):
 
     return portrayal
 
-#
+
 class HistogramModule(VisualizationElement):
     package_includes = ["Chart.min.js"]
     local_includes = ["HistogramModule.js"]
@@ -55,9 +55,9 @@ class HistogramModule(VisualizationElement):
         hist = np.histogram(wealth_vals, bins=self.bins)[0]
         print("Histogram wordt gemaakt")
         return [int(x) for x in hist]
-#
+
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 200, 500)
-#
+
 
 width = 26
 height = 26

@@ -34,28 +34,6 @@ class Customer(Agent):
         self.heading = heading
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
-
-    def random_move(self):
-        neigh_cells = self.model.grid.get_neighborhood(self.pos, True)
-        # print("neighborhood: ", neigh_cells)
-        selected_cell = neigh_cells[0]
-        self.model.grid.move_agent(self, selected_cell)
-
-    def step(self):
-        # The agent's step will go here.
-        self.random_move()
-        pass
-
-
-class Attraction(Agent):
-    def __init__(self, unique_id, model, pos, name, heading=(1, 0)):
-        super().__init__(unique_id, model)
-        self.name = name
-        self.pos = pos
-        self.model = model
-        self.heading = heading
-        self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
-
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
@@ -67,14 +45,24 @@ class Attraction(Agent):
             include_center=False
         )
         new_position = self.random.choice(possible_steps)
-        # self.model.grid.move_agent(self, new_position)
+        self.model.grid.move_agent(self, new_position)
 
     def step(self):
         '''
         TODO: Dit moet natuurlijk bij customer.
         This method should move the customer using the `random_move()` method.
         '''
-        # self.move()
+        self.move()
+
+
+class Attraction(Agent):
+    def __init__(self, unique_id, model, pos, name, heading=(1, 0)):
+        super().__init__(unique_id, model)
+        self.name = name
+        self.pos = pos
+        self.model = model
+        self.heading = heading
+        self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
 
 class Themepark(Model):
@@ -91,7 +79,6 @@ class Themepark(Model):
         self.attractions = self.make_attractions()
         self.make_attractions()
         self.add_customers()
-        # self.add_people()
 
         self.running = True
         # self.datacollector.collect(self)
@@ -108,7 +95,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, pos,name, heading)
+                a = Attraction(i, self, pos, name, heading)
                 attractions[i] = a
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
@@ -126,23 +113,10 @@ class Themepark(Model):
             self.schedule.add(a)
             self.grid.place_agent(a, pos)
 
-    def add_people(self):
-        """Add people to a random attraction."""
-
-        self.position_counter = []
-        for person in range(num_people):
-
-            # Go to random attraction
-            pos = random.choice(positions)
-            self.position_counter.append(pos)
-
-            # Make individual agents
-            customer = Customer(person, self, pos, heading)
-            self.grid.place_agent(customer, pos)
-
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
         return [[x, self.position_counter.count(x)] for x in set(self.position_counter)]
+
 
     def step(self):
         """Advance the model by one step."""
