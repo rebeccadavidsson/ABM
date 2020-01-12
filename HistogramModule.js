@@ -1,7 +1,5 @@
 var HistogramModule = function(bins, canvas_width, canvas_height, data) {
-    // Create the elements
 
-    console.log(bins);
     // Create the tag:
     var canvas_tag = "<canvas id='canvas' width='" + canvas_width + "' height='" + canvas_height + "' ";
     canvas_tag += "style='position:absolute'></canvas>";
@@ -12,6 +10,7 @@ var HistogramModule = function(bins, canvas_width, canvas_height, data) {
     // Create the context and the drawing controller:
     var context = canvas.getContext("2d");
 
+    console.log(data);
     // Prep the chart properties and series:
     var datasets = [{
         label: "Data",
@@ -19,12 +18,13 @@ var HistogramModule = function(bins, canvas_width, canvas_height, data) {
         strokeColor: "rgba(151,187,205,0.8)",
         highlightFill: "rgba(151,187,205,0.75)",
         highlightStroke: "rgba(151,187,205,1)",
-        data: [30,27,43]
+        data: data
     }];
 
     // Add a zero value for each bin
-    for (var i in bins)
-        datasets[0].data.push(0);
+    // for (var i in data)
+    // console.log(datasets[0].data);
+    //     datasets[0].data.push(data[i]);
 
     var data = {
         labels: bins,
@@ -42,9 +42,13 @@ var HistogramModule = function(bins, canvas_width, canvas_height, data) {
       },
       options);
 
+    // chart.data.datasets[0].data[i] = data[i];
+
     this.render = function(data) {
+      console.log(data, "DATA");
         for (var i in data)
-            chart.datasets[0].bars[i].value = data[i];
+            chart.data.datasets[0].data[i] = data[i];
+            console.log(chart.data);
         chart.update();
     };
 

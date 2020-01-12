@@ -104,9 +104,8 @@ class Themepark(Model):
 
     def add_customers(self):
         """ Initialize customers on random positions."""
+
         for i in range(self.N_cust):
-            # rand_x = random.choice(list(np.arange(0, self.width)))
-            # rand_y = random.choice(list(np.arange(0, self.height)))
             pos_temp = random.choice(path_coordinates)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
@@ -120,7 +119,8 @@ class Themepark(Model):
 
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
-        return [[x, self.position_counter.count(x)] for x in set(self.position_counter)]
+
+        return [random.random(), random.random(), random.random()]
 
     def make_route(self):
         """Draw coordinates of a possible path."""

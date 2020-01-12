@@ -17,7 +17,7 @@ def agent_draw(agent):
 
     if type(agent) is Route:
         portrayal["Shape"] = "circle"
-        portrayal["Color"] = "blue"
+        portrayal["Color"] = "black"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 0
         portrayal["r"] = 0.15
@@ -47,22 +47,19 @@ class HistogramModule(VisualizationElement):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
         self.bins = ["Attraction1", "Attraction2", "Attraction3"]
-        new_element = "new HistogramModule({}, {}, {})"
+        self.data = [23, 45, 31]
+        new_element = "new HistogramModule({}, {}, {}, {})"
         new_element = new_element.format(bins,
                                          canvas_width,
-                                         canvas_height)
+                                         canvas_height,
+                                         self.data)
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):
+        """ TODO!!!"""
 
-        # TODO, dit moeten dan de echte waardes worden natuurlijk
-        wealth_vals = [1, 2, 3]
-        hist = np.histogram(wealth_vals, bins=self.bins)[0]
-        print("Histogram wordt gemaakt")
-        return [int(x) for x in hist]
-
-histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 200, 500)
-
+        data = model.calculate_people()
+        return data
 
 width = 26
 height = 26
@@ -70,20 +67,19 @@ N_attr = 3
 N_cust = 5
 pixel_ratio = 26
 
-# # width = 10
-# # height = 10
-# # num_agents = 3
-# # pixel_ratio = 10
-#
+
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 # chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
 #                              {"Label": "Sheep", "Color": "#666666"}])
+
+histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 20, 50)
+
 server = ModularServer(
     Themepark,
-    [grid],
+    # [grid],
 
     # om histogram aan te zetten, uncomment dit hier onder
-    # [grid, histogram],
+    [grid, histogram],
     "Theme Park Model",
     {"N_attr": num_agents, "N_cust": N_cust, "width": width, "height": height},
 )
