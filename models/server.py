@@ -4,7 +4,8 @@ import numpy as np
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
 
-from .model import Attraction, Themepark, Customer, Route
+from .model import Attraction, Themepark, Customer
+from .route import Route
 
 NUM_ATTRACTIONS = 3
 num_agents = 3

@@ -7,7 +7,7 @@ from collections import Counter
 import matplotlib.pylab as plt
 import random
 import numpy as np
-from .route import get_coordinates
+from .route import get_coordinates, Route
 
 
 WIDTH = 26
@@ -106,7 +106,8 @@ class Themepark(Model):
         """ Initialize customers on random positions."""
 
         for i in range(self.N_cust):
-            pos_temp = random.choice(path_coordinates)
+            # pos_temp = random.choice(path_coordinates)
+            pos_temp = random.choice(positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
@@ -120,6 +121,20 @@ class Themepark(Model):
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
 
+        for attraction_pos in positions:
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=1,
+                include_center=True
+            )
+
+            counter = 0
+            for agent in agents:
+                if type(agent) is Customer:
+                    counter += 1
+
+        # TODO!!! Ik moest weg dus kon het niet afmaken
         return [random.random(), random.random(), random.random()]
 
     def make_route(self):
@@ -136,10 +151,3 @@ class Themepark(Model):
     def step(self):
         """Advance the model by one step."""
         self.schedule.step()
-
-
-class Route(Agent):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id, model)
-        self.pos = pos
-        self.model = model
