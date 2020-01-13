@@ -40,9 +40,8 @@ class Customer(Agent):
             include_center=False
         )
         new_position = self.random.choice(possible_steps)
-
         # Restrict to path
-        while list(new_position) not in path_coordinates:
+        while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
         self.model.grid.move_agent(self, new_position)
@@ -111,7 +110,8 @@ class Themepark(Model):
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
-            pos = (rand_x, rand_y)
+            # pos = (rand_x, rand_y)
+            pos = pos_temp
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
             a = Customer(i, self, pos, heading)
@@ -127,14 +127,15 @@ class Themepark(Model):
 
         for i in range(len(path_coordinates)):
             pos = path_coordinates[i]
-
             # Create path agent?
             path = Route(i, self, pos)
             self.schedule.add(path)
+
             self.grid.place_agent(path, pos)
 
     def step(self):
         """Advance the model by one step."""
+
         self.schedule.step()
 
 
