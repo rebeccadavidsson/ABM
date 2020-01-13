@@ -7,7 +7,7 @@ from collections import Counter
 import matplotlib.pylab as plt
 import random
 import numpy as np
-from .route import get_coordinates
+from .route import get_coordinates, Route
 
 
 WIDTH = 26
@@ -29,6 +29,11 @@ class Customer(Agent):
         self.heading = heading
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
+        # Assign destination
+        self.destination = random.choice(positions)
+        while self.destination is self.pos:
+            self.destination = random.choice(positions)
+
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
@@ -39,12 +44,28 @@ class Customer(Agent):
             moore=True,
             include_center=False
         )
-        new_position = self.random.choice(possible_steps)
+
+        temp = possible_steps[0]
+        # Loop over every possible step to get fastest step
+        for step in possible_steps:
+
+            # if step is closer to destination
+            # TODO: Moet dit AND of OR zijn?
+            if (step[0] - self.destination[0]) < temp[0] or (step[1] - self.destination[1]) < temp[1]:
+                temp = step
+
+        new_position = temp
+
         # Restrict to path
+        # TODO! Dit moet minder random
         while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
         self.model.grid.move_agent(self, new_position)
+
+    def calc_fast_route():
+        """Calculate fastest route from one attraction to another."""
+        pass
 
     def step(self):
         '''
@@ -103,10 +124,10 @@ class Themepark(Model):
 
     def add_customers(self):
         """ Initialize customers on random positions."""
+
         for i in range(self.N_cust):
-            # rand_x = random.choice(list(np.arange(0, self.width)))
-            # rand_y = random.choice(list(np.arange(0, self.height)))
-            pos_temp = random.choice(path_coordinates)
+            # pos_temp = random.choice(path_coordinates)
+            pos_temp = random.choice(positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
@@ -120,7 +141,22 @@ class Themepark(Model):
 
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
-        return [[x, self.position_counter.count(x)] for x in set(self.position_counter)]
+
+        for attraction_pos in positions:
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=1,
+                include_center=True
+            )
+
+            counter = 0
+            for agent in agents:
+                if type(agent) is Customer:
+                    counter += 1
+
+        # TODO!!! Ik moest weg dus kon het niet afmaken
+        return [random.random(), random.random(), random.random()]
 
     def make_route(self):
         """Draw coordinates of a possible path."""
@@ -137,10 +173,3 @@ class Themepark(Model):
         """Advance the model by one step."""
 
         self.schedule.step()
-
-
-class Route(Agent):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id, model)
-        self.pos = pos
-        self.model = model

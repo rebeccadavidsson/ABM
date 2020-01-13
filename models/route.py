@@ -1,3 +1,12 @@
+from mesa import Agent
+
+
+class Route(Agent):
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id, model)
+        self.pos = pos
+        self.model = model
+
 
 def get_coordinates(width, height):
     """Calculate the coordinates of a route, given the
