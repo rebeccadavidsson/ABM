@@ -29,6 +29,11 @@ class Customer(Agent):
         self.heading = heading
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
+        # Assign destination
+        self.destination = random.choice(positions)
+        while self.destination is self.pos:
+            self.destination = random.choice(positions)
+
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
@@ -39,13 +44,28 @@ class Customer(Agent):
             moore=True,
             include_center=False
         )
-        new_position = self.random.choice(possible_steps)
+
+        temp = possible_steps[0]
+        # Loop over every possible step to get fastest step
+        for step in possible_steps:
+
+            # if step is closer to destination
+            # TODO: Moet dit AND of OR zijn?
+            if (step[0] - self.destination[0]) < temp[0] or (step[1] - self.destination[1]) < temp[1]:
+                temp = step
+
+        new_position = temp
 
         # Restrict to path
+        # TODO! Dit moet minder random
         while list(new_position) not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
         self.model.grid.move_agent(self, new_position)
+
+    def calc_fast_route():
+        """Calculate fastest route from one attraction to another."""
+        pass
 
     def step(self):
         '''

@@ -65,7 +65,7 @@ class HistogramModule(VisualizationElement):
 width = 26
 height = 26
 N_attr = 3
-N_cust = 5
+N_cust = 10
 pixel_ratio = 26
 
 
