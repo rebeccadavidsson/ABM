@@ -25,7 +25,7 @@ def get_coordinates(width, height):
         coordinates.append((int(temp / 2) - 1, i))
         temp += 1
     #
-
+    # een extra comment omdat ik antwoord wil geven op de commit vraag
     # POGING TOT EEN ROUTE-ALGORITME
     # grid_matrix = np.zeros((5, 5))
     # for i in range(5):
