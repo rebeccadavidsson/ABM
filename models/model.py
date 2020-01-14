@@ -64,7 +64,9 @@ class Customer(Agent):
         self.model.grid.move_agent(self, new_position)
 
     def calc_fast_route():
+        # volgens mij was het idee om iedere agent een "kaart" met te geven (dict met routes)
         """Calculate fastest route from one attraction to another."""
+
         pass
 
     def step(self):
