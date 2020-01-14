@@ -18,6 +18,7 @@ path_coordinates = get_coordinates(WIDTH, HEIGHT)
 x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
+
 heading = (1, 0)
 
 
@@ -45,14 +46,17 @@ class Customer(Agent):
             include_center=False
         )
 
-        temp = possible_steps[0]
+        # start with random choice of position
+        temp = random.choice(possible_steps)
+
         # Loop over every possible step to get fastest step
         for step in possible_steps:
 
-            # if step is closer to destination
-            # TODO: Moet dit AND of OR zijn?
-            if (step[0] - self.destination[0]) < temp[0] or (step[1] - self.destination[1]) < temp[1]:
-                temp = step
+            # check if step is closer to destination
+            if (abs(step[0] - self.destination[0]) < abs(temp[0] - self.destination[0]) or
+               abs(step[1] - self.destination[1]) < abs(temp[1] - self.destination[1])):
+
+               temp = step
 
         new_position = temp
 
@@ -60,6 +64,11 @@ class Customer(Agent):
         # TODO! Dit moet minder random
         while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
+
+        # Check if destination has to be changed
+        print(new_position, self.destination)
+        if new_position == self.destination:
+            self.destination = random.choice(positions)
 
         self.model.grid.move_agent(self, new_position)
 
@@ -144,7 +153,10 @@ class Themepark(Model):
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
 
+        counter_total = {}
+
         for attraction_pos in positions:
+
             agents = self.grid.get_neighbors(
                 attraction_pos,
                 moore=True,
@@ -157,8 +169,10 @@ class Themepark(Model):
                 if type(agent) is Customer:
                     counter += 1
 
+            counter_total[attraction_pos] = counter
+
         # TODO!!! Ik moest weg dus kon het niet afmaken
-        return [random.random(), random.random(), random.random()]
+        return list(counter_total.values())
 
     def make_route(self):
         """Draw coordinates of a possible path."""

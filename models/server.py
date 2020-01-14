@@ -48,7 +48,7 @@ class HistogramModule(VisualizationElement):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
         self.bins = ["Attraction1", "Attraction2", "Attraction3"]
-        self.data = [23, 45, 31]
+        self.data = [] # TODO
         new_element = "new HistogramModule({}, {}, {}, {})"
         new_element = new_element.format(bins,
                                          canvas_width,
@@ -61,6 +61,7 @@ class HistogramModule(VisualizationElement):
 
         data = model.calculate_people()
         return data
+
 
 width = 26
 height = 26
