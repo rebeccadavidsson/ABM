@@ -46,6 +46,8 @@ class Customer(Agent):
             include_center=False
         )
 
+        # Comment
+
         # start with random choice of position
         temp = random.choice(possible_steps)
 
