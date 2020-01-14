@@ -2,14 +2,18 @@
 Agent Based Modelling UvA (2020)
 
 ## Getting started
+All requirements can be installed with:
+```
+pip install -r requirements.txt
+```
 
 ### Requirements
 
 ### Repository
 
 ### Built with
-[Mesa](https://github.com/projectmesa/mesa) - ABM Framework
-[Matplotlib](https://matplotlib.org) - 2D plotting 
+* [Mesa](https://github.com/projectmesa/mesa) - ABM Framework
+* [Matplotlib](https://matplotlib.org) - 2D plotting
 
 ### Authors
 * __R. Davidsson__

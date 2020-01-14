@@ -1,6 +1,5 @@
 var HistogramModule = function(bins, canvas_width, canvas_height, data) {
 
-  console.log(data, "DATA");
     // Create the tag:
     var canvas_tag = "<canvas id='canvas' width='" + canvas_width + "' height='" + canvas_height + "' ";
     canvas_tag += "style='position:absolute'></canvas>";
@@ -13,7 +12,7 @@ var HistogramModule = function(bins, canvas_width, canvas_height, data) {
 
     // Prep the chart properties and series:
     var datasets = [{
-        label: "Data",
+        label: "Number of customers in an attraction",
         fillColor: "rgba(151,187,205,0.5)",
         strokeColor: "rgba(151,187,205,0.8)",
         highlightFill: "rgba(151,187,205,0.75)",
