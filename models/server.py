@@ -57,7 +57,6 @@ class HistogramModule(VisualizationElement):
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):
-        """ TODO!!!"""
 
         data = model.calculate_people()
         return data
@@ -66,7 +65,7 @@ class HistogramModule(VisualizationElement):
 width = 26
 height = 26
 N_attr = 3
-N_cust = 10
+N_cust = 15
 pixel_ratio = 26
 
 

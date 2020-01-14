@@ -46,8 +46,6 @@ class Customer(Agent):
             include_center=False
         )
 
-        # Comment
-
         # start with random choice of position
         temp = random.choice(possible_steps)
 
@@ -63,12 +61,11 @@ class Customer(Agent):
         new_position = temp
 
         # Restrict to path
-        # TODO! Dit moet minder random
+        # TODO! Dit moet minder random?
         while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
         # Check if destination has to be changed
-        print(new_position, self.destination)
         if new_position == self.destination:
             self.destination = random.choice(positions)
 
@@ -181,6 +178,7 @@ class Themepark(Model):
 
         for i in range(len(path_coordinates)):
             pos = path_coordinates[i]
+            
             # Create path agent?
             path = Route(i, self, pos)
             self.schedule.add(path)
