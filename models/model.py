@@ -76,7 +76,6 @@ class Themepark(Model):
 
         for i in range(self.N_cust):
             # pos_temp = random.choice(path_coordinates)
-            print(starting_positions)
             pos_temp = random.choice(starting_positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]

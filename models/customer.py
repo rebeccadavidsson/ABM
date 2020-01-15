@@ -30,6 +30,7 @@ class Customer(Agent):
 
         # TODO: Hoe lang blijven de mensen in de attractie?
         self.waitingtime = random.randrange(20, 30)
+        self.waiting = False
 
         # Start waited period with zero
         self.waited_period = 0
@@ -64,18 +65,30 @@ class Customer(Agent):
         while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
-        # Check if destination has to be changed
-        if new_position == self.destination:
+        if new_position == self.destination and self.waiting is False:
+            self.model.grid.move_agent(self, new_position)
+            self.waiting = True
 
-            # Let this agent sit in this attraction for a while
+        print(self.pos, self.destination, "DESTINAA")
+        if self.pos == self.destination:
             self.waited_period += 1
 
-            if self.waited_period >= self.waitingtime:
-                self.destination = random.choice(positions)
-                self.waited_period = 0
+        if self.waitingtime == self.waited_period:
 
-        elif new_position != self.destination and self.waited_period < self.waitingtime:
+            # Change direction
+            temp_new = random.choice(positions)
+
+            while self.destination == temp_new:
+                temp_new = random.choice(positions)
+
+            self.destination = temp_new
+
+            self.waiting = False
+            self.waited_period = 0
+
+        if self.waiting is False:
             self.model.grid.move_agent(self, new_position)
+
 
     def calc_fast_route():
         # volgens mij was het idee om iedere agent een "kaart" met te geven (dict met routes)
@@ -87,4 +100,6 @@ class Customer(Agent):
         '''
         This method should move the customer using the `random_move()` method.
         '''
+
+
         self.move()
