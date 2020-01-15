@@ -9,6 +9,7 @@ import random
 import numpy as np
 from .route import get_coordinates, Route
 from .customer import Customer
+from .attraction import Attraction
 
 
 WIDTH = 26
@@ -20,17 +21,7 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
-
 heading = (1, 0)
-
-class Attraction(Agent):
-    def __init__(self, unique_id, model, pos, name, heading=(1, 0)):
-        super().__init__(unique_id, model)
-        self.name = name
-        self.pos = pos
-        self.model = model
-        self.heading = heading
-        self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
 
 class Themepark(Model):
@@ -65,7 +56,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, pos, name, heading)
+                a = Attraction(i, self, pos, name, self.N_cust, heading)
                 attractions[i] = a
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
@@ -109,7 +100,6 @@ class Themepark(Model):
 
             counter_total[attraction_pos] = counter
 
-        # TODO!!! Ik moest weg dus kon het niet afmaken
         return list(counter_total.values())
 
     def make_route(self):

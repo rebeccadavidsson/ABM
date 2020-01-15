@@ -69,13 +69,14 @@ class Customer(Agent):
             self.model.grid.move_agent(self, new_position)
             self.waiting = True
 
-        print(self.pos, self.destination, "DESTINAA")
         if self.pos == self.destination:
             self.waited_period += 1
 
+        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig? 
         if self.waitingtime == self.waited_period:
 
             # Change direction
+            # TODO: implementeren van de target functie
             temp_new = random.choice(positions)
 
             while self.destination == temp_new:

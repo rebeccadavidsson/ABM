@@ -23,6 +23,11 @@ def get_coordinates(width, height):
         coordinates.append((int(temp / 2), i))
         coordinates.append((int(temp / 2) + 1, i))
         coordinates.append((int(temp / 2) - 1, i))
+
+        coordinates.append((int(temp / 2) + 2, int(temp / 2) + 2))
+        coordinates.append((int(temp / 2) - 2, int(temp / 2) - 2))
+        coordinates.append((int(temp / 2) - 2, int(temp / 2) + 2))
+        coordinates.append((int(temp / 2) + 2, int(temp / 2) - 2))
         temp += 1
     #
     # een extra comment omdat ik antwoord wil geven op de commit vraag
