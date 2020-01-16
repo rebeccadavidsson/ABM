@@ -14,8 +14,6 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
-
-
 class Customer(Agent):
     def __init__(self, unique_id, model, pos):
         super().__init__(unique_id, model)

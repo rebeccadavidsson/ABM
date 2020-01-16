@@ -19,8 +19,8 @@ pip install -r requirements.txt
 * __R. Davidsson__
 * __S. Donker__
 * __A. Dijkhuis__
+* __R. van Drimmelen__
 * __L. Heek__
 * __S. Verhezen__
-* __R __
 
 ## License
