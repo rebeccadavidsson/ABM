@@ -33,6 +33,7 @@ class Themepark(Model):
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))
 
         self.grid = MultiGrid(width, height, torus=False)
+        print(self.grid)
         self.schedule = BaseScheduler(self)
 
         self.attractions = self.make_attractions()

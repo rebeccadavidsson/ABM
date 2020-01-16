@@ -88,12 +88,20 @@ class Customer(Agent):
 
             # Change direction
             # TODO: implementeren van de target functie
-            temp_new = random.choice(positions)
 
-            while self.destination == temp_new:
-                temp_new = random.choice(positions)
+            # RANDOM new destination
+            # temp_new = random.choice(positions)
+            # while self.destination == temp_new:
+            #     temp_new = random.choice(positions)
+            # self.destination = temp_new
 
-            self.destination = temp_new
+            # SHORTEST waiting line as destination
+            # TODO: current attraction should not be an option, even if it has the shortest waiting line
+            waiting_lines = self.model.calculate_people()
+            minimum = min(waiting_lines)
+
+            # Change current destination to new destination
+            self.destination = positions[waiting_lines.index(minimum)]
 
             self.waiting = False
             self.waited_period = 0
