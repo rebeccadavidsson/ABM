@@ -1,7 +1,7 @@
 from mesa import Agent
 import random
 from .route import get_coordinates
-
+from .attraction import Attraction
 
 WIDTH = 26
 HEIGHT = 26
@@ -13,7 +13,6 @@ y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
 heading = (1, 0)
-
 
 class Customer(Agent):
     def __init__(self, unique_id, model, pos, heading=(1, 0)):
@@ -34,6 +33,7 @@ class Customer(Agent):
 
         # Start waited period with zero
         self.waited_period = 0
+
 
     def move(self):
         '''
@@ -72,7 +72,18 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig? 
+        # Get waitingtime from attraction
+        agents = self.model.grid.get_neighbors(
+            self.pos,
+            moore=True,
+            radius=0,
+            include_center=True
+        )
+
+        for agent_object in agents:
+            if type(agent_object) == Attraction:
+                self.waitingtime = agent_object.waiting_time
+
         if self.waitingtime == self.waited_period:
 
             # Change direction

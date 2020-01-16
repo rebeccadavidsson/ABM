@@ -11,7 +11,6 @@ from .route import get_coordinates, Route
 from .customer import Customer
 from .attraction import Attraction
 
-
 WIDTH = 26
 HEIGHT = 26
 
@@ -22,7 +21,7 @@ y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
 heading = (1, 0)
-
+waiting_times = [5.0,5.0,5.0]
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height):
@@ -42,7 +41,9 @@ class Themepark(Model):
         self.add_customers()
 
         self.running = True
-        # self.datacollector.collect(self)
+        # self.datacollector = DataCollector(
+        #     {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
+        #      "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -56,8 +57,9 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, pos, name, self.N_cust, heading)
+                a = Attraction(i, self, waiting_times[i],pos, name, self.N_cust, heading)
                 attractions[i] = a
+                print(a.waiting_time, "waitingtime")
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
@@ -67,16 +69,19 @@ class Themepark(Model):
 
         for i in range(self.N_cust):
             # pos_temp = random.choice(path_coordinates)
+            print(self.N_cust,'ncust')
+            print(starting_positions)
             pos_temp = random.choice(starting_positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
-            # pos = (rand_x, rand_y)
-            pos = pos_temp
+            pos = (rand_x, rand_y)
+            # pos = pos_temp
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
             a = Customer(i, self, pos, heading)
             self.schedule.add(a)
+            print(pos)
             self.grid.place_agent(a, pos)
 
     def calculate_people(self):
@@ -116,5 +121,5 @@ class Themepark(Model):
 
     def step(self):
         """Advance the model by one step."""
-
+        # self.datacollector.collect(self)
         self.schedule.step()

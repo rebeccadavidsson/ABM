@@ -14,13 +14,14 @@ positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, pos, name, N_cust, heading=(1, 0)):
+    def __init__(self, unique_id, model, waiting_time, pos, name, N_cust, heading=(1, 0)):
         super().__init__(unique_id, model)
         self.name = name
         self.pos = pos
         self.model = model
 
-        self.waiting_time = random.randrange(10, 20)
+        # self.waiting_time = random.randrange(10, 20)
+        self.waiting_time = waiting_time
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)
         self.N_current_cust = 0
