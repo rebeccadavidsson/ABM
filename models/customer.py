@@ -12,15 +12,12 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
-heading = (1, 0)
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, heading=(1, 0)):
+    def __init__(self, unique_id, model, pos):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
-        self.heading = heading
-        self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
         # Assign destination
         self.destination = random.choice(positions)
@@ -33,7 +30,6 @@ class Customer(Agent):
 
         # Start waited period with zero
         self.waited_period = 0
-
 
     def move(self):
         '''
@@ -61,13 +57,20 @@ class Customer(Agent):
         new_position = temp
 
         # Restrict to path
-        # TODO! Dit moet minder random?
         while new_position not in path_coordinates:
             new_position = self.random.choice(possible_steps)
 
         if new_position == self.destination and self.waiting is False:
             self.model.grid.move_agent(self, new_position)
             self.waiting = True
+
+        # Extra check to see if agent is at destination
+        if self.check_move(new_position) is True:
+            self.model.grid.move_agent(self, new_position)
+
+
+    def check_move(self, new_position):
+        """ Checks if a move can be done, given a new position."""
 
         if self.pos == self.destination:
             self.waited_period += 1
@@ -84,20 +87,17 @@ class Customer(Agent):
             if type(agent_object) == Attraction:
                 self.waitingtime = agent_object.waiting_time
 
+        # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
 
-            # Change direction
-            # TODO: implementeren van de target functie
-
-            # RANDOM new destination
-            # temp_new = random.choice(positions)
-            # while self.destination == temp_new:
-            #     temp_new = random.choice(positions)
-            # self.destination = temp_new
-
             # SHORTEST waiting line as destination
-            # TODO: current attraction should not be an option, even if it has the shortest waiting line
             waiting_lines = self.model.calculate_people()
+
+            # Exclude own position
+            index_to_exclude = positions.index(self.pos)
+            waiting_lines[index_to_exclude] = max(waiting_lines)+1
+
+            # Get minimum watingtime
             minimum = min(waiting_lines)
 
             # Change current destination to new destination
@@ -107,19 +107,11 @@ class Customer(Agent):
             self.waited_period = 0
 
         if self.waiting is False:
-            self.model.grid.move_agent(self, new_position)
-
-
-    def calc_fast_route():
-        # volgens mij was het idee om iedere agent een "kaart" met te geven (dict met routes)
-        """Calculate fastest route from one attraction to another."""
-
-        pass
+            return True
+        return False
 
     def step(self):
         '''
         This method should move the customer using the `random_move()` method.
         '''
-
-
         self.move()

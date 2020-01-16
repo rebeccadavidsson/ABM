@@ -20,8 +20,8 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
-heading = (1, 0)
-waiting_times = [5.0,5.0,5.0]
+
+waiting_times = [5.0, 5.0, 5.0]
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height):
@@ -29,8 +29,6 @@ class Themepark(Model):
         self.N_cust = N_cust    # num of customer agents
         self.width = width
         self.height = height
-
-        self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))
 
         self.grid = MultiGrid(width, height, torus=False)
         print(self.grid)
@@ -58,7 +56,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, waiting_times[i],pos, name, self.N_cust, heading)
+                a = Attraction(i, self, waiting_times[i],pos, name, self.N_cust)
                 attractions[i] = a
                 print(a.waiting_time, "waitingtime")
                 self.schedule.add(a)
@@ -70,8 +68,8 @@ class Themepark(Model):
 
         for i in range(self.N_cust):
             # pos_temp = random.choice(path_coordinates)
-            print(self.N_cust,'ncust')
-            print(starting_positions)
+            # print(self.N_cust,'ncust')
+            # print(starting_positions)
             pos_temp = random.choice(starting_positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
@@ -80,7 +78,7 @@ class Themepark(Model):
             # pos = pos_temp
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
-            a = Customer(i, self, pos, heading)
+            a = Customer(i, self, pos)
             self.schedule.add(a)
             print(pos)
             self.grid.place_agent(a, pos)
