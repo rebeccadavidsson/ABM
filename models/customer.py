@@ -1,6 +1,7 @@
 from mesa import Agent
 import random
 from .route import get_coordinates
+# from model import calculate_people
 
 
 WIDTH = 26
@@ -72,17 +73,25 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig? 
+        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig?
         if self.waitingtime == self.waited_period:
 
             # Change direction
             # TODO: implementeren van de target functie
-            temp_new = random.choice(positions)
 
-            while self.destination == temp_new:
-                temp_new = random.choice(positions)
+            # RANDOM new destination
+            # temp_new = random.choice(positions)
+            # while self.destination == temp_new:
+            #     temp_new = random.choice(positions)
+            # self.destination = temp_new
 
-            self.destination = temp_new
+            # SHORTEST waiting line as destination
+            # TODO: current attraction should not be an option, even if it has the shortest waiting line
+            waiting_lines = self.model.calculate_people()
+            minimum = min(waiting_lines)
+
+            # Change current destination to new destination
+            self.destination = positions[waiting_lines.index(minimum)]
 
             self.waiting = False
             self.waited_period = 0

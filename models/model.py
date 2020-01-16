@@ -34,6 +34,7 @@ class Themepark(Model):
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))
 
         self.grid = MultiGrid(width, height, torus=False)
+        print(self.grid)
         self.schedule = BaseScheduler(self)
 
         self.attractions = self.make_attractions()
@@ -71,8 +72,8 @@ class Themepark(Model):
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
-            # pos = (rand_x, rand_y)
-            pos = pos_temp
+            pos = (rand_x, rand_y)
+            # pos = pos_temp
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
             a = Customer(i, self, pos, heading)
