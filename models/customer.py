@@ -73,6 +73,8 @@ class Customer(Agent):
     def check_move(self, new_position):
         """ Checks if a move can be done, given a new position."""
 
+
+        # TODO: de eerste keer dat dit zo is moet de attractie queue worden geupdated
         if self.pos == self.destination:
             self.waited_period += 1
 
@@ -90,6 +92,8 @@ class Customer(Agent):
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
+
+            # TODO: reduce number of customers in attraction
 
             # SHORTEST waiting line as destination
             waiting_lines = self.model.calculate_people()
@@ -133,3 +137,27 @@ class Customer(Agent):
         This method should move the customer using the `random_move()` method.
         '''
         self.move()
+
+
+    # TODO: DIT IS ALLEMAAL NOG NIET GETEST WANT WEET EVEN NIET HOE IK BIJ
+    # ATTRACTIES KOM EN ER IS SEMINAR STRESS DUS WIL NIEMAND AFLEIDEN XO
+    def set_waiting_time(self, attractions):
+        '''
+        This method calculates the waiting time of the customer based on the
+        number of customers in line, and the duration of the attraction
+        '''
+        # get duration of attraction
+        for attraction in attractions:
+            if attraction.pos == self.pos:
+                current_a = i
+
+        duration = current_a.attraction_duration
+
+        # get number of customers in line
+        current_customers = current_a.N_current_cust
+
+        # calculate waitingtime
+        waitingtime = duration * current_customers
+
+        # add waiting time to agent
+        self.waitingtime = waitingtime
