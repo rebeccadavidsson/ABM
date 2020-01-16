@@ -1,6 +1,7 @@
 from mesa import Agent
 import random
 from .route import get_coordinates
+# from model import calculate_people
 
 
 WIDTH = 26
@@ -72,17 +73,49 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig? 
+        # TODO: Get waitingtime from attraction, not from customer. Dus model.grid nodig?
         if self.waitingtime == self.waited_period:
 
             # Change direction
             # TODO: implementeren van de target functie
-            temp_new = random.choice(positions)
 
-            while self.destination == temp_new:
-                temp_new = random.choice(positions)
+            # RANDOM new destination
+            # temp_new = random.choice(positions)
+            # while self.destination == temp_new:
+            #     temp_new = random.choice(positions)
+            # self.destination = temp_new
 
-            self.destination = temp_new
+            # SHORTEST waiting line as destination
+            # TODO: current attraction should not be an option, even if it has the shortest waiting line
+            waiting_lines = self.model.calculate_people()
+            minimum = min(waiting_lines)
+
+            # Change current destination to new destination
+            self.destination = positions[waiting_lines.index(minimum)]
+
+            # If new destination is current attraction choose second closest
+            if self.pos == self.destination:
+                print("test new position")
+                print("previous dest", self.destination)
+                second_shortest = sorted(waiting_lines)[1]
+
+                # check if two waiting times are of same length
+                indexi = []
+                for i in range(len(waiting_lines)):
+                    if waiting_lines[i] == second_shortest:
+                        indexi.append(i)
+                if len(indexi) > 1:
+                    print("gelijke lines")
+                    print(waiting_lines, indexi)
+                    for i in indexi:
+                        print(positions[i])
+                        if positions[i] != self.pos:
+                            print("kom ik hier???????????")
+                            self.destination = positions[waiting_lines[i]]
+                            break
+                else:
+                    self.destination = positions[waiting_lines.index(second_shortest)]
+                print("new dest", self.destination)
 
             self.waiting = False
             self.waited_period = 0
