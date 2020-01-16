@@ -95,8 +95,6 @@ class Customer(Agent):
 
             # If new destination is current attraction choose second closest
             if self.pos == self.destination:
-                print("test new position")
-                print("previous dest", self.destination)
                 second_shortest = sorted(waiting_lines)[1]
 
                 # check if two waiting times are of same length
@@ -105,17 +103,12 @@ class Customer(Agent):
                     if waiting_lines[i] == second_shortest:
                         indexi.append(i)
                 if len(indexi) > 1:
-                    print("gelijke lines")
-                    print(waiting_lines, indexi)
                     for i in indexi:
-                        print(positions[i])
                         if positions[i] != self.pos:
-                            print("kom ik hier???????????")
                             self.destination = positions[waiting_lines[i]]
                             break
                 else:
                     self.destination = positions[waiting_lines.index(second_shortest)]
-                print("new dest", self.destination)
 
             self.waiting = False
             self.waited_period = 0

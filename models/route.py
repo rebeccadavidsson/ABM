@@ -68,7 +68,7 @@ def get_coordinates(width, height):
     #                 find_route[current_location] = grid_matrix[current_location[0]+1][current_location[1]]
     #             except:
     #                 None
-    #
+    #  #commit
     #             try:
     #                 if grid_matrix[current_location[0]+1][current_location[1]] is not 0:
     #                     find_route[current_location] = grid_matrix[current_location[0]][current_location[1]+1]
