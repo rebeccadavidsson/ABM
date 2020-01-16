@@ -89,7 +89,7 @@ class Themepark(Model):
             agents = self.grid.get_neighbors(
                 attraction_pos,
                 moore=True,
-                radius=1,
+                radius=0,
                 include_center=True
             )
 
