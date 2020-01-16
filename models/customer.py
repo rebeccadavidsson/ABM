@@ -1,7 +1,8 @@
 from mesa import Agent
 import random
 from .route import get_coordinates
-from .attraction import Attraction
+# from model import calculate_people
+
 
 WIDTH = 26
 HEIGHT = 26
@@ -11,6 +12,7 @@ path_coordinates = get_coordinates(WIDTH, HEIGHT)
 x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
+
 
 
 class Customer(Agent):
@@ -102,6 +104,23 @@ class Customer(Agent):
 
             # Change current destination to new destination
             self.destination = positions[waiting_lines.index(minimum)]
+
+            # If new destination is current attraction choose second closest
+            if self.pos == self.destination:
+                second_shortest = sorted(waiting_lines)[1]
+
+                # check if two waiting times are of same length
+                indexi = []
+                for i in range(len(waiting_lines)):
+                    if waiting_lines[i] == second_shortest:
+                        indexi.append(i)
+                if len(indexi) > 1:
+                    for i in indexi:
+                        if positions[i] != self.pos:
+                            self.destination = positions[waiting_lines[i]]
+                            break
+                else:
+                    self.destination = positions[waiting_lines.index(second_shortest)]
 
             self.waiting = False
             self.waited_period = 0
