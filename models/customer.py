@@ -1,6 +1,7 @@
 from mesa import Agent
 import random
 from .route import get_coordinates
+from .attraction import Attraction
 # from model import calculate_people
 
 
@@ -96,8 +97,8 @@ class Customer(Agent):
             waiting_lines = self.model.calculate_people()
 
             # Exclude own position
-            index_to_exclude = positions.index(self.pos)
-            waiting_lines[index_to_exclude] = max(waiting_lines)+1
+            # index_to_exclude = positions.index(self.pos)
+            # waiting_lines[index_to_exclude] = max(waiting_lines)+1
 
             # Get minimum watingtime
             minimum = min(waiting_lines)
