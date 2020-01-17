@@ -4,12 +4,13 @@ from .route import get_coordinates, Route
 from .attraction import Attraction
 # from model import calculate_people
 
+
+# TODO NIEUWE MENSEN IN HET PARK LATEN KOMEN
 WIDTH = 36
 HEIGHT = 36
 NUM_ATTRACTIONS = 5
 NUM_OBSTACLES = 20
-starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
-
+starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 class Customer(Agent):
     def __init__(self, unique_id, model, pos, x_list, y_list, positions):
@@ -86,16 +87,12 @@ class Customer(Agent):
 
         if new_position == self.destination and self.waiting is False:
 
-            if self.leaving is True:
-
+            if self.leaving == True:
                 self.model.schedule.remove(self)
                 # TODO: stip ook verwijderen
             else:
-                # TODO: is dit de goede plek om deze aan te roepen?
-                # Sanne: jaaaa, ik had onder de douche ook al bedacht dat die zo kon hihihi
-                self.set_waiting_time()
-
                 self.model.grid.move_agent(self, new_position)
+                self.set_waiting_time()
                 self.waiting = True
 
         # Extra check to see if agent is at destination
@@ -110,24 +107,24 @@ class Customer(Agent):
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
-        if self.waitingtime == self.waited_period:
+        if self.waitingtime is not None:
 
-            # Update goals
-            for attraction in self.goals:
-                if attraction.pos == self.pos:
-                    self.goals.remove(attraction)
+            if self.waitingtime <= self.waited_period:
 
-            # Check if agent needs to leave or go to new goal
-            if len(self.goals) > 0:
-                self.get_destination()
-            else:
-                # TODO: agent has to leave the park
-                # print("AGENT SHOULD LEAVE")
-                # get leave positions
-                # choose a random leave position to go to
-                self.leaving = True
-                self.destination = random.choice(starting_positions)
-                self.waiting = False
+                # Update goals and attraction
+                for attraction in self.goals:
+                    if attraction.pos == self.pos:
+                        self.goals.remove(attraction)
+                        attraction.N_current_cust -= 1
+                        attraction.calculate_waiting_time()
+
+                # Check if agent needs to leave or go to new goal
+                if len(self.goals) > 0:
+                    self.get_destination()
+                else:
+                    self.leaving = True
+                    self.destination = random.choice(starting_positions)
+                    self.waiting = False
 
         if self.waiting is False:
             return True
@@ -138,20 +135,33 @@ class Customer(Agent):
         This method calculates the waiting time of the customer based on the
         number of customers in line, and the duration of the attraction
         '''
-        # get number of customers in line
-        waiting_lines = self.model.calculate_people()
+        attractions = self.model.get_attractions()
+        attraction = None
+        for i in attractions:
+            if self.pos == i.pos:
+                attraction = i
+                break
 
-        # get attraction durations
-        durations = self.model.get_durations()
+        self.waitingtime = attraction.current_waitingtime
 
-        # get current attraction from destination
-        index = self.positions.index(self.destination)
+        # Update waitingtime of attraction
+        attraction.N_current_cust += 1
+        attraction.calculate_waiting_time()
 
-        # calculate waitingtime
-        waitingtime = durations[index] * waiting_lines[index]
-
-        # add waiting time to agent
-        self.waitingtime = waitingtime
+        # # get number of customers in line
+        # waiting_lines = self.model.calculate_people()
+        #
+        # # get attraction durations
+        # durations = self.model.get_durations()
+        #
+        # # get current attraction from destination
+        # index = positions.index(self.destination)
+        #
+        # # calculate waitingtime
+        # waitingtime = durations[index] * waiting_lines[index]
+        #
+        # # add waiting time to agent
+        # self.waitingtime = waitingtime
 
     def step(self):
         '''
@@ -170,12 +180,8 @@ class Customer(Agent):
             self.destination == self.goals[0].pos
             self.goals = []
         else:
-            # TODO: current_waitingtime in attracties updaten
-
             destinations = []
             for attraction in self.goals:
-                # time_to_wait = attraction.current_waitingtime
-                # waiting_lines.append(time_to_wait)
                 destinations.append(attraction)
 
             # Get minimum watingtime
@@ -185,7 +191,6 @@ class Customer(Agent):
             minimum = min(waiting_lines)
 
             # Change current destination to new destination
-            # self.destination = positions[waiting_lines.index(minimum)]
             self.destination = destinations[waiting_lines.index(minimum)].pos
 
             # If new destination is current attraction choose second closest

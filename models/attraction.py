@@ -15,9 +15,7 @@ class Attraction(Agent):
         self.pos = pos
         self.model = model
 
-        # self.waiting_time = random.randrange(10, 20)
-        # TODO: volgens mij kan waiting_time weg? Want is ook in customers en we
-        # hebben ook al attraction_duration
+        # TODO: current_waitingtime moet worden geupdated in customer.py
         self.current_waitingtime = 0
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)
