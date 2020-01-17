@@ -71,7 +71,6 @@ class Customer(Agent):
 
         # start with random choice of position
         temp = random.choice(possible_steps)
-        temp_list = []
 
         # Loop over every possible step to get fastest step
         for step in possible_steps:
@@ -81,17 +80,19 @@ class Customer(Agent):
                abs(step[1] - self.destination[1]) < abs(temp[1] - self.destination[1])):
 
                temp = step
-               temp_list.append(temp)
 
         new_position = temp
 
         if new_position == self.destination and self.waiting is False:
 
-            if self.leaving == True:
+            if self.leaving is True:
                 self.model.schedule.remove(self)
                 # TODO: stip ook verwijderen
             else:
+
+                # Only move if there is no queue
                 self.model.grid.move_agent(self, new_position)
+
                 self.set_waiting_time()
                 self.waiting = True
 
@@ -115,7 +116,8 @@ class Customer(Agent):
                 for attraction in self.goals:
                     if attraction.pos == self.pos:
                         self.goals.remove(attraction)
-                        attraction.N_current_cust -= 1
+                        if attraction.N_current_cust != 1:
+                            attraction.N_current_cust -= 1
                         attraction.calculate_waiting_time()
 
                 # Check if agent needs to leave or go to new goal
@@ -149,19 +151,19 @@ class Customer(Agent):
         attraction.calculate_waiting_time()
 
         # # get number of customers in line
-        # waiting_lines = self.model.calculate_people()
-        #
-        # # get attraction durations
-        # durations = self.model.get_durations()
-        #
-        # # get current attraction from destination
-        # index = positions.index(self.destination)
-        #
-        # # calculate waitingtime
-        # waitingtime = durations[index] * waiting_lines[index]
-        #
-        # # add waiting time to agent
-        # self.waitingtime = waitingtime
+        waiting_lines = self.model.calculate_people()
+
+        # get attraction durations
+        durations = self.model.get_durations()
+
+        # get current attraction from destination
+        index = self.positions.index(self.destination)
+
+        # calculate waitingtime
+        waitingtime = durations[index] * waiting_lines[index]
+
+        # add waiting time to agent
+        self.waitingtime = waitingtime
 
     def step(self):
         '''
@@ -177,17 +179,16 @@ class Customer(Agent):
 
         # TODO hihi even gehardcoded dit, als jullie dat te lelijk vinden mag het anders
         if len(self.goals) == 1:
-            self.destination == self.goals[0].pos
+            self.destination = self.goals[0].pos
             self.goals = []
         else:
-            destinations = []
-            for attraction in self.goals:
-                destinations.append(attraction)
+            destinations, waiting_lines = [], []
+            [destinations.append(attraction) for attraction in self.goals]
 
             # Get minimum watingtime
             waiting_lines = []
-            for destination in destinations:
-                waiting_lines.append(destination.current_waitingtime)
+            [waiting_lines.append(dest.current_waitingtime) for dest in destinations]
+
             minimum = min(waiting_lines)
 
             # Change current destination to new destination
@@ -203,12 +204,14 @@ class Customer(Agent):
                     if waiting_lines[i] == second_shortest:
                         indexi.append(i)
                 if len(indexi) > 1:
+                    # TODO: volgens mij kan deze hele for-loop weg...
                     for i in indexi:
                         if self.positions[i] != self.pos:
-                            self.destination = positions[i]
+                            self.destination = self.positions[i]
                             break
                 else:
                     self.destination = self.positions[waiting_lines.index(second_shortest)]
 
         self.waiting = False
         self.waited_period = 0
+        return False
