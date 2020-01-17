@@ -74,7 +74,7 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 20, 50)
+histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3", "Attraction4", "Attraction5"], 20, 50)
 
 
 server = ModularServer(
