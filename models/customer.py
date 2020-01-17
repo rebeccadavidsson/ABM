@@ -27,7 +27,7 @@ class Customer(Agent):
             self.destination = random.choice(positions)
 
         # TODO: Hoe lang blijven de mensen in de attractie?
-        self.waitingtime = random.randrange(20, 30)
+        # self.waitingtime = random
         self.waiting = False
 
         # Start waited period with zero
@@ -66,9 +66,6 @@ class Customer(Agent):
 
         if new_position == self.destination and self.waiting is False:
 
-            # TODO: is dit de goede plek om deze aan te roepen?
-            self.set_waiting_time()
-
             self.model.grid.move_agent(self, new_position)
             self.waiting = True
 
@@ -82,6 +79,9 @@ class Customer(Agent):
 
         if self.pos == self.destination:
             self.waited_period += 1
+
+            # TODO: is dit de goede plek om deze aan te roepen?
+            self.set_waiting_time()
 
         # Get waitingtime from attraction
         agents = self.model.grid.get_neighbors(
@@ -97,13 +97,9 @@ class Customer(Agent):
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
-
+            print(self.waited_period, self.waited_period, "IK KOM HIER")
             # SHORTEST waiting line as destination
             waiting_lines = self.model.calculate_people()
-
-            # Exclude own position
-            # index_to_exclude = positions.index(self.pos)
-            # waiting_lines[index_to_exclude] = max(waiting_lines)+1
 
             # Get minimum watingtime
             minimum = min(waiting_lines)
@@ -130,6 +126,7 @@ class Customer(Agent):
 
             self.waiting = False
             self.waited_period = 0
+            self.current_a = None
 
         if self.waiting is False:
             return True
@@ -159,7 +156,6 @@ class Customer(Agent):
 
         # add waiting time to agent
         self.waitingtime = waitingtime
-        print(waitingtime, waiting_lines, index)
 
     def step(self):
         '''
