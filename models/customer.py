@@ -38,6 +38,10 @@ class Customer(Agent):
         self.waited_period = 0
         self.current_a = None
 
+        # Set goals
+        # self.goals = pak random attracties
+        # self.reached_goals = False
+
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),

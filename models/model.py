@@ -20,6 +20,8 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
+mid_point = (13, 13)
+RADIUS = 15
 
 waiting_times = [5.0, 5.0, 5.0]
 
@@ -61,6 +63,23 @@ class Themepark(Model):
                 print(a.waiting_time, "waitingtime")
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
+        return attractions
+
+    def get_attractions(self):
+        """
+        Get a list with all attractions
+        """
+        agents = self.grid.get_neighbors(
+            mid_point,
+            moore=True,
+            radius=RADIUS,
+            include_center = True)
+
+        attractions = []
+        for agent in agents:
+            if type(agent) == Attraction:
+                attractions.append(agent)
+
         return attractions
 
     def add_customers(self):
