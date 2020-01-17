@@ -28,18 +28,20 @@ def agent_draw(agent):
         # portrayal["r"] = 0.15
 
     elif type(agent) is Attraction:
-        portrayal["Shape"] = "circle"
         portrayal["Color"] = "gold"
+        portrayal["Shape"] = "circle"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 1
         portrayal["r"] = 1
 
     elif type(agent) is Customer:
+
+        portrayal["text"] = agent.unique_id
+        portrayal["text_color"] = "black",
         portrayal["Shape"] = "circle"
         portrayal["Color"] = "red"
-        portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
-        portrayal["r"] = 0.45
+        portrayal["r"] = 0.85
 
     return portrayal
 
@@ -70,7 +72,7 @@ class HistogramModule(VisualizationElement):
 width = 26
 height = 26
 N_attr = 3
-N_cust = 30
+N_cust = 15
 pixel_ratio = 26
 
 
