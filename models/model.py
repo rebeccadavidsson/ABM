@@ -60,7 +60,7 @@ class Themepark(Model):
                 name = str(i)
                 a = Attraction(i, self, waiting_times[i],pos, name, self.N_cust)
                 attractions[i] = a
-                print(a.waiting_time, "waitingtime")
+                print(a.current_waitingtime, "waitingtime")
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
