@@ -16,7 +16,7 @@ positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/
 
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
-
+# TODO NIEUWE MENSEN IN HET PARK LATEN KOMEN
 
 class Customer(Agent):
     def __init__(self, unique_id, model, pos):
@@ -93,12 +93,9 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
 
             if self.leaving == True:
-                print("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST")
                 self.model.schedule.remove(self)
                 # TODO: stip ook verwijderen
             else:
-                # TODO: is dit de goede plek om deze aan te roepen?
-                # Sanne: jaaaa, ik had onder de douche ook al bedacht dat die zo kon hihihi
                 self.set_waiting_time()
 
                 self.model.grid.move_agent(self, new_position)
@@ -116,24 +113,22 @@ class Customer(Agent):
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
-        if self.waitingtime == self.waited_period:
+        if self.waitingtime is not None:
 
-            # Update goals
-            for attraction in self.goals:
-                if attraction.pos == self.pos:
-                    self.goals.remove(attraction)
+            if self.waitingtime <= self.waited_period:
 
-            # Check if agent needs to leave or go to new goal
-            if len(self.goals) > 0:
-                self.get_destination()
-            else:
-                # TODO: agent has to leave the park
-                print("AGENT SHOULD LEAVE")
-                # get leave positions
-                # choose a random leave position to go to
-                self.leaving = True
-                self.destination = random.choice(starting_positions)
-                self.waiting = False
+                # Update goals
+                for attraction in self.goals:
+                    if attraction.pos == self.pos:
+                        self.goals.remove(attraction)
+
+                # Check if agent needs to leave or go to new goal
+                if len(self.goals) > 0:
+                    self.get_destination()
+                else:
+                    self.leaving = True
+                    self.destination = random.choice(starting_positions)
+                    self.waiting = False
 
         if self.waiting is False:
             return True
