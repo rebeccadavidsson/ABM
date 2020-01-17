@@ -1,20 +1,15 @@
 from mesa import Agent
 import random
-from .route import get_coordinates
+from .route import get_attraction_coordinates
 
-
-WIDTH = 26
-HEIGHT = 26
-
-path_coordinates = get_coordinates(WIDTH, HEIGHT)
-
-x_list = [1, int(WIDTH/2), WIDTH-1]
-y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
+WIDTH = 36
+HEIGHT = 36
+RADIUS = 15
+NUM_OBSTACLES = 80
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, current_waitingtime, pos, name, N_cust, heading=(1, 0)):
+    def __init__(self, unique_id, model, waiting_time, pos, name, N_cust):
         super().__init__(unique_id, model)
         self.name = name
         self.pos = pos

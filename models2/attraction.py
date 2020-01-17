@@ -6,13 +6,6 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 80
-NUM_ATTRACTIONS = 5
-waiting_times = [5.0, 5.0, 5.0]
-
-
-# x_list = [1, int(WIDTH/2), WIDTH-1]
-# y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-# positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
 
 class Attraction(Agent):

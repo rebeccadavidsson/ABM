@@ -1,5 +1,11 @@
 from mesa import Agent
 import numpy as np
+import random
+
+WIDTH = 36
+HEIGHT = 36
+starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
+
 
 class Route(Agent):
     def __init__(self, unique_id, model, pos):
@@ -8,84 +14,37 @@ class Route(Agent):
         self.model = model
 
 
-def get_coordinates(width, height):
+def get_coordinates(width, height, num_obstacles, num_attractions):
     """Calculate the coordinates of a route, given the
     width and height of a grid."""
 
     coordinates = []
 
-    for i in range(width):
+    positions = get_attraction_coordinates(width, height, num_attractions)[2]
 
-        temp = width
-        coordinates.append((i, int(temp / 2)))
-        coordinates.append((i, int(temp / 2) + 1))
-        coordinates.append((i, int(temp / 2) - 1))
-        coordinates.append((int(temp / 2), i))
-        coordinates.append((int(temp / 2) + 1, i))
-        coordinates.append((int(temp / 2) - 1, i))
+    for i in range(num_obstacles):
+        coordinate = (random.randrange(width), random.randrange(height))
 
-        coordinates.append((int(temp / 2) + 2, int(temp / 2) + 2))
-        coordinates.append((int(temp / 2) - 2, int(temp / 2) - 2))
-        coordinates.append((int(temp / 2) - 2, int(temp / 2) + 2))
-        coordinates.append((int(temp / 2) + 2, int(temp / 2) - 2))
-        temp += 1
-    #
-    # een extra comment omdat ik antwoord wil geven op de commit vraag
-    # POGING TOT EEN ROUTE-ALGORITME
-    # grid_matrix = np.zeros((5, 5))
-    # for i in range(5):
-    #
-    #     temp = 5
-    #     grid_matrix[int(temp/2), i] = 1
-    #     grid_matrix[int(temp / 2) + 1,i ] = 1
-    #     # grid_matrix[int(temp / 2) - 1,i ] = 1
-    #     grid_matrix[i, int(temp / 2)] = 1
-    #     grid_matrix[i, int(temp / 2) + 1] = 1
-    #     # grid_matrix[i, int(temp / 2) - 1] = 1
-    #     temp += 1
-    # print(grid_matrix)
-    #
-    # attractions = [(0,3), (3,0), (3,5)]
-    # middle = (3,3)
+        # TODO: checken of het overlapt met andere agents
+        while coordinate in positions or coordinate in starting_positions:
+            coordinate = (random.randrange(width), random.randrange(height))
 
-    # routes_dict = {}
-    # for i in range(len(attractions)):
-    #     routes_dict[i] = {}
-    #     for j in range(len(attractions)):
-    #         routes_dict[i][j] = []
-    # print(routes_dict)
-    #
-    # current_location = None
-    # find_route = {}
-    # for attr in attractions:
-    #     current_location = attr
-    #
-    #     while current_location is not middle:
-    #         for i in range(8):
-    #
-    #             try:
-    #                 if grid_matrix[current_location[0]+1][current_location[1]] is not 0:
-    #                 find_route[current_location] = grid_matrix[current_location[0]+1][current_location[1]]
-    #             except:
-    #                 None
-    #  #commit
-    #             try:
-    #                 if grid_matrix[current_location[0]+1][current_location[1]] is not 0:
-    #                     find_route[current_location] = grid_matrix[current_location[0]][current_location[1]+1]
-    #             except:
-    #                 None
-    #
-    #             try:
-    #                 if grid_matrix[current_location[0]+1][current_location[1]] is not 0:
-    #                     find_route[current_location] = grid_matrix[current_location[0]-1][current_location[1]]
-    #             except:
-    #                 None
-    #
-    #             try:
-    #                 if grid_matrix[current_location[0]+1][current_location[1]] is not 0:
-    #                     find_route[current_location]= grid_matrix[current_location[0]][current_location[1]-1]
-    #             except:
-    #                 None
-    #
+        coordinates.append((random.randrange(width), random.randrange(height)))
 
     return coordinates
+
+
+def get_attraction_coordinates(width, height, num_attractions):
+    """Generate random coordinates for attractions."""
+    # TODO: minder random, checken dat ze niet te dicht bij elkaar mogen.
+
+    xlist, ylist, total = [], [], []
+
+    for i in range(num_attractions):
+        xlist.append(random.randrange(0, width))
+        ylist.append(random.randrange(10, height))
+
+    for i in range(num_attractions):
+        total.append((xlist[i], ylist[i]))
+
+    return xlist, ylist, total

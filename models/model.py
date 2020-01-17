@@ -7,23 +7,25 @@ from collections import Counter
 import matplotlib.pylab as plt
 import random
 import numpy as np
-from .route import get_coordinates, Route
+from .route import get_coordinates, get_attraction_coordinates, Route
 from .customer import Customer
 from .attraction import Attraction
 
-WIDTH = 26
-HEIGHT = 26
-
-path_coordinates = get_coordinates(WIDTH, HEIGHT)
-
-x_list = [1, int(WIDTH/2), WIDTH-1]
-y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
-starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
-mid_point = (13, 13)
+WIDTH = 36
+HEIGHT = 36
 RADIUS = 15
+NUM_OBSTACLES = 5
+NUM_ATTRACTIONS = 5
+RADIUS = int(WIDTH/2)
+waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0]
 
-waiting_times = [5.0, 5.0, 5.0]
+
+x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS)
+starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
+mid_point = (int(WIDTH/2), int(HEIGHT/2))
+
+
+path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS)
 
 
 class Themepark(Model):
@@ -34,7 +36,6 @@ class Themepark(Model):
         self.height = height
 
         self.grid = MultiGrid(width, height, torus=False)
-        print(self.grid)
         self.schedule = BaseScheduler(self)
 
         self.attractions = self.make_attractions()
@@ -43,9 +44,6 @@ class Themepark(Model):
         self.add_customers()
 
         self.running = True
-        # self.datacollector = DataCollector(
-        #     {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
-        #      "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -59,9 +57,9 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, waiting_times[i],pos, name, self.N_cust)
+                a = Attraction(i, self, waiting_times[i], pos, name, self.N_cust)
                 attractions[i] = a
-                print(a.current_waitingtime, "waitingtime")
+
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
@@ -74,7 +72,7 @@ class Themepark(Model):
             mid_point,
             moore=True,
             radius=RADIUS,
-            include_center = True)
+            include_center=True)
 
         attractions = []
         for agent in agents:
@@ -87,20 +85,18 @@ class Themepark(Model):
         """ Initialize customers on random positions."""
 
         for i in range(self.N_cust):
-            # pos_temp = random.choice(path_coordinates)
-            # print(self.N_cust,'ncust')
-            # print(starting_positions)
+
             pos_temp = random.choice(starting_positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
             pos = (rand_x, rand_y)
-            # pos = pos_temp
+
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
-            a = Customer(i, self, pos)
+            a = Customer(i, self, pos, x_list, y_list, positions)
             self.schedule.add(a)
-            print(pos)
+
             self.grid.place_agent(a, pos)
 
     def calculate_people(self):
@@ -152,11 +148,13 @@ class Themepark(Model):
         for i in range(len(path_coordinates)):
             pos = path_coordinates[i]
 
-            # Create path agent?
-            path = Route(i, self, pos)
-            self.schedule.add(path)
+            if pos not in positions:
 
-            self.grid.place_agent(path, pos)
+                # Create path agent
+                path = Route(i, self, pos)
+                self.schedule.add(path)
+
+                self.grid.place_agent(path, pos)
 
     def step(self):
         """Advance the model by one step."""

@@ -46,9 +46,7 @@ class Themepark(Model):
         self.add_customers()
 
         self.running = True
-        # self.datacollector = DataCollector(
-        #     {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
-        #      "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
+
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -90,20 +88,18 @@ class Themepark(Model):
         """ Initialize customers on random positions."""
 
         for i in range(self.N_cust):
-            # pos_temp = random.choice(path_coordinates)
-            # print(self.N_cust,'ncust')
-            # print(starting_positions)
+
             pos_temp = random.choice(starting_positions)
             rand_x = pos_temp[0]
             rand_y = pos_temp[1]
 
             pos = (rand_x, rand_y)
-            # pos = pos_temp
+
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
             a = Customer(i, self, pos, x_list, y_list, positions)
             self.schedule.add(a)
-            print(pos)
+
             self.grid.place_agent(a, pos)
 
     def calculate_people(self):
@@ -165,5 +161,4 @@ class Themepark(Model):
 
     def step(self):
         """Advance the model by one step."""
-        # self.datacollector.collect(self)
         self.schedule.step()

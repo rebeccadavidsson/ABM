@@ -9,8 +9,12 @@ from .customer import Customer
 from .route import Route
 from .attraction import Attraction
 
-NUM_ATTRACTIONS = 3
-num_agents = 3
+width = 36
+height = 36
+N_attr = 5
+N_cust = 15
+pixel_ratio = 20
+num_agents = 5
 
 
 def agent_draw(agent):
@@ -68,17 +72,7 @@ class HistogramModule(VisualizationElement):
         data = model.calculate_people()
         return data
 
-
-width = 26
-height = 26
-N_attr = 3
-N_cust = 15
-pixel_ratio = 26
-
-
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
-# chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
-#                              {"Label": "Sheep", "Color": "#666666"}])
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 20, 50)
 
