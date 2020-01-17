@@ -16,13 +16,14 @@ HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 5
 NUM_ATTRACTIONS = 5
-RADIUS = int(WIDTH/2)
 waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0]
 
 
 x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS)
+
+# positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
-mid_point = (int(WIDTH/2), int(HEIGHT/2))
+mid_point = (WIDTH/2, HEIGHT/2)
 
 
 path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS)
@@ -36,6 +37,7 @@ class Themepark(Model):
         self.height = height
 
         self.grid = MultiGrid(width, height, torus=False)
+        print(self.grid)
         self.schedule = BaseScheduler(self)
 
         self.attractions = self.make_attractions()
@@ -44,6 +46,7 @@ class Themepark(Model):
         self.add_customers()
 
         self.running = True
+
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -59,7 +62,7 @@ class Themepark(Model):
                 name = str(i)
                 a = Attraction(i, self, waiting_times[i], pos, name, self.N_cust)
                 attractions[i] = a
-
+                print(a.waiting_time, "waitingtime")
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
@@ -117,10 +120,7 @@ class Themepark(Model):
             for agent in agents:
                 if type(agent) is Customer:
                     counter += 1
-                else:
-                    attraction = agent
 
-            attraction.N_current_cust = counter
             counter_total[attraction_pos] = counter
 
         return list(counter_total.values())
@@ -161,5 +161,4 @@ class Themepark(Model):
 
     def step(self):
         """Advance the model by one step."""
-        # self.datacollector.collect(self)
         self.schedule.step()

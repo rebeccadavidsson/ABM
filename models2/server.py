@@ -37,6 +37,8 @@ def agent_draw(agent):
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 1
         portrayal["r"] = 1
+        portrayal["text"] = agent.waiting_time
+        portrayal["text_color"] = "black",
 
     elif type(agent) is Customer:
 
@@ -57,7 +59,7 @@ class HistogramModule(VisualizationElement):
     def __init__(self, bins, canvas_height, canvas_width):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        self.bins = ["Attraction1", "Attraction2", "Attraction3"]
+        self.bins = ["Attraction1", "Attraction2", "Attraction3", "Attraction4", "Attraction5"]
         self.data = [] # TODO
         new_element = "new HistogramModule({}, {}, {}, {})"
         new_element = new_element.format(bins,
@@ -72,7 +74,9 @@ class HistogramModule(VisualizationElement):
         data = model.calculate_people()
         return data
 
+
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
+
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3", "Attraction4", "Attraction5"], 20, 50)
 

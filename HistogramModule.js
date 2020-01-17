@@ -2,13 +2,14 @@ var HistogramModule = function(bins, canvas_width, canvas_height, data) {
 
     // Create the tag:
     var canvas_tag = "<canvas id='canvas' width='" + canvas_width + "' height='" + canvas_height + "' ";
-    canvas_tag += "style='position:absolute'></canvas>";
+    canvas_tag += "></canvas>";
     // Append it to body:
     var canvas = $(canvas_tag)[0];
     $("body").append(canvas);
 
     // Create the context and the drawing controller:
     var context = canvas.getContext("2d");
+    canvas.width = canvas_width
 
     // Prep the chart properties and series:
     var datasets = [{

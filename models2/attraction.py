@@ -15,15 +15,10 @@ class Attraction(Agent):
         self.pos = pos
         self.model = model
 
-        # TODO: current_waitingtime moet worden geupdated in customer.py
-        self.current_waitingtime = 0
+        # self.waiting_time = random.randrange(10, 20)
+        # TODO: volgens mij kan waiting_time weg? Want is ook in customers en we
+        # hebben ook al attraction_duration
+        self.waiting_time = waiting_time
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)
         self.N_current_cust = 0
-
-    def calculate_waiting_time(self):
-        '''
-        Calculates current waiting_time of the attraction
-        '''
-        waitingtime = self.N_current_cust * self.attraction_duration
-        self.current_waitingtime = waitingtime

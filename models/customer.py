@@ -1,28 +1,26 @@
 from mesa import Agent
 import random
-from .route import get_coordinates
+from .route import get_coordinates, Route
 from .attraction import Attraction
 # from model import calculate_people
 
 
-WIDTH = 26
-HEIGHT = 26
-
-path_coordinates = get_coordinates(WIDTH, HEIGHT)
-
-x_list = [1, int(WIDTH/2), WIDTH-1]
-y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
-
+# TODO NIEUWE MENSEN IN HET PARK LATEN KOMEN
+WIDTH = 36
+HEIGHT = 36
+NUM_ATTRACTIONS = 5
+NUM_OBSTACLES = 20
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
-# TODO NIEUWE MENSEN IN HET PARK LATEN KOMEN
-
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
+        self.unique_id = unique_id
+        self.x_list = x_list
+        self.y_list = y_list
+        self.positions = positions
 
         # Assign destination
         self.destination = random.choice(positions)
@@ -60,6 +58,16 @@ class Customer(Agent):
             moore=True,
             include_center=False
         )
+        obstacles_check = self.model.grid.get_neighbors(
+            self.pos,
+            moore=True,
+            include_center=False,
+            radius=1
+        )
+
+        for obj in obstacles_check:
+            if type(obj) is Route:
+                possible_steps.remove(obj.pos)
 
         # start with random choice of position
         temp = random.choice(possible_steps)
@@ -76,19 +84,6 @@ class Customer(Agent):
                temp_list.append(temp)
 
         new_position = temp
-
-        # TODO AAAH BLERP ZE DOEN NOG STEEDS MEGA RANDOM STAPPEN EN IK SNAP NIET WAAROM
-        # Restrict to path and take closest step possible
-        possible_step = False
-        for step in temp_list[::-1]:
-            if step in path_coordinates:
-                new_position = step
-                possible_step = True
-                break
-
-        # If none of the closer steps were possible, take a random step
-        while new_position not in path_coordinates and possible_step == False:
-            new_position = self.random.choice(possible_steps)
 
         if new_position == self.destination and self.waiting is False:
 
@@ -134,7 +129,6 @@ class Customer(Agent):
         if self.waiting is False:
             return True
         return False
-
 
     def set_waiting_time(self):
         '''
@@ -210,11 +204,11 @@ class Customer(Agent):
                         indexi.append(i)
                 if len(indexi) > 1:
                     for i in indexi:
-                        if positions[i] != self.pos:
+                        if self.positions[i] != self.pos:
                             self.destination = positions[i]
                             break
                 else:
-                    self.destination = positions[waiting_lines.index(second_shortest)]
+                    self.destination = self.positions[waiting_lines.index(second_shortest)]
 
         self.waiting = False
         self.waited_period = 0
