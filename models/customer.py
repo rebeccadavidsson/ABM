@@ -14,6 +14,7 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
+
 class Customer(Agent):
     def __init__(self, unique_id, model, pos):
         super().__init__(unique_id, model)
@@ -31,12 +32,14 @@ class Customer(Agent):
 
         # Start waited period with zero
         self.waited_period = 0
+        self.current_a = None
 
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
         select one, and move the agent to this cell.
         '''
+
         possible_steps = self.model.grid.get_neighborhood(
             self.pos,
             moore=True,
@@ -62,6 +65,10 @@ class Customer(Agent):
             new_position = self.random.choice(possible_steps)
 
         if new_position == self.destination and self.waiting is False:
+
+            # TODO: is dit de goede plek om deze aan te roepen?
+            self.set_waiting_time()
+
             self.model.grid.move_agent(self, new_position)
             self.waiting = True
 
@@ -73,8 +80,6 @@ class Customer(Agent):
     def check_move(self, new_position):
         """ Checks if a move can be done, given a new position."""
 
-
-        # TODO: de eerste keer dat dit zo is moet de attractie queue worden geupdated
         if self.pos == self.destination:
             self.waited_period += 1
 
@@ -92,8 +97,6 @@ class Customer(Agent):
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
-
-            # TODO: reduce number of customers in attraction
 
             # SHORTEST waiting line as destination
             waiting_lines = self.model.calculate_people()
@@ -132,32 +135,34 @@ class Customer(Agent):
             return True
         return False
 
+    # TODO: DIT IS ALLEMAAL NOG NIET GETEST WANT WEET EVEN NIET HOE IK BIJ
+    # ATTRACTIES KOM EN ER IS SEMINAR STRESS DUS WIL NIEMAND AFLEIDEN XO
+    # _______________________________________________________________
+    # Rebecca: Ik weet het wel hihihih ik heb het gefixt denk ik xoxoxooxox
+    def set_waiting_time(self):
+        '''
+        This method calculates the waiting time of the customer based on the
+        number of customers in line, and the duration of the attraction
+        '''
+
+        # get number of customers in line
+        waiting_lines = self.model.calculate_people()
+
+        # get attraction durations
+        durations = self.model.get_durations()
+
+        # get current attraction from destination
+        index = positions.index(self.destination)
+
+        # calculate waitingtime
+        waitingtime = durations[index] * waiting_lines[index]
+
+        # add waiting time to agent
+        self.waitingtime = waitingtime
+        print(waitingtime, waiting_lines, index)
+
     def step(self):
         '''
         This method should move the customer using the `random_move()` method.
         '''
         self.move()
-
-
-    # TODO: DIT IS ALLEMAAL NOG NIET GETEST WANT WEET EVEN NIET HOE IK BIJ
-    # ATTRACTIES KOM EN ER IS SEMINAR STRESS DUS WIL NIEMAND AFLEIDEN XO
-    def set_waiting_time(self, attractions):
-        '''
-        This method calculates the waiting time of the customer based on the
-        number of customers in line, and the duration of the attraction
-        '''
-        # get duration of attraction
-        for attraction in attractions:
-            if attraction.pos == self.pos:
-                current_a = i
-
-        duration = current_a.attraction_duration
-
-        # get number of customers in line
-        current_customers = current_a.N_current_cust
-
-        # calculate waitingtime
-        waitingtime = duration * current_customers
-
-        # add waiting time to agent
-        self.waitingtime = waitingtime

@@ -106,6 +106,26 @@ class Themepark(Model):
 
         return list(counter_total.values())
 
+    def get_durations(self):
+        """ Get duraction of every attraction in a list """
+
+        durations = []
+
+        for attraction_pos in positions:
+
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=0,
+                include_center=True
+            )
+
+            for agent in agents:
+                if type(agent) is Attraction:
+                    durations.append(agent.attraction_duration)
+
+        return durations
+
     def make_route(self):
         """Draw coordinates of a possible path."""
 
