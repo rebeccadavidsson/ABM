@@ -15,9 +15,8 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 5
-NUM_ATTRACTIONS = 5
+NUM_ATTRACTIONS = 6
 RADIUS = int(WIDTH/2)
-waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0]
 
 
 x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS)
@@ -34,6 +33,8 @@ class Themepark(Model):
         self.N_cust = N_cust    # num of customer agents
         self.width = width
         self.height = height
+        self.total_steps = 0
+        self.cust_ids = N_cust
 
         self.grid = MultiGrid(width, height, torus=False)
         self.schedule = BaseScheduler(self)
@@ -41,7 +42,7 @@ class Themepark(Model):
         self.attractions = self.make_attractions()
         self.make_attractions()
         self.make_route()
-        self.add_customers()
+        self.add_customers(self.N_cust)
 
         self.running = True
 
@@ -57,7 +58,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, waiting_times[i], pos, name, self.N_cust)
+                a = Attraction(i, self, pos, name, self.N_cust)
                 attractions[i] = a
 
                 self.schedule.add(a)
@@ -81,19 +82,20 @@ class Themepark(Model):
 
         return attractions
 
-    def add_customers(self):
+    def add_customers(self, N_cust, added=False):
         """ Initialize customers on random positions."""
 
-        for i in range(self.N_cust):
+        for i in range(N_cust):
 
             pos_temp = random.choice(starting_positions)
-            rand_x = pos_temp[0]
-            rand_y = pos_temp[1]
+            rand_x, rand_y = pos_temp[0], pos_temp[1]
 
             pos = (rand_x, rand_y)
 
             print("Creating CUSTOMER agent {2} at ({0}, {1})"
                   .format(rand_x, rand_y, i))
+            if added is True:
+                i = self.cust_ids
             a = Customer(i, self, pos, x_list, y_list, positions)
             self.schedule.add(a)
 
@@ -161,5 +163,12 @@ class Themepark(Model):
 
     def step(self):
         """Advance the model by one step."""
-        # self.datacollector.collect(self)
+
         self.schedule.step()
+
+        self.total_steps += 1
+
+        if self.total_steps > random.randrange(10, 20):
+            self.cust_ids += 1
+            self.add_customers(1, added=True)
+            self.total_steps = 0

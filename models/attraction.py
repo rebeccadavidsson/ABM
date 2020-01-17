@@ -9,7 +9,7 @@ NUM_OBSTACLES = 80
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, waiting_time, pos, name, N_cust):
+    def __init__(self, unique_id, model, pos, name, N_cust):
         super().__init__(unique_id, model)
         self.name = name
         self.pos = pos

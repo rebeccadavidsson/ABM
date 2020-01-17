@@ -12,6 +12,7 @@ NUM_ATTRACTIONS = 5
 NUM_OBSTACLES = 20
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
+
 class Customer(Agent):
     def __init__(self, unique_id, model, pos, x_list, y_list, positions):
         super().__init__(unique_id, model)
@@ -21,6 +22,9 @@ class Customer(Agent):
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
+
+        # Random if customer has the app
+        self.has_app = random.choice([True, False])
 
         # Assign destination
         self.destination = random.choice(positions)
@@ -33,6 +37,7 @@ class Customer(Agent):
         # Start waited period with zero
         self.waited_period = 0
         self.current_a = None
+        self.total_ever_waited = 0
 
         # Set random goals
         attractions = self.model.get_attractions()
@@ -78,7 +83,6 @@ class Customer(Agent):
             # check if step is closer to destination
             if (abs(step[0] - self.destination[0]) < abs(temp[0] - self.destination[0]) or
                abs(step[1] - self.destination[1]) < abs(temp[1] - self.destination[1])):
-
                temp = step
 
         new_position = temp
@@ -106,6 +110,7 @@ class Customer(Agent):
 
         if self.pos == self.destination:
             self.waited_period += 1
+            self.total_ever_waited += 1
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
