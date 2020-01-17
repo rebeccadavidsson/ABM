@@ -21,6 +21,8 @@ class Attraction(Agent):
         self.model = model
 
         # self.waiting_time = random.randrange(10, 20)
+        # TODO: volgens mij kan waiting_time weg? Want is ook in customers en we
+        # hebben ook al attraction_duration
         self.waiting_time = waiting_time
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)

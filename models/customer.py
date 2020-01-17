@@ -26,8 +26,11 @@ class Customer(Agent):
         while self.destination is self.pos:
             self.destination = random.choice(positions)
 
-        # TODO: Hoe lang blijven de mensen in de attractie?
+        # TODO: Hier gaat iets gek, als waitingtime wordt aangepast (hier) dan
+        # veranderd er iets in hoe de customers lopen. Volgens mij had annemijn
+        # ook al hier een gekke bug bij.
         self.waitingtime = random.randrange(20, 30)
+        # self.waitingtime = 0
         self.waiting = False
 
         # Start waited period with zero
@@ -48,6 +51,7 @@ class Customer(Agent):
 
         # start with random choice of position
         temp = random.choice(possible_steps)
+        temp_list = []
 
         # Loop over every possible step to get fastest step
         for step in possible_steps:
@@ -57,11 +61,23 @@ class Customer(Agent):
                abs(step[1] - self.destination[1]) < abs(temp[1] - self.destination[1])):
 
                temp = step
+               temp_list.append(temp)
+
+        print(temp_list)
 
         new_position = temp
 
-        # Restrict to path
-        while new_position not in path_coordinates:
+        # TODO AAAH BLERP ZE DOEN NOG STEEDS MEGA RANDOM STAPPEN EN IK SNAP NIET WAAROM
+        # Restrict to path and take closest step possible
+        possible_step = False
+        for step in temp_list[::-1]:
+            if step in path_coordinates:
+                new_position = step
+                possible_step = True
+                break
+
+        # If none of the closer steps were possible, take a random step
+        while new_position not in path_coordinates and possible_step == False:
             new_position = self.random.choice(possible_steps)
 
         if new_position == self.destination and self.waiting is False:
