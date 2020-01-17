@@ -34,6 +34,7 @@ def agent_draw(agent):
     elif type(agent) is Attraction:
         portrayal["Color"] = "gold"
         portrayal["Shape"] = "circle"
+        # portrayal["Shape"] = "attraction.jpg"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 1
         portrayal["r"] = 1
@@ -42,10 +43,15 @@ def agent_draw(agent):
 
         portrayal["text"] = agent.unique_id
         portrayal["text_color"] = "black",
+        # portrayal["Shape"] = "starlight.png"
         portrayal["Shape"] = "circle"
-        portrayal["Color"] = "red"
         portrayal["Layer"] = 2
         portrayal["r"] = 0.85
+
+        if agent.waiting is True:
+            portrayal["Color"] = "red"
+        else:
+            portrayal["Color"] = "green"
 
     return portrayal
 
