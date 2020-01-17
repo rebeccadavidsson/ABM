@@ -67,6 +67,7 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
 
             # TODO: is dit de goede plek om deze aan te roepen?
+            # Sanne: jaaaa, ik had onder de douche ook al bedacht dat die zo kon hihihi
             self.set_waiting_time()
 
             self.model.grid.move_agent(self, new_position)
@@ -83,17 +84,19 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # Get waitingtime from attraction
-        agents = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            radius=0,
-            include_center=True
-        )
 
-        for agent_object in agents:
-            if type(agent_object) == Attraction:
-                self.waitingtime = agent_object.waiting_time
+        # TODO: dit kan weg, maar verwijderen is altijd pijnlijk
+        # Get waitingtime from attraction
+        # agents = self.model.grid.get_neighbors(
+        #     self.pos,
+        #     moore=True,
+        #     radius=0,
+        #     include_center=True
+        # )
+        #
+        # for agent_object in agents:
+        #     if type(agent_object) == Attraction:
+        #         self.waitingtime = agent_object.waiting_time
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
@@ -123,10 +126,13 @@ class Customer(Agent):
                 if len(indexi) > 1:
                     for i in indexi:
                         if positions[i] != self.pos:
-                            self.destination = positions[waiting_lines[i]]
+                            print(i, positions, waiting_lines)
+                            self.destination = positions[i]
                             break
                 else:
                     self.destination = positions[waiting_lines.index(second_shortest)]
+
+                print(self.destination)
 
             self.waiting = False
             self.waited_period = 0
@@ -135,16 +141,12 @@ class Customer(Agent):
             return True
         return False
 
-    # TODO: DIT IS ALLEMAAL NOG NIET GETEST WANT WEET EVEN NIET HOE IK BIJ
-    # ATTRACTIES KOM EN ER IS SEMINAR STRESS DUS WIL NIEMAND AFLEIDEN XO
-    # _______________________________________________________________
-    # Rebecca: Ik weet het wel hihihih ik heb het gefixt denk ik xoxoxooxox
+
     def set_waiting_time(self):
         '''
         This method calculates the waiting time of the customer based on the
         number of customers in line, and the duration of the attraction
         '''
-
         # get number of customers in line
         waiting_lines = self.model.calculate_people()
 
