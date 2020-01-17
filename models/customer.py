@@ -14,6 +14,9 @@ x_list = [1, int(WIDTH/2), WIDTH-1]
 y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
 positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
 
+starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
+
+
 
 class Customer(Agent):
     def __init__(self, unique_id, model, pos):
@@ -27,20 +30,25 @@ class Customer(Agent):
         while self.destination is self.pos:
             self.destination = random.choice(positions)
 
-        # TODO: Hier gaat iets gek, als waitingtime wordt aangepast (hier) dan
-        # veranderd er iets in hoe de customers lopen. Volgens mij had annemijn
-        # ook al hier een gekke bug bij.
-        self.waitingtime = random.randrange(20, 30)
-        # self.waitingtime = 0
+        self.waitingtime = None
         self.waiting = False
 
         # Start waited period with zero
         self.waited_period = 0
         self.current_a = None
 
-        # Set goals
-        # self.goals = pak random attracties
-        # self.reached_goals = False
+        # Set random goals
+        attractions = self.model.get_attractions()
+        r = random.randint(1, len(attractions))
+        goals = []
+        for i in range(r):
+            rand_choice = random.choice(attractions)
+            goals.append(rand_choice)
+            attractions.remove(rand_choice)
+        self.goals = goals
+        self.reached_goals = False
+
+        self.leaving = False
 
     def move(self):
         '''
@@ -85,8 +93,17 @@ class Customer(Agent):
 
         if new_position == self.destination and self.waiting is False:
 
-            self.model.grid.move_agent(self, new_position)
-            self.waiting = True
+            if self.leaving == True:
+                print("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST")
+                self.model.schedule.remove(self)
+                # TODO: stip ook verwijderen
+            else:
+                # TODO: is dit de goede plek om deze aan te roepen?
+                # Sanne: jaaaa, ik had onder de douche ook al bedacht dat die zo kon hihihi
+                self.set_waiting_time()
+
+                self.model.grid.move_agent(self, new_position)
+                self.waiting = True
 
         # Extra check to see if agent is at destination
         if self.check_move(new_position) is True:
@@ -99,50 +116,25 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # TODO: dit kan weg, maar verwijderen is altijd pijnlijk
-        # Get waitingtime from attraction
-        # agents = self.model.grid.get_neighbors(
-        #     self.pos,
-        #     moore=True,
-        #     radius=0,
-        #     include_center=True
-        # )
-        #
-        # for agent_object in agents:
-        #     if type(agent_object) == Attraction:
-        #         self.waitingtime = agent_object.waiting_time
-
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime == self.waited_period:
-            # SHORTEST waiting line as destination
-            waiting_lines = self.model.calculate_people()
 
-            # Get minimum watingtime
-            minimum = min(waiting_lines)
+            # Update goals
+            for attraction in self.goals:
+                if attraction.pos == self.pos:
+                    self.goals.remove(attraction)
 
-            # Change current destination to new destination
-            self.destination = positions[waiting_lines.index(minimum)]
-
-            # If new destination is current attraction choose second closest
-            if self.pos == self.destination:
-                second_shortest = sorted(waiting_lines)[1]
-
-                # check if two waiting times are of same length
-                indexi = []
-                for i in range(len(waiting_lines)):
-                    if waiting_lines[i] == second_shortest:
-                        indexi.append(i)
-                if len(indexi) > 1:
-                    for i in indexi:
-                        if positions[i] != self.pos:
-                            self.destination = positions[i]
-                            break
-                else:
-                    self.destination = positions[waiting_lines.index(second_shortest)]
-
-            self.waiting = False
-            self.waited_period = 0
-            self.current_a = None
+            # Check if agent needs to leave or go to new goal
+            if len(self.goals) > 0:
+                self.get_destination()
+            else:
+                # TODO: agent has to leave the park
+                print("AGENT SHOULD LEAVE")
+                # get leave positions
+                # choose a random leave position to go to
+                self.leaving = True
+                self.destination = random.choice(starting_positions)
+                self.waiting = False
 
         if self.waiting is False:
             return True
@@ -173,3 +165,52 @@ class Customer(Agent):
         This method should move the customer using the `random_move()` method.
         '''
         self.move()
+
+    def get_destination(self):
+        '''
+        Gives the agent a new destination based on goal and waiting time
+        TODO: based on walking distance
+        '''
+
+        # TODO hihi even gehardcoded dit, als jullie dat te lelijk vinden mag het anders
+        if len(self.goals) == 1:
+            self.destination == self.goals[0].pos
+            self.goals = []
+        else:
+            # TODO: current_waitingtime in attracties updaten
+
+            destinations = []
+            for attraction in self.goals:
+                # time_to_wait = attraction.current_waitingtime
+                # waiting_lines.append(time_to_wait)
+                destinations.append(attraction)
+
+            # Get minimum watingtime
+            waiting_lines = []
+            for destination in destinations:
+                waiting_lines.append(destination.current_waitingtime)
+            minimum = min(waiting_lines)
+
+            # Change current destination to new destination
+            # self.destination = positions[waiting_lines.index(minimum)]
+            self.destination = destinations[waiting_lines.index(minimum)].pos
+
+            # If new destination is current attraction choose second closest
+            if self.pos == self.destination:
+                second_shortest = sorted(waiting_lines)[1]
+
+                # check if two waiting times are of same length
+                indexi = []
+                for i in range(len(waiting_lines)):
+                    if waiting_lines[i] == second_shortest:
+                        indexi.append(i)
+                if len(indexi) > 1:
+                    for i in indexi:
+                        if positions[i] != self.pos:
+                            self.destination = positions[i]
+                            break
+                else:
+                    self.destination = positions[waiting_lines.index(second_shortest)]
+
+        self.waiting = False
+        self.waited_period = 0
