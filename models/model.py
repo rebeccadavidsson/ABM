@@ -120,7 +120,10 @@ class Themepark(Model):
             for agent in agents:
                 if type(agent) is Customer:
                     counter += 1
+                else:
+                    attraction = agent
 
+            attraction.N_current_cust = counter
             counter_total[attraction_pos] = counter
 
         return list(counter_total.values())

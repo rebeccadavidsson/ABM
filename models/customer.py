@@ -96,9 +96,8 @@ class Customer(Agent):
                 self.model.schedule.remove(self)
                 # TODO: stip ook verwijderen
             else:
-                self.set_waiting_time()
-
                 self.model.grid.move_agent(self, new_position)
+                self.set_waiting_time()
                 self.waiting = True
 
         # Extra check to see if agent is at destination
@@ -117,10 +116,12 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
-                # Update goals
+                # Update goals and attraction
                 for attraction in self.goals:
                     if attraction.pos == self.pos:
                         self.goals.remove(attraction)
+                        attraction.N_current_cust -= 1
+                        attraction.calculate_waiting_time()
 
                 # Check if agent needs to leave or go to new goal
                 if len(self.goals) > 0:
@@ -140,20 +141,33 @@ class Customer(Agent):
         This method calculates the waiting time of the customer based on the
         number of customers in line, and the duration of the attraction
         '''
-        # get number of customers in line
-        waiting_lines = self.model.calculate_people()
+        attractions = self.model.get_attractions()
+        attraction = None
+        for i in attractions:
+            if self.pos == i.pos:
+                attraction = i
+                break
 
-        # get attraction durations
-        durations = self.model.get_durations()
+        self.waitingtime = attraction.current_waitingtime
 
-        # get current attraction from destination
-        index = positions.index(self.destination)
+        # Update waitingtime of attraction
+        attraction.N_current_cust += 1
+        attraction.calculate_waiting_time()
 
-        # calculate waitingtime
-        waitingtime = durations[index] * waiting_lines[index]
-
-        # add waiting time to agent
-        self.waitingtime = waitingtime
+        # # get number of customers in line
+        # waiting_lines = self.model.calculate_people()
+        #
+        # # get attraction durations
+        # durations = self.model.get_durations()
+        #
+        # # get current attraction from destination
+        # index = positions.index(self.destination)
+        #
+        # # calculate waitingtime
+        # waitingtime = durations[index] * waiting_lines[index]
+        #
+        # # add waiting time to agent
+        # self.waitingtime = waitingtime
 
     def step(self):
         '''
@@ -172,12 +186,8 @@ class Customer(Agent):
             self.destination == self.goals[0].pos
             self.goals = []
         else:
-            # TODO: current_waitingtime in attracties updaten
-
             destinations = []
             for attraction in self.goals:
-                # time_to_wait = attraction.current_waitingtime
-                # waiting_lines.append(time_to_wait)
                 destinations.append(attraction)
 
             # Get minimum watingtime
@@ -187,7 +197,6 @@ class Customer(Agent):
             minimum = min(waiting_lines)
 
             # Change current destination to new destination
-            # self.destination = positions[waiting_lines.index(minimum)]
             self.destination = destinations[waiting_lines.index(minimum)].pos
 
             # If new destination is current attraction choose second closest
