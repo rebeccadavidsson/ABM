@@ -35,7 +35,7 @@ def agent_draw(agent):
         portrayal["Shape"] = "circle"
 
         # portrayal["Shape"] = "attraction.jpg"
-        # portrayal["Filled"] = "true"
+        portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
         portrayal["text"] = agent.unique_id
@@ -50,16 +50,17 @@ def agent_draw(agent):
         if agent.has_app is True:
             portrayal["Shape"] = "rect"
             portrayal["Color"] = "green"
-            portrayal["Filled"] = "false"
+            portrayal["Filled"] = "true"
             portrayal["w"] = 1
             portrayal["h"] = 1
         else:
             portrayal["Shape"] = "circle"
+            portrayal["Filled"] = "true"
             portrayal["r"] = 0.85
 
-        if agent.total_ever_waited > 80:
+        if agent.total_ever_waited > 90:
             portrayal["Color"] = "red"
-        elif agent.total_ever_waited > 40:
+        elif agent.total_ever_waited > 60:
             portrayal["Color"] = "orange"
         else:
             portrayal["Color"] = "green"

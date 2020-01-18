@@ -1,5 +1,6 @@
 from mesa import Agent
 import random
+import math
 import numpy as np
 from .route import get_coordinates, Route
 from .attraction import Attraction
@@ -37,13 +38,16 @@ class Customer(Agent):
         self.current_a = None
         self.total_ever_waited = 0
 
-        # Random if customer has the app
         self.has_app = random.choice([True, False])
+
+        # Random if customer has the app
         self.goals = self.get_goals()
         self.reached_goals = False
 
         self.leaving = False
-        self.get_walking_distances()
+
+        if self.has_app is True:
+            self.destination = self.search_best_option()
 
     def get_goals(self):
         """Set random goals."""
@@ -57,9 +61,8 @@ class Customer(Agent):
             attractions.remove(rand_choice)
 
         # Sort goals on destination and wating time
-        if self.has_app is True:
-            pass
-
+        # if self.has_app is True:
+        #     self.search_best_option()
 
         return goals
 
@@ -188,35 +191,64 @@ class Customer(Agent):
         """
         self.move()
 
+        # TODO:
+        # update customer choice of destination while walking, only for those who have the app
+
     def get_walking_distances(self):
         """
-        Return index of attraction with shortest walking distance.
-        _________________________________________________________
-        WERKT NOG NIET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Return index of attraction-id with shortest walking distance.
+        Function uses pythagoras formula.
+        For example:
+        indexes = [3, 2, 5, 1, 4]
+        indicates that attraction3 has the shortest walking distance.
         """
         attractions = self.model.get_attractions()
 
         distances = {}
-        i = 0
-
-        # TODO!!!! DIt even doen,
         for attraction in attractions:
-            a = np.array(list(self.pos))
-            b = np.array(list(attraction.pos))
-            dist = np.linalg.norm(a-b)
-            dist = distance.euclidean(a, b)
-            distances[i] = dist
-            i += 1
 
-        print(distances)
-        # Calculate minimum distance
+            # Stelling van pythagoras
+            p1, p2 = self.pos, attraction.pos
+            dist = math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
+            distances[attraction.unique_id] = dist
+
+        # Sort by shortest distance
         indexes = []
         {indexes.append(k): v for k, v in sorted(distances.items(), key=lambda item: item[1])}
 
-        # Get index of shortest
-        print("Indexes of distance", indexes)
-
         return indexes
+
+    def get_waiting_lines(self):
+        """
+        Return index of attraction-id with shortest waiting lines.
+        For example:
+        indexes = [3, 2, 5, 1, 4]
+        indicates that attraction3 has the shortest waiting line.
+        """
+        people = self.model.calculate_people()
+        return people
+
+    def search_best_option(self):
+        """
+        Get best choice of attraction based on watingtime and distance.
+        Returns a position of the best attraction.
+        """
+
+        walking_distances = self.get_walking_distances()
+        waiting_lines = self.get_waiting_lines()
+
+        # First, search for shortest waitingline
+
+        shortest = min(waiting_lines)
+        index_shortest = waiting_lines.index(shortest)
+
+        for dist in walking_distances:
+
+            # Check if this is also the closest
+            if walking_distances[index_shortest] == dist:
+
+                # Return position of the attraction for the best option
+                return self.positions[index_shortest]
 
     def get_shortest_dest(self):
         """
@@ -241,6 +273,7 @@ class Customer(Agent):
             minimum = min(waiting_lines)
 
             return destinations[waiting_lines.index(minimum)].pos, waiting_lines
+
 
     def get_destination(self):
         '''
