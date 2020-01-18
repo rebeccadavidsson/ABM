@@ -35,9 +35,10 @@ def agent_draw(agent):
         portrayal["Shape"] = "circle"
 
         # portrayal["Shape"] = "attraction.jpg"
-        portrayal["Filled"] = "true"
+        # portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
+        portrayal["text"] = agent.unique_id
 
     elif type(agent) is Customer:
 
@@ -66,7 +67,6 @@ def agent_draw(agent):
         # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
         # portrayal["Shape"] = "starlight.png"
 
-
     return portrayal
 
 
@@ -77,7 +77,7 @@ class HistogramModule(VisualizationElement):
     def __init__(self, bins, canvas_height, canvas_width):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        self.data = [] 
+        self.data = []
         new_element = "new HistogramModule({}, {}, {}, {})"
         new_element = new_element.format(bins,
                                          canvas_width,
@@ -94,7 +94,8 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3", "Attraction4", "Attraction5", "Attraction6"], 20, 50)
+histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
+                            "Attraction4", "Attraction5", "Attraction6"], 20, 50)
 
 
 server = ModularServer(

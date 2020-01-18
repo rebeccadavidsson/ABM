@@ -14,7 +14,7 @@ from .attraction import Attraction
 WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
-NUM_OBSTACLES = 5
+NUM_OBSTACLES = 10
 NUM_ATTRACTIONS = 6
 RADIUS = int(WIDTH/2)
 
