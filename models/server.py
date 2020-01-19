@@ -35,7 +35,7 @@ def agent_draw(agent):
         portrayal["Shape"] = "circle"
 
         # portrayal["Shape"] = "attraction.jpg"
-        portrayal["Filled"] = "true"
+        # portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
         portrayal["text"] = agent.unique_id

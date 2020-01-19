@@ -5,10 +5,9 @@ import numpy as np
 from .route import get_coordinates, Route
 from .attraction import Attraction
 from scipy.spatial import distance
+import heapq
 # from model import calculate_people
 
-
-# TODO NIEUWE MENSEN IN HET PARK LATEN KOMEN
 WIDTH = 36
 HEIGHT = 36
 NUM_ATTRACTIONS = 5
@@ -185,15 +184,6 @@ class Customer(Agent):
         # add waiting time to agent
         self.waitingtime = waitingtime
 
-    def step(self):
-        """
-        This method should move the customer using the `random_move()` method.
-        """
-        self.move()
-
-        # TODO:
-        # update customer choice of destination while walking, only for those who have the app
-
     def get_walking_distances(self):
         """
         Return index of attraction-id with shortest walking distance.
@@ -232,23 +222,41 @@ class Customer(Agent):
         """
         Get best choice of attraction based on watingtime and distance.
         Returns a position of the best attraction.
+        ONLY includes attractions in personal GOALS LIST.
         """
 
         walking_distances = self.get_walking_distances()
         waiting_lines = self.get_waiting_lines()
 
         # First, search for shortest waitingline
-
         shortest = min(waiting_lines)
+
         index_shortest = waiting_lines.index(shortest)
 
-        for dist in walking_distances:
+        goals_positions = []
+        [goals_positions.append(goal.pos) for goal in self.goals]
+
+        for i in range(len(walking_distances)):
 
             # Check if this is also the closest
-            if walking_distances[index_shortest] == dist:
+            if walking_distances[index_shortest] == walking_distances[i]:
+
+                # Best destination found!!!
+                if self.positions[index_shortest] in goals_positions:
+                    return self.positions[index_shortest]
+
+                # However, if this destination was not in this customer's goals,
+                # go to next goal destination. ALSO, if waiting line was too long.
+                else:
+                    print("TODO!!! In functie search_best_option()!!")
+                    # Dit is moeilijk zo met die index want je kan niet even +1 index doen :(
+                    self.destination = random.choice(self.positions)
+                    # self.search_best_option()
 
                 # Return position of the attraction for the best option
                 return self.positions[index_shortest]
+
+        return None
 
     def get_shortest_dest(self):
         """
@@ -277,8 +285,7 @@ class Customer(Agent):
 
     def get_destination(self):
         '''
-        Gives the agent a new destination based on goal and waiting time
-        TODO: based on walking distance
+        Gives the agent a new destination based on goal and waiting time.
         '''
         dest, waiting_lines = self.get_shortest_dest()
 
@@ -314,3 +321,29 @@ class Customer(Agent):
         self.waiting = False
         self.waited_period = 0
         return False
+
+    def update_choice(self):
+        """
+        Update customers choice of destination at every move, mainly for people
+        who have the app.
+        Destination choice can change based on knowledge about waitingtimes.
+        """
+
+        # Check again for best option
+        if self.search_best_option() is not self.destination:
+            best = self.search_best_option()
+
+            # is best destination is changed
+            if best is not None:
+                self.destination = best
+
+    def step(self):
+        """
+        This method should move the customer using the `random_move()` method.
+        """
+        self.move()
+
+        # Update customer choice of destination while walking,
+        # only for those who have the app
+        if self.has_app is True:
+            self.update_choice()
