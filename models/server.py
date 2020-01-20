@@ -11,7 +11,7 @@ from .attraction import Attraction
 
 width = 36
 height = 36
-N_cust = 15
+N_cust = 6
 pixel_ratio = 20
 num_agents = 6
 
@@ -38,7 +38,7 @@ def agent_draw(agent):
         # portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
-        portrayal["text"] = agent.unique_id
+        portrayal["text"] = agent.pos
 
     elif type(agent) is Customer:
 

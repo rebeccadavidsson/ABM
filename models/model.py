@@ -127,6 +127,48 @@ class Themepark(Model):
 
         return list(counter_total.values())
 
+    def calculate_people_sorted(self):
+        """
+        Calculate how many customers are in which attraction.
+        Returns a SORTED LIST.
+        For example: indexes = [3, 2, 5, 1, 4]
+        indicates that attraction3 has the least people waiting.
+        """
+
+        counter_total = {}
+
+        for attraction_pos in positions:
+
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=0,
+                include_center=True
+            )
+
+            counter = 0
+            for agent in agents:
+                if type(agent) is Customer:
+                    counter += 1
+                else:
+                    attraction = agent
+
+            attraction.N_current_cust = counter
+            counter_total[attraction.unique_id] = counter
+
+        # TODO, dit moet nog uitgebreid worden naar als er bijvorobeeld 3
+        # wachttijden gelijk zijn. Nu wordt alleen gecheckt of wachttijden
+        # bijvorobeeld overal 10 zijn of overal 0, dus overal gelijk.
+        if len(counter_total.items()) == len(set(counter_total.items())):
+            a1 = list(counter_total.items())
+            random.shuffle(a1)
+            counter_total = dict(a1)
+
+        indexes = []
+        {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
+
+        return counter_total
+
     def get_durations(self):
         """ Get duraction of every attraction in a list """
 

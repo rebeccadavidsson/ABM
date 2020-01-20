@@ -59,10 +59,6 @@ class Customer(Agent):
             goals.append(rand_choice)
             attractions.remove(rand_choice)
 
-        # Sort goals on destination and wating time
-        # if self.has_app is True:
-        #     self.search_best_option()
-
         return goals
 
     def move(self):
@@ -206,7 +202,7 @@ class Customer(Agent):
         indexes = []
         {indexes.append(k): v for k, v in sorted(distances.items(), key=lambda item: item[1])}
 
-        return indexes
+        return distances
 
     def get_waiting_lines(self):
         """
@@ -215,48 +211,71 @@ class Customer(Agent):
         indexes = [3, 2, 5, 1, 4]
         indicates that attraction3 has the shortest waiting line.
         """
-        people = self.model.calculate_people()
+        people = self.model.calculate_people_sorted()
         return people
+
+    def get_score(self, distances, waitinglines):
+        """
+        Return a score of distance + watingtime for all attractions.
+        """
+
+        scores = {}
+
+        for i in range(len(distances)):
+            scores[i] = distances.get(i) + waitinglines.get(i)
+
+        return scores
+
+    def helpers_best_choice(self, distances, waitinglines, index):
+        """
+        Helpers function for search_best_option().
+        Returns an index of the best choice.
+        """
+
+        scores = self.get_score(distances, waitinglines)
+
+        # Start with best solution
+        temp = scores.get(index)
+        for i in range(index, len(scores)):
+
+            if scores.get(i) <= temp:
+                return i
+            if index >= len(self.positions):
+                return i
 
     def search_best_option(self):
         """
         Get best choice of attraction based on watingtime and distance.
         Returns a position of the best attraction.
-        ONLY includes attractions in personal GOALS LIST.
+        Start with best solution; shortest distance and shortest waiting line,
+        if this solution is not in list of goals, go to second best solution.
+        So: ONLY includes attractions in personal GOALS LIST.
         """
 
-        walking_distances = self.get_walking_distances()
-        waiting_lines = self.get_waiting_lines()
-
-        # First, search for shortest waitingline
-        shortest = min(waiting_lines)
-
-        index_shortest = waiting_lines.index(shortest)
+        distances = self.get_walking_distances()
+        waitinglines = self.get_waiting_lines()
 
         goals_positions = []
         [goals_positions.append(goal.pos) for goal in self.goals]
 
-        for i in range(len(walking_distances)):
+        # Start with best solution and check if this solution is in goals
+        index = 0
 
-            # Check if this is also the closest
-            if walking_distances[index_shortest] == walking_distances[i]:
+        best_choice = self.helpers_best_choice(distances, waitinglines, index)
 
-                # Best destination found!!!
-                if self.positions[index_shortest] in goals_positions:
-                    return self.positions[index_shortest]
+        if goals_positions == []:
+            return None
 
-                # However, if this destination was not in this customer's goals,
-                # go to next goal destination. ALSO, if waiting line was too long.
-                else:
-                    print("TODO!!! In functie search_best_option()!!")
-                    # Dit is moeilijk zo met die index want je kan niet even +1 index doen :(
-                    self.destination = random.choice(self.positions)
-                    # self.search_best_option()
+        # Best choice is found!!!
+        if self.positions[best_choice] in goals_positions:
+            return self.positions[best_choice]
 
-                # Return position of the attraction for the best option
-                return self.positions[index_shortest]
+        while self.positions[best_choice] not in goals_positions:
+            index += 1
+            best_choice = self.helpers_best_choice(distances, waitinglines, index)
 
-        return None
+        return self.positions[best_choice]
+
 
     def get_shortest_dest(self):
         """
