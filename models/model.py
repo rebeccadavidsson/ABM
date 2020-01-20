@@ -14,8 +14,8 @@ from .attraction import Attraction
 WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
-NUM_OBSTACLES = 10
-NUM_ATTRACTIONS = 6
+NUM_OBSTACLES = 0
+NUM_ATTRACTIONS = 7
 RADIUS = int(WIDTH/2)
 
 
@@ -164,8 +164,8 @@ class Themepark(Model):
             random.shuffle(a1)
             counter_total = dict(a1)
 
-        indexes = []
-        {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
+        # indexes = []
+        # {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
 
         return counter_total
 
@@ -210,7 +210,7 @@ class Themepark(Model):
 
         self.total_steps += 1
 
-        if self.total_steps > random.randrange(10, 20):
+        if self.total_steps > random.randrange(10, 20) and self.cust_ids < self.N_cust * 2:
             self.cust_ids += 1
             self.add_customers(1, added=True)
             self.total_steps = 0

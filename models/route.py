@@ -47,7 +47,7 @@ def get_attraction_coordinates(width, height, num_attractions):
 
     for i in range(num_attractions):
         xlist.append(random.randrange(0, width))
-        ylist.append(random.randrange(13, height))
+        ylist.append(random.randrange(10, height))
 
     for i in range(num_attractions):
         total.append((xlist[i], ylist[i]))

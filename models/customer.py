@@ -10,7 +10,6 @@ import heapq
 
 WIDTH = 36
 HEIGHT = 36
-NUM_ATTRACTIONS = 5
 NUM_OBSTACLES = 20
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
@@ -35,9 +34,10 @@ class Customer(Agent):
         # Start waited period with zero
         self.waited_period = 0
         self.current_a = None
-        self.total_ever_waited = 0
+        self.sadness_score = 0
 
-        self.has_app = random.choice([True, False])
+        # self.has_app = random.choice([True, False])
+        self.has_app = True
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -46,6 +46,7 @@ class Customer(Agent):
         self.leaving = False
 
         if self.has_app is True:
+            self.checked_app = False
             self.destination = self.search_best_option()
 
     def get_goals(self):
@@ -58,7 +59,9 @@ class Customer(Agent):
             rand_choice = random.choice(attractions)
             goals.append(rand_choice)
             attractions.remove(rand_choice)
-
+        # goals.append(attractions[3])
+        # goals.append(attractions[4])
+        # goals.append(attractions[5])
         return goals
 
     def move(self):
@@ -82,7 +85,10 @@ class Customer(Agent):
 
         for obj in obstacles_check:
             if type(obj) is Route:
-                possible_steps.remove(obj.pos)
+                try:
+                    possible_steps.remove(obj.pos)
+                except ValueError:
+                    continue # TODO
 
         # start with random choice of position
         temp = random.choice(possible_steps)
@@ -120,7 +126,6 @@ class Customer(Agent):
 
         if self.pos == self.destination:
             self.waited_period += 1
-            self.total_ever_waited += 1
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
@@ -130,7 +135,9 @@ class Customer(Agent):
                 # Update goals and attraction
                 for attraction in self.goals:
                     if attraction.pos == self.pos:
+                        self.checked_app = False
                         self.goals.remove(attraction)
+                        self.sadness_score -= 20
                         if attraction.N_current_cust != 1:
                             attraction.N_current_cust -= 1
                         attraction.calculate_waiting_time()
@@ -236,12 +243,16 @@ class Customer(Agent):
 
         # Start with best solution
         temp = scores.get(index)
-        for i in range(index, len(scores)):
 
-            if scores.get(i) <= temp:
+        for i in range(index, len(scores) + 1):
+
+            if not scores.get(i + 1):
                 return i
-            if index >= len(self.positions):
+            if scores.get(i + 1) < scores.get(i):
+                return i + 1
+            else:
                 return i
+
 
     def search_best_option(self):
         """
@@ -263,19 +274,16 @@ class Customer(Agent):
 
         best_choice = self.helpers_best_choice(distances, waitinglines, index)
 
+        # Empty goals list, TODO
         if goals_positions == []:
             return None
 
-        # Best choice is found!!!
-        if self.positions[best_choice] in goals_positions:
-            return self.positions[best_choice]
-
-        while self.positions[best_choice] not in goals_positions:
-            index += 1
+        while self.positions[best_choice] not in goals_positions and index < len(self.positions):
             best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            index += 1
 
+        # Best choice is found!!!
         return self.positions[best_choice]
-
 
     def get_shortest_dest(self):
         """
@@ -300,7 +308,6 @@ class Customer(Agent):
             minimum = min(waiting_lines)
 
             return destinations[waiting_lines.index(minimum)].pos, waiting_lines
-
 
     def get_destination(self):
         '''
@@ -349,20 +356,23 @@ class Customer(Agent):
         """
 
         # Check again for best option
-        if self.search_best_option() is not self.destination:
-            best = self.search_best_option()
+        best = self.search_best_option()
 
-            # is best destination is changed
-            if best is not None:
-                self.destination = best
+        if best is not None:
+            self.destination = best
 
     def step(self):
         """
         This method should move the customer using the `random_move()` method.
         """
-        self.move()
 
         # Update customer choice of destination while walking,
         # only for those who have the app
-        if self.has_app is True:
+        if self.has_app is True and self.checked_app is False:
             self.update_choice()
+            self.checked_app = True
+
+        if self.waiting is True:
+            self.sadness_score += 1
+
+        self.move()

@@ -1,6 +1,5 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
-import numpy as np
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
 
@@ -11,9 +10,9 @@ from .attraction import Attraction
 
 width = 36
 height = 36
-N_cust = 6
+N_cust = 8
 pixel_ratio = 20
-num_agents = 6
+num_agents = 7
 
 
 def agent_draw(agent):
@@ -38,12 +37,13 @@ def agent_draw(agent):
         # portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
-        portrayal["text"] = agent.pos
+        portrayal["text"] = agent.current_waitingtime
+        portrayal["text_color"] = "black"
 
     elif type(agent) is Customer:
 
-        portrayal["text"] = agent.unique_id
-        portrayal["text_color"] = "black"
+        # portrayal["text"] = agent.unique_id
+        # portrayal["text_color"] = "black"
         portrayal["Layer"] = 1
 
         # Determine if customer has the app or not
@@ -58,9 +58,9 @@ def agent_draw(agent):
             portrayal["Filled"] = "true"
             portrayal["r"] = 0.85
 
-        if agent.total_ever_waited > 90:
+        if agent.sadness_score > 40:
             portrayal["Color"] = "red"
-        elif agent.total_ever_waited > 60:
+        elif agent.sadness_score > 20:
             portrayal["Color"] = "orange"
         else:
             portrayal["Color"] = "green"
@@ -96,7 +96,7 @@ class HistogramModule(VisualizationElement):
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
-                            "Attraction4", "Attraction5", "Attraction6"], 20, 50)
+                            "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
 
 
 server = ModularServer(
