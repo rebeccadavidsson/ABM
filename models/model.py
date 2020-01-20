@@ -46,6 +46,8 @@ class Themepark(Model):
 
         self.running = True
 
+        self.total_waited_time = 0
+
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
         attractions = {}
@@ -207,6 +209,11 @@ class Themepark(Model):
         """Advance the model by one step."""
 
         self.schedule.step()
+
+        attractions = self.get_attractions()
+
+        for attraction in attractions:
+            attraction.update_memory()
 
         self.total_steps += 1
 

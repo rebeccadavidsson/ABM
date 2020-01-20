@@ -100,6 +100,11 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
 
             if self.leaving is True:
+
+                # increment total waiting time
+                self.model.total_waited_time += self.total_ever_waited
+
+                # remove customer
                 self.model.schedule.remove(self)
                 # self.model.grid[self.pos[0]][self.pos[1]] = None
                 # TODO: stip ook verwijderen
