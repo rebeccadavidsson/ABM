@@ -172,10 +172,10 @@ class Themepark(Model):
         # TODO, dit moet nog uitgebreid worden naar als er bijvorobeeld 3
         # wachttijden gelijk zijn. Nu wordt alleen gecheckt of wachttijden
         # bijvorobeeld overal 10 zijn of overal 0, dus overal gelijk.
-        if len(counter_total.items()) == len(set(counter_total.items())):
-            a1 = list(counter_total.items())
-            random.shuffle(a1)
-            counter_total = dict(a1)
+        # if len(counter_total.items()) == len(set(counter_total.items())):
+        #     a1 = list(counter_total.items())
+        #     random.shuffle(a1)
+        #     counter_total = dict(a1)
 
         # indexes = []
         # {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
@@ -183,7 +183,7 @@ class Themepark(Model):
         return counter_total
 
     def get_durations(self):
-        """ Get duraction of every attraction in a list """
+        """ Get duratiosn of every attraction in a list """
 
         durations = []
 

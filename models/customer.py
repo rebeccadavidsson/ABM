@@ -106,7 +106,8 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
 
             if self.leaving is True:
-                self.model.schedule.remove(self)
+                # TODO: hier komt soms een error??? HELP!!!
+                self.model.schedule_Customer.remove(self)
                 # self.model.grid[self.pos[0]][self.pos[1]] = None
                 # TODO: stip ook verwijderen
             else:
