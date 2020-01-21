@@ -2,7 +2,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
-
+from mesa.visualization.UserParam import UserSettableParameter
 from .model import Themepark
 from .customer import Customer
 from .route import Route
@@ -60,9 +60,9 @@ def agent_draw(agent):
             portrayal["Filled"] = "true"
             portrayal["r"] = 0.65
 
-        if agent.sadness_score > 40:
+        if agent.sadness_score > 60:
             portrayal["Color"] = "red"
-        elif agent.sadness_score > 20:
+        elif agent.sadness_score > 40:
             portrayal["Color"] = "orange"
         else:
             portrayal["Color"] = "green"
@@ -128,12 +128,19 @@ chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
                             "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
 
+model_params = {
+    "height": height,
+    "width": width,
+    "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
+    "N_cust": UserSettableParameter("slider", "Number of customers", N_cust, 1, num_agents, 1),
+    "Strategy": UserSettableParameter('checkbox', 'Strategic', value=True)
+}
 
 server = ModularServer(
     Themepark,
     [grid, histogram, chart],
     "Theme Park Model",
-    {"N_attr": num_agents, "N_cust": N_cust, "width": width, "height": height},
+    model_params,
 )
 server.max_steps = 0
 server.port = 8521
