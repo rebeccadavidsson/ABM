@@ -119,7 +119,11 @@ grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel
 
 chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
                     {"Label": "Attraction2", "Color": "#303F9F"},
-                    {"Label": "Attraction3", "Color": "#F9A825"}], data_collector_name='datacollector')
+                    {"Label": "Attraction3", "Color": "#7B1FA2"},
+                    {"Label": "Attraction4", "Color": "#D81B60"},
+                    {"Label": "Attraction5", "Color": "#2E7D32"},
+                    {"Label": "Attraction6", "Color": "#F4511E"},
+                    {"Label": "Attraction7", "Color": "#F9A825"}], data_collector_name='datacollector')
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
                             "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
