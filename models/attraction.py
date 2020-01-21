@@ -65,4 +65,5 @@ class Attraction(Agent):
         self.cust_in_attr = amount
         self.cust_in_line -= amount
 
-    # def step(self):
+    def step(self):
+        self.calculate_waiting_time()
