@@ -6,6 +6,7 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 80
+MEMORY = 5
 
 
 class Attraction(Agent):
@@ -18,7 +19,6 @@ class Attraction(Agent):
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)
 
-        # TODO: current_waitingtime moet worden geupdated in customer.py
         self.current_waitingtime = 0
         self.attraction_duration = 10
         # self.max_queue = int(N_cust * 2)
@@ -29,6 +29,8 @@ class Attraction(Agent):
         self.cust_in_line = 0
 
 
+        self.memory = []
+
     def calculate_waiting_time(self):
         '''
         Calculates current waiting_time of the attraction
@@ -37,6 +39,13 @@ class Attraction(Agent):
         waitingtime = self.N_current_cust * self.attraction_duration
         self.current_waitingtime = waitingtime
 
+    def update_memory(self):
+        """
+        Updates the memory of the waitingtimes of the last MEMORY timesteps
+        """
+        self.memory.append(self.current_waitingtime)
+        if len(self.memory) == MEMORY + 1:
+            self.memory.remove(self.memory[0])
 
     def customers_inside(self):
         """Determine the amount of customers inside the Attraction agent."""

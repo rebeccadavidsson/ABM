@@ -30,6 +30,7 @@ class Customer(Agent):
 
         self.waitingtime = None
         self.waiting = False
+        self.total_ever_waited = 0
 
         # Start waited period with zero
         self.waited_period = 0

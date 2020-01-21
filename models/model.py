@@ -58,6 +58,8 @@ class Themepark(Model):
             "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside()
             })
 
+        self.total_waited_time = 0
+
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
 
@@ -192,7 +194,7 @@ class Themepark(Model):
         return counter_total
 
     def get_durations(self):
-        """ Get duraction of every attraction in a list """
+        """ Get duratiosn of every attraction in a list """
 
         durations = []
 
@@ -232,6 +234,11 @@ class Themepark(Model):
         self.datacollector.collect(self)
         self.schedule_Attraction.step()
         self.schedule_Customer.step()
+
+        # update memory of attractions
+        attractions = self.get_attractions()
+        for attraction in attractions:
+            attraction.update_memory()
 
         self.total_steps += 1
 
