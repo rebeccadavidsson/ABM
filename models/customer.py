@@ -36,8 +36,8 @@ class Customer(Agent):
         self.current_a = None
         self.sadness_score = 0
 
-        # self.has_app = random.choice([True, False])
-        self.has_app = True
+        self.has_app = random.choice([True, False])
+        # self.has_app = True
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -88,7 +88,7 @@ class Customer(Agent):
                 try:
                     possible_steps.remove(obj.pos)
                 except ValueError:
-                    continue # TODO
+                    continue # TODO, voor als we obstakels willen
 
         # start with random choice of position
         temp = random.choice(possible_steps)
@@ -134,18 +134,23 @@ class Customer(Agent):
 
                 # Update goals and attraction
                 for attraction in self.goals:
+
                     if attraction.pos == self.pos:
+
+                        # set checked_app = False so app can be checked at the
+                        # first step when cstomer walks away from an attraction.
                         self.checked_app = False
                         self.goals.remove(attraction)
                         self.sadness_score -= 20
-                        if attraction.N_current_cust != 1:
+                        if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
                         attraction.calculate_waiting_time()
+                    break
 
                 # Check if agent needs to leave or go to new goal
                 if len(self.goals) > 0:
                     self.get_destination()
-                else:
+                elif self.leaving is False:
                     self.leaving = True
                     self.destination = random.choice(starting_positions)
                     self.waiting = False

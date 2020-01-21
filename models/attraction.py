@@ -18,12 +18,13 @@ class Attraction(Agent):
         # TODO: current_waitingtime moet worden geupdated in customer.py
         self.current_waitingtime = 0
         self.attraction_duration = 10
-        self.max_queue = int(N_cust * 2)
-        self.N_current_cust = 1
+        # self.max_queue = int(N_cust * 2)
+        self.N_current_cust = 0
 
     def calculate_waiting_time(self):
         '''
         Calculates current waiting_time of the attraction
+        TODO: Waitingtime blijft soms boven 0 staan!!!
         '''
         waitingtime = self.N_current_cust * self.attraction_duration
         self.current_waitingtime = waitingtime

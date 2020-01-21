@@ -34,29 +34,31 @@ def agent_draw(agent):
         portrayal["Shape"] = "circle"
 
         # portrayal["Shape"] = "attraction.jpg"
-        # portrayal["Filled"] = "true"
+        # portrayal["Filled"] = "false"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
-        portrayal["text"] = agent.current_waitingtime
+        portrayal["text"] = str(agent.current_waitingtime) + ":" + str(agent.unique_id)
         portrayal["text_color"] = "black"
 
     elif type(agent) is Customer:
 
-        # portrayal["text"] = agent.unique_id
-        # portrayal["text_color"] = "black"
         portrayal["Layer"] = 1
+
+        if agent.waiting is False:
+            portrayal["text"] = agent.unique_id
+            portrayal["text_color"] = "black"
 
         # Determine if customer has the app or not
         if agent.has_app is True:
             portrayal["Shape"] = "rect"
             portrayal["Color"] = "green"
-            portrayal["Filled"] = "true"
-            portrayal["w"] = 1
-            portrayal["h"] = 1
+            portrayal["Filled"] = "false"
+            portrayal["w"] = 0.5
+            portrayal["h"] = 0.5
         else:
             portrayal["Shape"] = "circle"
             portrayal["Filled"] = "true"
-            portrayal["r"] = 0.85
+            portrayal["r"] = 0.65
 
         if agent.sadness_score > 40:
             portrayal["Color"] = "red"
