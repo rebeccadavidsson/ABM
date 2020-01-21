@@ -1,38 +1,68 @@
 from mesa import Agent
 import random
-from .route import get_coordinates
+import math
+import numpy as np
+from .route import get_coordinates, Route
 from .attraction import Attraction
+from scipy.spatial import distance
+import heapq
 # from model import calculate_people
 
-
-WIDTH = 26
-HEIGHT = 26
-
-path_coordinates = get_coordinates(WIDTH, HEIGHT)
-
-x_list = [1, int(WIDTH/2), WIDTH-1]
-y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
+WIDTH = 36
+HEIGHT = 36
+NUM_OBSTACLES = 20
+starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
+        self.unique_id = unique_id
+        self.x_list = x_list
+        self.y_list = y_list
+        self.positions = positions
 
-        # Assign destination
         self.destination = random.choice(positions)
         while self.destination is self.pos:
             self.destination = random.choice(positions)
 
-        # TODO: Hoe lang blijven de mensen in de attractie?
-        self.waitingtime = random.randrange(20, 30)
+        self.waitingtime = None
         self.waiting = False
 
         # Start waited period with zero
         self.waited_period = 0
         self.current_a = None
+        self.sadness_score = 0
+
+        # self.has_app = random.choice([True, False])
+        self.has_app = True
+
+        # Random if customer has the app
+        self.goals = self.get_goals()
+        self.reached_goals = False
+
+        self.leaving = False
+
+        if self.has_app is True:
+            self.checked_app = False
+            self.destination = self.search_best_option()
+
+    def get_goals(self):
+        """Set random goals."""
+
+        attractions = self.model.get_attractions()
+        r = random.randint(1, len(attractions))
+        goals = []
+        for i in range(r):
+            rand_choice = random.choice(attractions)
+            goals.append(rand_choice)
+            attractions.remove(rand_choice)
+        # goals.append(attractions[3])
+        # goals.append(attractions[4])
+        # goals.append(attractions[5])
+        return goals
 
     def move(self):
         '''
@@ -43,8 +73,22 @@ class Customer(Agent):
         possible_steps = self.model.grid.get_neighborhood(
             self.pos,
             moore=True,
+            radius=1,
             include_center=False
         )
+        obstacles_check = self.model.grid.get_neighbors(
+            self.pos,
+            moore=True,
+            include_center=False,
+            radius=1
+        )
+
+        for obj in obstacles_check:
+            if type(obj) is Route:
+                try:
+                    possible_steps.remove(obj.pos)
+                except ValueError:
+                    continue # TODO
 
         # start with random choice of position
         temp = random.choice(possible_steps)
@@ -55,27 +99,27 @@ class Customer(Agent):
             # check if step is closer to destination
             if (abs(step[0] - self.destination[0]) < abs(temp[0] - self.destination[0]) or
                abs(step[1] - self.destination[1]) < abs(temp[1] - self.destination[1])):
-
                temp = step
 
         new_position = temp
 
-        # Restrict to path
-        while new_position not in path_coordinates:
-            new_position = self.random.choice(possible_steps)
-
         if new_position == self.destination and self.waiting is False:
 
-            # TODO: is dit de goede plek om deze aan te roepen?
-            self.set_waiting_time()
+            if self.leaving is True:
+                self.model.schedule.remove(self)
+                # self.model.grid[self.pos[0]][self.pos[1]] = None
+                # TODO: stip ook verwijderen
+            else:
 
-            self.model.grid.move_agent(self, new_position)
-            self.waiting = True
+                # Only move if there is no queue
+                self.model.grid.move_agent(self, new_position)
+
+                self.set_waiting_time()
+                self.waiting = True
 
         # Extra check to see if agent is at destination
         if self.check_move(new_position) is True:
             self.model.grid.move_agent(self, new_position)
-
 
     def check_move(self, new_position):
         """ Checks if a move can be done, given a new position."""
@@ -83,86 +127,252 @@ class Customer(Agent):
         if self.pos == self.destination:
             self.waited_period += 1
 
-        # Get waitingtime from attraction
-        agents = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            radius=0,
-            include_center=True
-        )
-
-        for agent_object in agents:
-            if type(agent_object) == Attraction:
-                self.waitingtime = agent_object.waiting_time
-
         # CHANGE DIRECTION if waitingtime is met
-        if self.waitingtime == self.waited_period:
+        if self.waitingtime is not None:
 
-            # SHORTEST waiting line as destination
-            waiting_lines = self.model.calculate_people()
+            if self.waitingtime <= self.waited_period:
 
-            # Exclude own position
-            # index_to_exclude = positions.index(self.pos)
-            # waiting_lines[index_to_exclude] = max(waiting_lines)+1
+                # Update goals and attraction
+                for attraction in self.goals:
+                    if attraction.pos == self.pos:
+                        self.checked_app = False
+                        self.goals.remove(attraction)
+                        self.sadness_score -= 20
+                        if attraction.N_current_cust != 1:
+                            attraction.N_current_cust -= 1
+                        attraction.calculate_waiting_time()
 
-            # Get minimum watingtime
-            minimum = min(waiting_lines)
-
-            # Change current destination to new destination
-            self.destination = positions[waiting_lines.index(minimum)]
-
-            # If new destination is current attraction choose second closest
-            if self.pos == self.destination:
-                second_shortest = sorted(waiting_lines)[1]
-
-                # check if two waiting times are of same length
-                indexi = []
-                for i in range(len(waiting_lines)):
-                    if waiting_lines[i] == second_shortest:
-                        indexi.append(i)
-                if len(indexi) > 1:
-                    for i in indexi:
-                        if positions[i] != self.pos:
-                            self.destination = positions[waiting_lines[i]]
-                            break
+                # Check if agent needs to leave or go to new goal
+                if len(self.goals) > 0:
+                    self.get_destination()
                 else:
-                    self.destination = positions[waiting_lines.index(second_shortest)]
-
-            self.waiting = False
-            self.waited_period = 0
+                    self.leaving = True
+                    self.destination = random.choice(starting_positions)
+                    self.waiting = False
 
         if self.waiting is False:
             return True
         return False
 
-    # TODO: DIT IS ALLEMAAL NOG NIET GETEST WANT WEET EVEN NIET HOE IK BIJ
-    # ATTRACTIES KOM EN ER IS SEMINAR STRESS DUS WIL NIEMAND AFLEIDEN XO
-    # _______________________________________________________________
-    # Rebecca: Ik weet het wel hihihih ik heb het gefixt denk ik xoxoxooxox
     def set_waiting_time(self):
         '''
         This method calculates the waiting time of the customer based on the
         number of customers in line, and the duration of the attraction
         '''
+        attractions = self.model.get_attractions()
+        attraction = None
+        for i in attractions:
+            if self.pos == i.pos:
+                attraction = i
+                break
 
-        # get number of customers in line
+        self.waitingtime = attraction.current_waitingtime
+
+        # Update waitingtime of attraction
+        attraction.N_current_cust += 1
+        attraction.calculate_waiting_time()
+
+        # # get number of customers in line
         waiting_lines = self.model.calculate_people()
 
         # get attraction durations
         durations = self.model.get_durations()
 
         # get current attraction from destination
-        index = positions.index(self.destination)
+        index = self.positions.index(self.destination)
 
         # calculate waitingtime
         waitingtime = durations[index] * waiting_lines[index]
 
         # add waiting time to agent
         self.waitingtime = waitingtime
-        print(waitingtime, waiting_lines, index)
+
+    def get_walking_distances(self):
+        """
+        Return index of attraction-id with shortest walking distance.
+        Function uses pythagoras formula.
+        For example:
+        indexes = [3, 2, 5, 1, 4]
+        indicates that attraction3 has the shortest walking distance.
+        """
+        attractions = self.model.get_attractions()
+
+        distances = {}
+        for attraction in attractions:
+
+            # Stelling van pythagoras
+            p1, p2 = self.pos, attraction.pos
+            dist = math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
+            distances[attraction.unique_id] = dist
+
+        # Sort by shortest distance
+        indexes = []
+        {indexes.append(k): v for k, v in sorted(distances.items(), key=lambda item: item[1])}
+
+        return distances
+
+    def get_waiting_lines(self):
+        """
+        Return index of attraction-id with shortest waiting lines.
+        For example:
+        indexes = [3, 2, 5, 1, 4]
+        indicates that attraction3 has the shortest waiting line.
+        """
+        people = self.model.calculate_people_sorted()
+        return people
+
+    def get_score(self, distances, waitinglines):
+        """
+        Return a score of distance + watingtime for all attractions.
+        """
+
+        scores = {}
+
+        for i in range(len(distances)):
+            scores[i] = distances.get(i) + waitinglines.get(i)
+
+        return scores
+
+    def helpers_best_choice(self, distances, waitinglines, index):
+        """
+        Helpers function for search_best_option().
+        Returns an index of the best choice.
+        """
+
+        scores = self.get_score(distances, waitinglines)
+
+        # Start with best solution
+        temp = scores.get(index)
+
+        for i in range(index, len(scores) + 1):
+
+            if not scores.get(i + 1):
+                return i
+            if scores.get(i + 1) < scores.get(i):
+                return i + 1
+            else:
+                return i
+
+
+    def search_best_option(self):
+        """
+        Get best choice of attraction based on watingtime and distance.
+        Returns a position of the best attraction.
+        Start with best solution; shortest distance and shortest waiting line,
+        if this solution is not in list of goals, go to second best solution.
+        So: ONLY includes attractions in personal GOALS LIST.
+        """
+
+        distances = self.get_walking_distances()
+        waitinglines = self.get_waiting_lines()
+
+        goals_positions = []
+        [goals_positions.append(goal.pos) for goal in self.goals]
+
+        # Start with best solution and check if this solution is in goals
+        index = 0
+
+        best_choice = self.helpers_best_choice(distances, waitinglines, index)
+
+        # Empty goals list, TODO
+        if goals_positions == []:
+            return None
+
+        while self.positions[best_choice] not in goals_positions and index < len(self.positions):
+            best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            index += 1
+
+        # Best choice is found!!!
+        return self.positions[best_choice]
+
+    def get_shortest_dest(self):
+        """
+        Get destination from list of goals
+        with SHORTEST WATINGTIME for people with the app.
+        Not based on walking distance.
+        """
+
+        if len(self.goals) == 1:
+            self.destination = self.goals[0].pos
+            self.goals = []
+
+            return None, None
+        else:
+            destinations, waiting_lines = [], []
+            [destinations.append(attraction) for attraction in self.goals]
+
+            # Get minimum watingtime
+            waiting_lines = []
+            [waiting_lines.append(dest.current_waitingtime) for dest in destinations]
+
+            minimum = min(waiting_lines)
+
+            return destinations[waiting_lines.index(minimum)].pos, waiting_lines
+
+    def get_destination(self):
+        '''
+        Gives the agent a new destination based on goal and waiting time.
+        '''
+        dest, waiting_lines = self.get_shortest_dest()
+
+        if dest is not None:
+
+            # Change current destination to new destination
+            self.destination = dest
+
+        # If new destination is current attraction choose second closest
+        if self.pos == self.destination:
+
+            if self.has_app is True:
+                second_shortest = sorted(waiting_lines)[1]
+            else:
+                # TODO: Ik weet niet of dit nou helemaal goed gaat, even checken
+                # of dit mag met gewoon random eentje kiezen als die persoon
+                # de app niet heeft en dus niet weet wat de kortste wachtrij is.
+                second_shortest = random.choice(waiting_lines)
+            # check if two waiting times are of same length
+            indexi = []
+            for i in range(len(waiting_lines)):
+                if waiting_lines[i] == second_shortest:
+                    indexi.append(i)
+            if len(indexi) > 1:
+                # TODO: volgens mij kan deze hele for-loop weg...
+                for i in indexi:
+                    if self.positions[i] != self.pos:
+                        self.destination = self.positions[i]
+                        break
+            else:
+                self.destination = self.positions[waiting_lines.index(second_shortest)]
+
+        self.waiting = False
+        self.waited_period = 0
+        return False
+
+    def update_choice(self):
+        """
+        Update customers choice of destination at every move, mainly for people
+        who have the app.
+        Destination choice can change based on knowledge about waitingtimes.
+        """
+
+        # Check again for best option
+        best = self.search_best_option()
+
+        if best is not None:
+            self.destination = best
 
     def step(self):
-        '''
-        This method should move the customer using the `move()` method.
-        '''
+        """
+        This method should move the customer using the `random_move()` method.
+        """
+
+        # Update customer choice of destination while walking,
+        # only for those who have the app
+        if self.has_app is True and self.checked_app is False:
+            self.update_choice()
+            self.checked_app = True
+
+        if self.waiting is True:
+            self.sadness_score += 1
+
         self.move()

@@ -1,6 +1,5 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
-import numpy as np
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import ChartModule
 
@@ -9,8 +8,11 @@ from .customer import Customer
 from .route import Route
 from .attraction import Attraction
 
-NUM_ATTRACTIONS = 3
-num_agents = 3
+width = 36
+height = 36
+N_cust = 8
+pixel_ratio = 20
+num_agents = 7
 
 
 def agent_draw(agent):
@@ -28,18 +30,43 @@ def agent_draw(agent):
         # portrayal["r"] = 0.15
 
     elif type(agent) is Attraction:
+        portrayal["Color"] = "blue"
         portrayal["Shape"] = "circle"
-        portrayal["Color"] = "gold"
-        portrayal["Filled"] = "true"
-        portrayal["Layer"] = 1
+
+        # portrayal["Shape"] = "attraction.jpg"
+        # portrayal["Filled"] = "true"
+        portrayal["Layer"] = 2
         portrayal["r"] = 1
+        portrayal["text"] = agent.current_waitingtime
+        portrayal["text_color"] = "black"
 
     elif type(agent) is Customer:
-        portrayal["Shape"] = "circle"
-        portrayal["Color"] = "red"
-        portrayal["Filled"] = "true"
-        portrayal["Layer"] = 2
-        portrayal["r"] = 0.45
+
+        # portrayal["text"] = agent.unique_id
+        # portrayal["text_color"] = "black"
+        portrayal["Layer"] = 1
+
+        # Determine if customer has the app or not
+        if agent.has_app is True:
+            portrayal["Shape"] = "rect"
+            portrayal["Color"] = "green"
+            portrayal["Filled"] = "true"
+            portrayal["w"] = 1
+            portrayal["h"] = 1
+        else:
+            portrayal["Shape"] = "circle"
+            portrayal["Filled"] = "true"
+            portrayal["r"] = 0.85
+
+        if agent.sadness_score > 40:
+            portrayal["Color"] = "red"
+        elif agent.sadness_score > 20:
+            portrayal["Color"] = "orange"
+        else:
+            portrayal["Color"] = "green"
+
+        # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
+        # portrayal["Shape"] = "starlight.png"
 
     return portrayal
 
@@ -51,8 +78,7 @@ class HistogramModule(VisualizationElement):
     def __init__(self, bins, canvas_height, canvas_width):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        self.bins = ["Attraction1", "Attraction2", "Attraction3"]
-        self.data = [] # TODO
+        self.data = []
         new_element = "new HistogramModule({}, {}, {}, {})"
         new_element = new_element.format(bins,
                                          canvas_width,
@@ -87,21 +113,14 @@ class HistogramModule(VisualizationElement):
 #         data = model.calculate_people()
 #         return data
 
-width = 26
-height = 26
-N_attr = 3
-N_cust = 30
-pixel_ratio = 26
-
-
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
 chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
                     {"Label": "Attraction2", "Color": "#303F9F"},
                     {"Label": "Attraction3", "Color": "#F9A825"}], data_collector_name='datacollector')
 
-histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 10, 25)
-# chart = ChartModule(10, 25)
+histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
+                            "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
 
 
 server = ModularServer(

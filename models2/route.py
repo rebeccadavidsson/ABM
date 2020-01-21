@@ -31,11 +31,6 @@ def get_coordinates(width, height, num_obstacles, num_attractions):
 
         coordinates.append((random.randrange(width), random.randrange(height)))
 
-    # Hardcode starting path
-    coordinates.append((int((WIDTH/2) - 2), 0))
-    coordinates.append((int((WIDTH/2) - 2), 1))
-    coordinates.append((int((WIDTH/2) + 2), 0))
-    coordinates.append((int((WIDTH/2) + 2), 1))
     return coordinates
 
 

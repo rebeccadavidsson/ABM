@@ -1,18 +1,11 @@
 from mesa import Agent
 import random
-from .route import get_coordinates, Route
-from . import *
-# from .customer import Customer
+from .route import get_attraction_coordinates, Route
 
-
-WIDTH = 26
-HEIGHT = 26
-
-path_coordinates = get_coordinates(WIDTH, HEIGHT)
-
-x_list = [1, int(WIDTH/2), WIDTH-1]
-y_list = [int(HEIGHT/2), HEIGHT-1, int(HEIGHT/2)]
-positions = [(1, int(HEIGHT/2)), (int(WIDTH/2), HEIGHT-1), (WIDTH-1, int(HEIGHT/2))]
+WIDTH = 36
+HEIGHT = 36
+RADIUS = 15
+NUM_OBSTACLES = 80
 
 
 class Attraction(Agent):
@@ -25,9 +18,22 @@ class Attraction(Agent):
         self.attraction_duration = 10
         self.max_queue = int(N_cust * 2)
 
+        # TODO: current_waitingtime moet worden geupdated in customer.py
+        self.current_waitingtime = 0
+        self.N_current_cust = 1
+
         self.cust_capacity = customer_capacity
         self.cust_in_attr = 0
         self.cust_in_line = 0
+
+
+    def calculate_waiting_time(self):
+        '''
+        Calculates current waiting_time of the attraction
+        '''
+        waitingtime = self.N_current_cust * self.attraction_duration
+        self.current_waitingtime = waitingtime
+
 
     def customers_inside(self):
         """Determine the amount of customers inside the Attraction agent."""
@@ -49,10 +55,11 @@ class Attraction(Agent):
 
         return counter
 
+
     def run_attraction(self, amount):
         """Customers enter attraction and leave waiting line."""
-        
+
         self.cust_in_attr = amount
         self.cust_in_line -= amount
 
-    def step(self):
+    # def step(self):
