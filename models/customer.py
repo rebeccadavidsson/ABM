@@ -30,6 +30,7 @@ class Customer(Agent):
 
         self.waitingtime = None
         self.waiting = False
+        self.total_ever_waited = 0
 
         # Start waited period with zero
         self.waited_period = 0
@@ -106,7 +107,6 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
 
             if self.leaving is True:
-                # TODO: hier komt soms een error??? HELP!!!
                 self.model.schedule_Customer.remove(self)
                 # self.model.grid[self.pos[0]][self.pos[1]] = None
                 # TODO: stip ook verwijderen

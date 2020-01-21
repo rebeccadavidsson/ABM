@@ -58,6 +58,8 @@ class Themepark(Model):
             "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside()
             })
 
+        self.total_waited_time = 0
+
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
 
@@ -172,10 +174,19 @@ class Themepark(Model):
         # TODO, dit moet nog uitgebreid worden naar als er bijvorobeeld 3
         # wachttijden gelijk zijn. Nu wordt alleen gecheckt of wachttijden
         # bijvorobeeld overal 10 zijn of overal 0, dus overal gelijk.
-        # if len(counter_total.items()) == len(set(counter_total.items())):
-        #     a1 = list(counter_total.items())
-        #     random.shuffle(a1)
-        #     counter_total = dict(a1)
+
+        # dit is altijd true want dict keys worden meegenomen bij dict.items() en die zijn nooit verschillend (dus set nemen verandert niets)
+        if len(counter_total.items()) == len(set(counter_total.items())):
+            a1 = list(counter_total.items())
+            # print("A11111111111111111111111111111", a1.values())
+            random.shuffle(a1)
+            print(a1)
+            counter_total = dict(a1)
+            print(counter_total)
+
+        # if len(counter_total.values()) != len(set(counter_total.values())):
+
+
 
         # indexes = []
         # {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
@@ -223,6 +234,11 @@ class Themepark(Model):
         self.datacollector.collect(self)
         self.schedule_Attraction.step()
         self.schedule_Customer.step()
+
+        # update memory of attractions
+        attractions = self.get_attractions()
+        for attraction in attractions:
+            attraction.update_memory()
 
         self.total_steps += 1
 
