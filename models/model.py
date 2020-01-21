@@ -50,15 +50,32 @@ class Themepark(Model):
         self.add_customers(self.N_cust)
 
         self.running = True
+
+        # Dynamic datacollector (werkt niet :( )
+        # self.datacollector = DataCollector(self.datacollection_dict())
+
+        # Hardcoded datacollector
         self.datacollector = DataCollector(
-            # {"Custumors": lambda m: self.schedule_Customer.get_agent_count(),
-            #  "Attractions": lambda m: self.schedule_Attraction.get_agent_count()})
             {"Attraction1": lambda m: self.schedule_Attraction.agents[0].customers_inside(),
             "Attraction2": lambda m: self.schedule_Attraction.agents[1].customers_inside(),
-            "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside()
+            "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside(),
+            "Attraction4": lambda m: self.schedule_Attraction.agents[3].customers_inside(),
+            "Attraction5": lambda m: self.schedule_Attraction.agents[4].customers_inside(),
+            "Attraction6": lambda m: self.schedule_Attraction.agents[5].customers_inside(),
+            "Attraction7": lambda m: self.schedule_Attraction.agents[6].customers_inside()
             })
 
         self.total_waited_time = 0
+
+    # def datacollection_dict(self):
+    #     """ Returns a dictionary for the DataCollector. """
+    #
+    #     dict = {}
+    #     for i in range(NUM_ATTRACTIONS):
+    #         dict["Attraction{}".format(i)] = lambda m: self.schedule_Attraction.agents[i].customers_inside()
+    #
+    #     return dict
+
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
