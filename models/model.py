@@ -210,8 +210,8 @@ class Themepark(Model):
 
         self.schedule.step()
 
+        # update memory of attractions
         attractions = self.get_attractions()
-
         for attraction in attractions:
             attraction.update_memory()
 

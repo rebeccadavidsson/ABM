@@ -34,8 +34,6 @@ class Attraction(Agent):
         """
         Updates the memory of the waitingtimes of the last MEMORY timesteps
         """
-        print("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST")
-        print(self.memory)
         self.memory.append(self.current_waitingtime)
         if len(self.memory) == MEMORY + 1:
             self.memory.remove(self.memory[0])
