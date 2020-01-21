@@ -66,6 +66,26 @@ class HistogramModule(VisualizationElement):
         data = model.calculate_people()
         return data
 
+# class ChartModule(VisualizationElement):
+#     package_includes = ["Chart.min.js"]
+#     local_includes = ["HistogramModule.js"]
+#
+#     def __init__(self, canvas_height, canvas_width):
+#         self.canvas_height = canvas_height
+#         self.canvas_width = canvas_width
+#         self.data_collector_name = "datacollector"
+#         self.data = []
+#         new_element = "new ChartModule({}, {}, {})"
+#         new_element = new_element.format(["Attraction1", "Attraction2", "Attraction3"],canvas_width,
+#                                          canvas_height,
+#                                          self.data)
+#         self.js_code = "elements.push(" + new_element + ");"
+#
+#     def render(self, model):
+#         """Render a histogram with HistogramModule.js"""
+#
+#         data = model.calculate_people()
+#         return data
 
 width = 26
 height = 26
@@ -75,18 +95,18 @@ pixel_ratio = 26
 
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
-# chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
-#                              {"Label": "Sheep", "Color": "#666666"}])
 
-histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 20, 50)
+chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
+                    {"Label": "Attraction2", "Color": "#303F9F"},
+                    {"Label": "Attraction3", "Color": "#F9A825"}], data_collector_name='datacollector')
+
+histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3"], 10, 25)
+# chart = ChartModule(10, 25)
 
 
 server = ModularServer(
     Themepark,
-    # [grid],
-
-    # om histogram aan te zetten, uncomment dit hier onder
-    [grid, histogram],
+    [grid, histogram, chart],
     "Theme Park Model",
     {"N_attr": num_agents, "N_cust": N_cust, "width": width, "height": height},
 )

@@ -163,6 +163,6 @@ class Customer(Agent):
 
     def step(self):
         '''
-        This method should move the customer using the `random_move()` method.
+        This method should move the customer using the `move()` method.
         '''
         self.move()
