@@ -17,26 +17,25 @@ class Attraction(Agent):
         self.model = model
         self.waiting_time = waiting_time
         self.attraction_duration = 10
-        self.max_queue = int(N_cust * 2)
-
         self.current_waitingtime = 0
-        self.attraction_duration = 10
-        # self.max_queue = int(N_cust * 2)
         self.N_current_cust = 0
-
         self.cust_capacity = customer_capacity
         self.cust_in_attr = 0
         self.cust_in_line = 0
-
-
         self.memory = []
+        self.ride_time = 0
 
     def calculate_waiting_time(self):
         '''
-        Calculates current waiting_time of the attraction
-        TODO: Waitingtime blijft soms boven 0 staan!!!
+        Calculates and updates current waiting_time of the attraction.
+
+        TODO
+        Every step that a customer is in an attraction (for a period of attraction_duration),
+        waitingtime has to decrease by 1.
+
         '''
-        waitingtime = self.N_current_cust * self.attraction_duration
+
+        waitingtime = (self.N_current_cust * self.attraction_duration)
         self.current_waitingtime = waitingtime
 
     def update_memory(self):
@@ -67,7 +66,6 @@ class Attraction(Agent):
 
         return counter
 
-
     def run_attraction(self, amount):
         """Customers enter attraction and leave waiting line."""
 
@@ -76,4 +74,5 @@ class Attraction(Agent):
 
     def step(self):
         """step"""
+        # print(self.ride_time)
         self.calculate_waiting_time()

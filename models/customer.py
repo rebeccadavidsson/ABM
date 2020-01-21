@@ -119,13 +119,21 @@ class Customer(Agent):
                 self.waiting = True
 
         # Extra check to see if agent is at destination
-        if self.check_move(new_position) is True:
+        if self.check_move() is True:
             self.model.grid.move_agent(self, new_position)
 
-    def check_move(self, new_position):
+    def check_move(self):
         """ Checks if a move can be done, given a new position."""
 
         if self.pos == self.destination:
+
+            # Check which attraction
+            attractions = self.model.get_attractions()
+            for attraction in attractions:
+                if attraction.pos == self.pos:
+                    self.current_a = attraction
+
+            self.current_a.ride_time += 1
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
@@ -146,6 +154,7 @@ class Customer(Agent):
                         if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
                         attraction.calculate_waiting_time()
+
                     break
 
                 # Check if agent needs to leave or go to new goal
@@ -155,6 +164,9 @@ class Customer(Agent):
                     self.leaving = True
                     self.destination = random.choice(starting_positions)
                     self.waiting = False
+
+            if self.waitingtime == self.waited_period:
+                self.current_a.ride_time = 0
 
         if self.waiting is False:
             return True
@@ -380,5 +392,6 @@ class Customer(Agent):
 
         if self.waiting is True:
             self.sadness_score += 1
-
         self.move()
+
+        # TODO: Voor elke stap de wachttijd laten afnemen

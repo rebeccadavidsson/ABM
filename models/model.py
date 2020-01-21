@@ -29,6 +29,7 @@ path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS
 waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 customer_capacity = [5, 5, 5, 5, 5, 5, 5]
 
+
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, Strategy):
 
@@ -75,7 +76,7 @@ class Themepark(Model):
                 name = str(i)
                 a = Attraction(i, self, waiting_times[i], customer_capacity[i], pos, name, self.N_cust)
                 attractions[i] = a
-                print(a.waiting_time, "waitingtime")
+                # print(a.waiting_time, "waitingtime")
                 self.schedule_Attraction.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
@@ -170,27 +171,6 @@ class Themepark(Model):
 
             attraction.N_current_cust = counter
             counter_total[attraction.unique_id] = counter
-
-        # TODO, dit moet nog uitgebreid worden naar als er bijvorobeeld 3
-        # wachttijden gelijk zijn. Nu wordt alleen gecheckt of wachttijden
-        # bijvorobeeld overal 10 zijn of overal 0, dus overal gelijk.
-
-        # dit is altijd true want dict keys worden meegenomen bij dict.items() en die zijn nooit verschillend (dus set nemen verandert niets)
-        if len(counter_total.items()) == len(set(counter_total.items())):
-            a1 = list(counter_total.items())
-            # print("A11111111111111111111111111111", a1.values())
-            random.shuffle(a1)
-            print(a1)
-            counter_total = dict(a1)
-            print(counter_total)
-
-        # if len(counter_total.values()) != len(set(counter_total.values())):
-
-
-
-        # indexes = []
-        # {indexes.append(k): v for k, v in sorted(counter_total.items(), key=lambda item: item[1])}
-
         return counter_total
 
     def get_durations(self):
