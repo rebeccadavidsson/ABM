@@ -26,9 +26,12 @@ mid_point = (int(WIDTH/2), int(HEIGHT/2))
 
 path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS)
 
+waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
+customer_capacity = [5, 5, 5, 5, 5, 5, 5]
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height):
+
         self.N_attr = N_attr    # num of attraction agents
         self.N_cust = N_cust    # num of customer agents
         self.width = width
@@ -38,6 +41,8 @@ class Themepark(Model):
 
         self.grid = MultiGrid(width, height, torus=False)
         self.schedule = BaseScheduler(self)
+        self.schedule_Attraction = BaseScheduler(self)
+        self.schedule_Customer = BaseScheduler(self)
 
         self.attractions = self.make_attractions()
         self.make_attractions()
@@ -45,9 +50,17 @@ class Themepark(Model):
         self.add_customers(self.N_cust)
 
         self.running = True
+        self.datacollector = DataCollector(
+            # {"Custumors": lambda m: self.schedule_Customer.get_agent_count(),
+            #  "Attractions": lambda m: self.schedule_Attraction.get_agent_count()})
+            {"Attraction1": lambda m: self.schedule_Attraction.agents[0].customers_inside(),
+            "Attraction2": lambda m: self.schedule_Attraction.agents[1].customers_inside(),
+            "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside()
+            })
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
+
         attractions = {}
         for i in range(self.N_attr):
             pos = (x_list[i], y_list[i])
@@ -58,10 +71,10 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, pos, name, self.N_cust)
+                a = Attraction(i, self, waiting_times[i], customer_capacity[i], pos, name, self.N_cust)
                 attractions[i] = a
-
-                self.schedule.add(a)
+                print(a.waiting_time, "waitingtime")
+                self.schedule_Attraction.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
 
@@ -97,7 +110,7 @@ class Themepark(Model):
             if added is True:
                 i = self.cust_ids
             a = Customer(i, self, pos, x_list, y_list, positions)
-            self.schedule.add(a)
+            self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
 
@@ -207,6 +220,9 @@ class Themepark(Model):
         """Advance the model by one step."""
 
         self.schedule.step()
+        self.datacollector.collect(self)
+        self.schedule_Attraction.step()
+        self.schedule_Customer.step()
 
         self.total_steps += 1
 
