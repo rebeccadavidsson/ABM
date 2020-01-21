@@ -30,7 +30,7 @@ waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 customer_capacity = [5, 5, 5, 5, 5, 5, 5]
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height):
+    def __init__(self, N_attr, N_cust, width, height, Strategy):
 
         self.N_attr = N_attr    # num of attraction agents
         self.N_cust = N_cust    # num of customer agents
