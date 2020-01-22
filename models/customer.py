@@ -48,6 +48,9 @@ class Customer(Agent):
         if self.has_app is True:
             self.destination = self.search_best_option()
 
+        self.memory_strategy = 1
+
+
     def get_goals(self):
         """Set random goals."""
 
@@ -242,6 +245,14 @@ class Customer(Agent):
                 return i
             if index >= len(self.positions):
                 return i
+    def strategy_distance():
+        pass
+
+    def strategy_time():
+        pass
+
+
+
 
     def search_best_option(self):
         """
