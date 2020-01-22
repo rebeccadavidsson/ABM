@@ -38,10 +38,13 @@ class Customer(Agent):
         self.sadness_score = 0
 
         self.strategy = strategy
-        if self.strategy is True:
+        if self.strategy == "Random":
+            self.has_app = False
+        elif self.strategy == "Knowledge":
             self.has_app = True
         else:
-            self.has_app = False
+            raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
+            quit()
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -280,7 +283,6 @@ class Customer(Agent):
                 return i + 1
             else:
                 return i
-
 
     def search_best_option(self):
         """
