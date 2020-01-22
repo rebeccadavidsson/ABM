@@ -56,6 +56,9 @@ class Customer(Agent):
             self.checked_app = False
             self.destination = self.search_best_option()
 
+        self.memory_strategy = 1
+
+
     def get_goals(self):
         """Set random goals."""
 
@@ -283,6 +286,14 @@ class Customer(Agent):
                 return i + 1
             else:
                 return i
+    def strategy_distance():
+        pass
+
+    def strategy_time():
+        pass
+
+
+
 
     def search_best_option(self):
         """
