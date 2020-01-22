@@ -18,6 +18,7 @@ HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
 NUM_ATTRACTIONS = 7
+MAX_TIME = 500
 RADIUS = int(WIDTH/2)
 
 
@@ -46,7 +47,7 @@ class Themepark(Model):
         self.schedule = BaseScheduler(self)
         self.schedule_Attraction = BaseScheduler(self)
         self.schedule_Customer = BaseScheduler(self)
-
+        self.totalTOTAL = 0
         self.attractions = self.make_attractions()
         self.make_attractions()
         self.make_route()
@@ -228,22 +229,32 @@ class Themepark(Model):
 
                 self.grid.place_agent(path, pos)
 
+    def final(self):
+        """ Return data """
+        print("RUN HAS ENDED")
+        quit()
+
     def step(self):
         """Advance the model by one step."""
+        if self.totalTOTAL < MAX_TIME:
+            self.totalTOTAL += 1
+            self.schedule.step()
+            self.datacollector.collect(self)
+            self.schedule_Attraction.step()
+            self.schedule_Customer.step()
 
-        self.schedule.step()
-        self.datacollector.collect(self)
-        self.schedule_Attraction.step()
-        self.schedule_Customer.step()
+            # update memory of attractions
+            attractions = self.get_attractions()
+            for attraction in attractions:
+                attraction.update_memory()
 
-        # update memory of attractions
-        attractions = self.get_attractions()
-        for attraction in attractions:
-            attraction.update_memory()
+            self.total_steps += 1
 
-        self.total_steps += 1
-
-        if self.total_steps > random.randrange(10, 20) and self.cust_ids < self.N_cust * 2:
-            self.cust_ids += 1
-            self.add_customers(1, added=True)
-            self.total_steps = 0
+            if self.total_steps > random.randrange(10, 20) and \
+               self.cust_ids < self.N_cust * 2 and \
+               self.totalTOTAL < int(MAX_TIME/1.3):
+                self.cust_ids += 1
+                self.add_customers(1, added=True)
+                self.total_steps = 0
+        else:
+            self.final()
