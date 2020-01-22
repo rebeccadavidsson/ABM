@@ -15,7 +15,7 @@ starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, x_list, y_list, positions):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
@@ -37,8 +37,11 @@ class Customer(Agent):
         self.current_a = None
         self.sadness_score = 0
 
-        self.has_app = random.choice([True, False])
-        # self.has_app = True
+        self.strategy = strategy
+        if self.strategy is True:
+            self.has_app = True
+        else:
+            self.has_app = False
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -115,6 +118,13 @@ class Customer(Agent):
                 # Only move if there is no queue
                 self.model.grid.move_agent(self, new_position)
 
+                # Get object of current attraction
+                attractions = self.model.get_attractions()
+                for attraction in attractions:
+                    if attraction.pos == new_position:
+                        current_a = attraction
+                self.current_a = current_a
+
                 self.set_waiting_time()
                 self.waiting = True
 
@@ -166,7 +176,7 @@ class Customer(Agent):
                     self.waiting = False
 
             if self.waitingtime == self.waited_period:
-                self.current_a.ride_time = 0
+                self.current_a = None
 
         if self.waiting is False:
             return True
@@ -395,3 +405,5 @@ class Customer(Agent):
         self.move()
 
         # TODO: Voor elke stap de wachttijd laten afnemen
+        # if self.current_a:
+        #     print(self.current_a.unique_id)

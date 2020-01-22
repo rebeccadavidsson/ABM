@@ -31,7 +31,7 @@ customer_capacity = [5, 5, 5, 5, 5, 5, 5]
 
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, Strategy):
+    def __init__(self, N_attr, N_cust, width, height, strategy):
 
         self.N_attr = N_attr    # num of attraction agents
         self.N_cust = N_cust    # num of customer agents
@@ -39,7 +39,7 @@ class Themepark(Model):
         self.height = height
         self.total_steps = 0
         self.cust_ids = N_cust
-
+        self.strategy = strategy
         self.grid = MultiGrid(width, height, torus=False)
         self.schedule = BaseScheduler(self)
         self.schedule_Attraction = BaseScheduler(self)
@@ -129,7 +129,7 @@ class Themepark(Model):
                   .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
-            a = Customer(i, self, pos, x_list, y_list, positions)
+            a = Customer(i, self, pos, x_list, y_list, positions, self.strategy)
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)

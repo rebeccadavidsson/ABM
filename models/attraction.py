@@ -32,8 +32,13 @@ class Attraction(Agent):
         TODO
         Every step that a customer is in an attraction (for a period of attraction_duration),
         waitingtime has to decrease by 1.
-
         '''
+
+        # PSEUDOCODE:
+        # Elke stap dat een customer aan het wachten is moet de wachttijd afnemen
+
+        # 1. Check voor elke attractie wat de wachttijd is.
+        # 2. Als de wachttijd groter is dan 1, laat de wachttijd elke stap afnemen.
 
         waitingtime = (self.N_current_cust * self.attraction_duration)
         self.current_waitingtime = waitingtime

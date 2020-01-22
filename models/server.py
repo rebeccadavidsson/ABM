@@ -10,7 +10,7 @@ from .attraction import Attraction
 
 width = 36
 height = 36
-N_cust = 8
+N_cust = 15
 pixel_ratio = 20
 num_agents = 7
 
@@ -132,8 +132,8 @@ model_params = {
     "height": height,
     "width": width,
     "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
-    "N_cust": UserSettableParameter("slider", "Number of customers", N_cust, 1, num_agents, 1),
-    "Strategy": UserSettableParameter('checkbox', 'Strategic', value=True)
+    "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust, 1),
+    "strategy": UserSettableParameter('checkbox', 'Strategic', value=True),
 }
 
 server = ModularServer(
