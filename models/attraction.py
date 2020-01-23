@@ -40,8 +40,16 @@ class Attraction(Agent):
         # 1. Check voor elke attractie wat de wachttijd is.
         # 2. Als de wachttijd groter is dan 1, laat de wachttijd elke stap afnemen.
 
-        waitingtime = (self.N_current_cust * self.attraction_duration)
+        waitingtime = (self.N_current_cust * self.attraction_duration) - self.ride_time
         self.current_waitingtime = waitingtime
+
+        if self.unique_id == 0:
+            print("-------------------------------------")
+            print("id: ", self.unique_id)
+            print("ride time: ", self.ride_time)
+            print("current cust: ", self.N_current_cust)
+            print("attraction duration: ", self.attraction_duration)
+            print("current_waitingtime: ", self.current_waitingtime)
 
     def update_memory(self):
         """
@@ -79,5 +87,5 @@ class Attraction(Agent):
 
     def step(self):
         """step"""
-        # print(self.ride_time)
+
         self.calculate_waiting_time()

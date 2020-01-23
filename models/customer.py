@@ -36,6 +36,8 @@ class Customer(Agent):
         self.waited_period = 0
         self.current_a = None
         self.sadness_score = 0
+        self.in_attraction = False
+
 
         self.strategy = strategy
         if self.strategy is True:
@@ -143,13 +145,18 @@ class Customer(Agent):
                 if attraction.pos == self.pos:
                     self.current_a = attraction
 
-            self.current_a.ride_time += 1
+            # self.current_a. += 1
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
 
             if self.waitingtime <= self.waited_period:
+
+                # # reset ride time
+                # if self.current_a is not None:
+                #     attraction = self.current_a
+                #     attraction.ride_time = 0
 
                 # Update goals and attraction
                 for attraction in self.goals:
@@ -176,6 +183,7 @@ class Customer(Agent):
                     self.waiting = False
 
             if self.waitingtime == self.waited_period:
+
                 self.current_a = None
 
         if self.waiting is False:
