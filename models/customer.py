@@ -36,18 +36,28 @@ class Customer(Agent):
         self.waited_period = 0
         self.current_a = None
         self.sadness_score = 0
+        self.in_attraction = False
+
 
         self.strategy = strategy
         if self.strategy == "Random":
             self.has_app = True
         elif self.strategy == "Knowledge":
             self.has_app = True
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ee44be986b434b4a4aeaee9a1e4567ae785bf2b
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
 
+<<<<<<< HEAD
         self.guided = False
+=======
+        self.guided = True
+
+>>>>>>> 1ee44be986b434b4a4aeaee9a1e4567ae785bf2b
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -153,13 +163,18 @@ class Customer(Agent):
                 if attraction.pos == self.pos:
                     self.current_a = attraction
 
-            self.current_a.ride_time += 1
+            # self.current_a. += 1
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
 
             if self.waitingtime <= self.waited_period:
+
+                # # reset ride time
+                # if self.current_a is not None:
+                #     attraction = self.current_a
+                #     attraction.ride_time = 0
 
                 # Update goals and attraction
                 for attraction in self.goals:
@@ -186,6 +201,7 @@ class Customer(Agent):
                     self.waiting = False
 
             if self.waitingtime == self.waited_period:
+
                 self.current_a = None
 
         if self.waiting is False:
@@ -426,6 +442,7 @@ class Customer(Agent):
 
         if self.waiting is True:
             self.sadness_score += 1
+
         self.move()
 
         # TODO: Voor elke stap de wachttijd laten afnemen

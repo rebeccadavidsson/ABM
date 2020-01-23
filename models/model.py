@@ -20,14 +20,15 @@ NUM_OBSTACLES = 0
 NUM_ATTRACTIONS = 7
 MAX_TIME = 500
 RADIUS = int(WIDTH/2)
+METHOD = "circle"
 
 
-x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS)
+x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS, METHOD)
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 
 
-path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS)
+path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS, METHOD)
 
 waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 customer_capacity = [5, 5, 5, 5, 5, 5, 5]
