@@ -10,7 +10,6 @@ import heapq
 
 WIDTH = 36
 HEIGHT = 36
-NUM_OBSTACLES = 20
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
@@ -24,9 +23,11 @@ class Customer(Agent):
         self.y_list = y_list
         self.positions = positions
 
-        self.destination = random.choice(positions)
-        while self.destination is self.pos:
-            self.destination = random.choice(positions)
+        # self.destination = random.choice(positions)
+        # while self.destination is self.pos:
+        #     self.destination = random.choice(positions)
+
+        self.destination = self.closest_by().pos
 
         self.waitingtime = None
         self.waiting = False
@@ -42,8 +43,9 @@ class Customer(Agent):
         if self.strategy == "Random":
             self.has_app = False
         elif self.strategy == "Knowledge":
+            self.has_app = True
+        elif self.strategy == "Closest_by":
             self.has_app = False
-
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
@@ -66,18 +68,24 @@ class Customer(Agent):
 
     def get_goals(self):
         """Set random goals."""
+        #
+        # attractions = self.model.get_attractions()
+        # r = random.randint(1, len(attractions))
+        # goals = []
+        # for i in range(r):
+        #     rand_choice = random.choice(attractions)
+        #     goals.append(rand_choice)
+        #     attractions.remove(rand_choice)
+        # # goals.append(attractions[3])
+        # # goals.append(attractions[4])
+        # # goals.append(attractions[5])
+        # print("goals = ", goals)
+        # return goals
 
-        attractions = self.model.get_attractions()
-        r = random.randint(1, len(attractions))
         goals = []
-        for i in range(r):
-            rand_choice = random.choice(attractions)
-            goals.append(rand_choice)
-            attractions.remove(rand_choice)
-        # goals.append(attractions[3])
-        # goals.append(attractions[4])
-        # goals.append(attractions[5])
-
+        attractions = self.model.get_attractions()
+        for attr in attractions:
+            goals.append(attr)
         return goals
 
     def make_history(self):
@@ -103,7 +111,7 @@ class Customer(Agent):
         penalty = total_difference_sum * self.model.penalty_per
 
         return penalty
-        
+
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
@@ -198,32 +206,34 @@ class Customer(Agent):
                 #     attraction.ride_time = 0
 
                 # Update goals and attraction
-                for attraction in self.goals:
+                for attraction in self.model.get_attractions():
 
                     if attraction.pos == self.pos:
 
                         # set checked_app = False so app can be checked at the
                         # first step when cstomer walks away from an attraction.
-                        self.checked_app = False
-                        self.goals.remove(attraction)
-                        self.sadness_score -= 20
+                        # self.checked_app = False
+                        # self.goals.remove(attraction)
+                        # self.sadness_score -= 20
                         if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
                         # attraction.calculate_waiting_time()
 
-                    break
+                    # break
 
                 # Check if agent needs to leave or go to new goal
-                if len(self.goals) > 0:
-                    self.get_destination()
-                elif self.leaving is False:
-                    self.leaving = True
-                    self.destination = random.choice(starting_positions)
-                    self.waiting = False
+                # if len(self.goals) > 0:
+                #     self.get_destination()
+                # elif self.leaving is False:
+                #     self.leaving = True
+                #     self.destination = random.choice(starting_positions)
+                #     self.waiting = False
 
             if self.waitingtime == self.waited_period:
 
                 self.current_a = None
+                self.destination = self.closest_by().pos
+                self.waiting = False
 
         if self.waiting is False:
             return True
@@ -319,6 +329,10 @@ class Customer(Agent):
         # Start with best solution
         temp = scores.get(index)
 
+        if index > len(self.positions):
+            print('\033[93m' + "There was no best choice... Index =" + str(index) + '\033[0m')
+            index = len(self.positions)
+
         for i in range(index, len(scores) + 1):
 
             if not scores.get(i + 1):
@@ -327,6 +341,7 @@ class Customer(Agent):
                 return i + 1
             else:
                 return i
+
     def strategy_distance():
         pass
 
@@ -362,6 +377,8 @@ class Customer(Agent):
 
         while self.positions[best_choice] not in goals_positions and index < len(self.positions):
             best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            if best_choice is None:
+                print('\033[93m' + "There was no best choice...?" + '\033[0m')
             index += 1
 
         # Best choice is found!!!
@@ -457,7 +474,6 @@ class Customer(Agent):
 
 
         if self.has_app is True and self.checked_app is False:
-            # print("hoi")
             self.update_choice()
             self.checked_app = True
 
@@ -470,12 +486,12 @@ class Customer(Agent):
         # if self.current_a:
         #     print(self.current_a.unique_id)
 
-    def closest_by():
-        Predictions = {}
+    def closest_by(self):
+        predictions = self.get_walking_distances()
         minval = min(predictions.values())
         res = [k for k, v in predictions.items() if v==minval]
         if len(res) is 1:
             predicted_attraction = res[0]
         else:
             predicted_attraction = random.choice(res)
-        return predicted_attraction
+        return self.model.attractions[predicted_attraction]

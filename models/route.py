@@ -5,6 +5,8 @@ import math
 
 WIDTH = 36
 HEIGHT = 36
+NUM_CLUSTERS = 3
+MAX = 4
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
 
 
@@ -57,14 +59,41 @@ def get_attraction_coordinates(width, height, num_attractions, method):
     elif method == "circle":
         r = width / 3
         total = calc_points(r, num_attractions, WIDTH, HEIGHT)
-        print(total)
+
         for i in total:
             xlist.append(i[0])
             ylist.append(i[1])
+
+    elif method == "cluster":
+
+        for i in range(NUM_CLUSTERS):
+            xlist.append(random.randrange(MAX, WIDTH - MAX))
+            ylist.append(random.randrange(6, HEIGHT - MAX))
+            total.append((xlist[i], ylist[i]))
+
+        counter = 0
+        for i in range(len(total)):
+
+            while counter < num_attractions - NUM_CLUSTERS:
+
+                current_clust = random.choice(total)
+                x_r = random.randrange(-MAX, MAX)
+                y_r = random.randrange(-MAX, MAX)
+                coordinate = (current_clust[0] + x_r, current_clust[1] + y_r)
+                while coordinate in total:
+                    x_r = random.randrange(-MAX, MAX)
+                    y_r = random.randrange(-MAX, MAX)
+                    coordinate = (current_clust[0] + x_r, current_clust[1] + y_r)
+
+                xlist.append(coordinate[0])
+                ylist.append(coordinate[1])
+                total.append(coordinate)
+
+                counter += 1
 
     return xlist, ylist, total
 
 
 def calc_points(r, n, WIDTH, HEIGHT):
-    print()
-    return [(int(math.cos(2* np.pi/n*x)*r) + int(WIDTH / 2), int(math.sin(2* np.pi/n*x)*r) + int(HEIGHT / 2)) for x in range(0, n+10)]
+
+    return [(int(math.cos(2* np.pi/n*x)*r) + int(WIDTH / 2), int(math.sin(2* np.pi/n*x)*r) + int(HEIGHT / 2)) for x in range(0, n)]

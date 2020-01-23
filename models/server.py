@@ -12,7 +12,7 @@ width = 36
 height = 36
 N_cust = 15
 pixel_ratio = 20
-num_agents = 7
+num_agents = 15
 
 
 def agent_draw(agent):
@@ -117,13 +117,13 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
-                    {"Label": "Attraction2", "Color": "#303F9F"},
-                    {"Label": "Attraction3", "Color": "#7B1FA2"},
-                    {"Label": "Attraction4", "Color": "#D81B60"},
-                    {"Label": "Attraction5", "Color": "#2E7D32"},
-                    {"Label": "Attraction6", "Color": "#F4511E"},
-                    {"Label": "Attraction7", "Color": "#F9A825"}], data_collector_name='datacollector')
+# chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
+#                     {"Label": "Attraction2", "Color": "#303F9F"},
+#                     {"Label": "Attraction3", "Color": "#7B1FA2"},
+#                     {"Label": "Attraction4", "Color": "#D81B60"},
+#                     {"Label": "Attraction5", "Color": "#2E7D32"},
+#                     {"Label": "Attraction6", "Color": "#F4511E"},
+#                     {"Label": "Attraction7", "Color": "#F9A825"}], data_collector_name='datacollector')
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
                             "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
@@ -132,14 +132,18 @@ model_params = {
     "height": height,
     "width": width,
     "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
-    "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust, 1),
+
+    "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust * 2, 1),
     "strategy": UserSettableParameter('choice', 'Strategy choice', value='Random',
-                                      choices=['Random', 'Knowledge', 'Guided']),
+                                      choices=['Random', 'Knowledge', 'Guided', 'Closest_by']),
+    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='circle',
+                                      choices=['random', 'circle', 'cluster']),
 }
 
 server = ModularServer(
     Themepark,
-    [grid, histogram, chart],
+    # [grid, histogram, chart],
+    [grid, histogram],
     "Theme Park Model",
     model_params,
 )
