@@ -22,12 +22,15 @@ class Customer(Agent):
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
+        self.strategy = strategy
 
-        # self.destination = random.choice(positions)
-        # while self.destination is self.pos:
-        #     self.destination = random.choice(positions)
+        if self.strategy == 'Random':
+            self.destination = random.choice(positions)
+            while self.destination is self.pos:
+                self.destination = random.choice(positions)
 
-        self.destination = self.closest_by().pos
+        if self.strategy == 'Closest_by':
+            self.destination = self.closest_by().pos
 
         self.waitingtime = None
         self.waiting = False
@@ -234,10 +237,16 @@ class Customer(Agent):
 
                 # increment number of rides taken of customer
                 self.nmbr_attractions += 1
-
+                self.total_ever_waited += self.waited_period
                 self.waited_period = 0
                 self.current_a = None
-                self.destination = self.closest_by().pos
+                if self.strategy == "Closest_by":
+                    self.destination = self.closest_by().pos
+                if self.strategy == 'Random':
+                    self.destination = random.choice(self.positions)
+                    while self.destination is self.pos:
+                        self.destination = random.choice(self.positions)
+
                 self.waiting = False
 
         if self.waiting is False:

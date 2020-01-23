@@ -17,7 +17,7 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
-MAX_TIME = 400
+MAX_TIME = 200
 RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
@@ -288,8 +288,8 @@ class Themepark(Model):
 
         cust_data = self.get_data_customers()
 
-        pickle.dump(self.data_dict, open("data/attractions.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers.p", 'wb'))
+        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
 
         print()
         print("RUN HAS ENDED")
