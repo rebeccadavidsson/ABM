@@ -10,7 +10,6 @@ import heapq
 
 WIDTH = 36
 HEIGHT = 36
-NUM_OBSTACLES = 20
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
@@ -173,6 +172,11 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
+                # increment number of rides taken
+                if self.current_a is not None:
+                    self.current_a.rides_taken += 1
+
+
                 # # reset ride time
                 # if self.current_a is not None:
                 #     attraction = self.current_a
@@ -302,6 +306,10 @@ class Customer(Agent):
         # Start with best solution
         temp = scores.get(index)
 
+        if index > len(self.positions):
+            print('\033[93m' + "There was no best choice... Index =" + str(index) + '\033[0m')
+            index = len(self.positions)
+
         for i in range(index, len(scores) + 1):
 
             if not scores.get(i + 1):
@@ -310,6 +318,7 @@ class Customer(Agent):
                 return i + 1
             else:
                 return i
+
     def strategy_distance():
         pass
 
@@ -345,6 +354,8 @@ class Customer(Agent):
 
         while self.positions[best_choice] not in goals_positions and index < len(self.positions):
             best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            if best_choice is None:
+                print('\033[93m' + "There was no best choice...?" + '\033[0m')
             index += 1
 
         # Best choice is found!!!
@@ -422,7 +433,7 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-        print(best, "best")
+        # print(best, "best")
         if best is not None:
             self.destination = best
 
@@ -440,7 +451,6 @@ class Customer(Agent):
 
 
         if self.has_app is True and self.checked_app is False:
-            print("hoi")
             self.update_choice()
             self.checked_app = True
 
