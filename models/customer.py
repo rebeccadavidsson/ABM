@@ -440,3 +440,13 @@ class Customer(Agent):
         # TODO: Voor elke stap de wachttijd laten afnemen
         # if self.current_a:
         #     print(self.current_a.unique_id)
+
+    def closest_by():
+        Predictions = {}
+        minval = min(predictions.values())
+        res = [k for k, v in predictions.items() if v==minval]
+        if len(res) is 1:
+            predicted_attraction = res[0]
+        else:
+            predicted_attraction = random.choice(res)
+        return predicted_attraction
