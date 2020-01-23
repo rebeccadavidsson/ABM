@@ -42,10 +42,12 @@ class Customer(Agent):
             self.has_app = True
         elif self.strategy == "Knowledge":
             self.has_app = True
-        self.guided = True
+
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
+
+        self.guided = False
 
         # Random if customer has the app
         self.goals = self.get_goals()
