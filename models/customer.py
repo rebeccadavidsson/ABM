@@ -437,7 +437,6 @@ class Customer(Agent):
         if best is not None:
             self.destination = best
 
-
         if self.guided is True and best is not None:
             self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
 

@@ -17,7 +17,7 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
-MAX_TIME = 500
+MAX_TIME = 400
 RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 
@@ -48,6 +48,7 @@ class Themepark(Model):
         self.make_route()
         self.add_customers(self.N_cust)
         self.running = True
+        self.data = []
 
 
 
@@ -158,7 +159,7 @@ class Themepark(Model):
                     attraction = agent
 
             attraction.N_current_cust = counter
-            counter_total[attraction_pos] = counter
+            counter_total[attraction.unique_id] = counter
 
         return list(counter_total.values())
 
@@ -228,6 +229,8 @@ class Themepark(Model):
 
     def final(self):
         """ Return data """
+        print(self.data)
+        print()
         print("RUN HAS ENDED")
         quit()
 
@@ -241,6 +244,14 @@ class Themepark(Model):
             total_current += attraction.current_waitingtime
 
         return total_current
+
+    def save_data(self):
+        """Save data of all attractions and customers."""
+
+        # Get info
+        waitinglines = self.calculate_people_sorted()
+
+        self.data.append(waitinglines)
 
 
     def step(self):
@@ -266,5 +277,8 @@ class Themepark(Model):
                 self.cust_ids += 1
                 self.add_customers(1, added=True)
                 self.total_steps = 0
+
+            self.save_data()
+
         else:
             self.final()
