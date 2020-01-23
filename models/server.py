@@ -133,8 +133,9 @@ model_params = {
     "width": width,
     "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
     "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust, 1),
-    "strategy": UserSettableParameter('choice', 'Strategy choice', value='Random',
-                                      choices=['Random', 'Knowledge', 'Guided']),
+    # "strategy": UserSettableParameter('choice', 'Strategy choice', value='Random',
+    #                                   choices=['Random', 'Knowledge', 'Guided']),
+    "strategy": "Closest_by"
 }
 
 server = ModularServer(
