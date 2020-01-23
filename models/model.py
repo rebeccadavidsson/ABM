@@ -20,7 +20,7 @@ NUM_OBSTACLES = 0
 MAX_TIME = 500
 RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
-
+PENALTY_PERCENTAGE = 5
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme):
@@ -47,6 +47,8 @@ class Themepark(Model):
         self.make_attractions()
         self.make_route()
         self.add_customers(self.N_cust)
+        self.penalty_per = PENALTY_PERCENTAGE
+
         self.running = True
 
 

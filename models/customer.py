@@ -40,10 +40,9 @@ class Customer(Agent):
         self.sadness_score = 0
         self.in_attraction = False
 
-
         self.strategy = strategy
         if self.strategy == "Random":
-            self.has_app = True
+            self.has_app = False
         elif self.strategy == "Knowledge":
             self.has_app = True
         elif self.strategy == "Closest_by":
@@ -52,12 +51,12 @@ class Customer(Agent):
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
 
-        self.guided = True
-
+        self.guided = False
 
         # Random if customer has the app
         self.goals = self.get_goals()
         self.reached_goals = False
+        self.history = self.make_history()
 
         self.leaving = False
 
@@ -89,6 +88,30 @@ class Customer(Agent):
         for attr in attractions:
             goals.append(attr)
         return goals
+
+    def make_history(self):
+        history = {}
+        attractions = self.model.get_attractions()
+        for attraction in range(len(attractions)):
+            history[attraction] = 0
+
+        return history
+
+    def penalty(self, current_attraction):
+
+        total_difference_sum = 0
+        for attraction in self.model.get_attractions():
+            difference = current_attraction - self.history[attraction]
+
+            total_difference_sum += difference
+
+        if total_difference_sum < 0:
+            total_difference_sum = 0
+
+
+        penalty = total_difference_sum * self.model.penalty_per
+
+        return penalty
 
     def move(self):
         '''
