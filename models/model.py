@@ -235,6 +235,18 @@ class Themepark(Model):
         print("RUN HAS ENDED")
         quit()
 
+    def get_themepark_score(self):
+        """
+        Get current waiting time of the themepark
+        """
+        attractions = self.get_attractions()
+        total_current = 0
+        for attraction in attractions:
+            total_current += attraction.current_waitingtime
+
+        return total_current
+
+
     def step(self):
         """Advance the model by one step."""
         if self.totalTOTAL < MAX_TIME:

@@ -163,6 +163,11 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
+                # increment number of rides taken
+                if self.current_a is not None:
+                    self.current_a.rides_taken += 1
+
+
                 # # reset ride time
                 # if self.current_a is not None:
                 #     attraction = self.current_a
@@ -410,7 +415,7 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-        print(best, "best")
+        # print(best, "best")
         if best is not None:
             self.destination = best
 
@@ -428,7 +433,7 @@ class Customer(Agent):
 
 
         if self.has_app is True and self.checked_app is False:
-            print("hoi")
+            # print("hoi")
             self.update_choice()
             self.checked_app = True
 
