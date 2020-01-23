@@ -22,6 +22,7 @@ RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
 
+
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme):
         self.theme = theme
