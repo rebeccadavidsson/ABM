@@ -30,8 +30,8 @@ mid_point = (int(WIDTH/2), int(HEIGHT/2))
 
 path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS, METHOD)
 
-waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-customer_capacity = [5, 5, 5, 5, 5, 5, 5]
+waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5,5,5,5,5,5,5]
+customer_capacity = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5,5,5,5,5,5,5]
 
 
 class Themepark(Model):
@@ -89,11 +89,12 @@ class Themepark(Model):
 
         attractions = {}
         for i in range(self.N_attr):
+
             pos = (x_list[i], y_list[i])
 
             if self.grid.is_cell_empty(pos):
-                print("Creating ATTRACTION agent {2} at ({0}, {1})"
-                      .format(x_list[i], y_list[i], i))
+                # print("Creating ATTRACTION agent {2} at ({0}, {1})"
+                #       .format(x_list[i], y_list[i], i))
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
@@ -131,8 +132,8 @@ class Themepark(Model):
 
             pos = (rand_x, rand_y)
 
-            print("Creating CUSTOMER agent {2} at ({0}, {1})"
-                  .format(rand_x, rand_y, i))
+            # print("Creating CUSTOMER agent {2} at ({0}, {1})"
+            #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
             a = Customer(i, self, pos, x_list, y_list, positions, self.strategy)
