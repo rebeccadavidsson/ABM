@@ -17,28 +17,22 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
-NUM_ATTRACTIONS = 7
 MAX_TIME = 500
 RADIUS = int(WIDTH/2)
-METHOD = "circle"
-
-
-x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS, METHOD)
-starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 
 
-path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, NUM_ATTRACTIONS, METHOD)
-
-waiting_times = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5,5,5,5,5,5,5]
-customer_capacity = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5,5,5,5,5,5,5]
-
-
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy):
-
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme):
+        self.theme = theme
+        self.N_attr = N_attr
+        self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
+        self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
+        self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
         self.N_attr = N_attr    # num of attraction agents
         self.N_cust = N_cust    # num of customer agents
+        self.waiting_times = [5.0] * self.N_attr
+        self.customer_capacity = [5.0] * self.N_attr
         self.width = width
         self.height = height
         self.total_steps = 0
@@ -53,10 +47,9 @@ class Themepark(Model):
         self.make_attractions()
         self.make_route()
         self.add_customers(self.N_cust)
-
         self.running = True
 
-        self.monitor = Monitor(MAX_TIME,NUM_ATTRACTIONS, positions)
+
 
         # Dynamic datacollector (werkt niet :( )
         # self.datacollector = DataCollector(self.datacollection_dict())
@@ -74,11 +67,13 @@ class Themepark(Model):
 
         self.total_waited_time = 0
 
+        self.monitor = Monitor(MAX_TIME, self.N_attr, self.positions)
+
     # def datacollection_dict(self):
     #     """ Returns a dictionary for the DataCollector. """
     #
     #     dict = {}
-    #     for i in range(NUM_ATTRACTIONS):
+    #     for i in range(self.N_attr):
     #         dict["Attraction{}".format(i)] = lambda m: self.schedule_Attraction.agents[i].customers_inside()
     #
     #     return dict
@@ -90,7 +85,7 @@ class Themepark(Model):
         attractions = {}
         for i in range(self.N_attr):
 
-            pos = (x_list[i], y_list[i])
+            pos = (self.x_list[i], self.y_list[i])
 
             if self.grid.is_cell_empty(pos):
                 # print("Creating ATTRACTION agent {2} at ({0}, {1})"
@@ -98,7 +93,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, waiting_times[i], customer_capacity[i], pos, name, self.N_cust)
+                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust)
                 attractions[i] = a
                 # print(a.waiting_time, "waitingtime")
                 self.schedule_Attraction.add(a)
@@ -127,7 +122,7 @@ class Themepark(Model):
 
         for i in range(N_cust):
 
-            pos_temp = random.choice(starting_positions)
+            pos_temp = random.choice(self.starting_positions)
             rand_x, rand_y = pos_temp[0], pos_temp[1]
 
             pos = (rand_x, rand_y)
@@ -136,7 +131,7 @@ class Themepark(Model):
             #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
-            a = Customer(i, self, pos, x_list, y_list, positions, self.strategy)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy)
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
@@ -146,7 +141,7 @@ class Themepark(Model):
 
         counter_total = {}
 
-        for attraction_pos in positions:
+        for attraction_pos in self.positions:
 
             agents = self.grid.get_neighbors(
                 attraction_pos,
@@ -177,7 +172,7 @@ class Themepark(Model):
 
         counter_total = {}
 
-        for attraction_pos in positions:
+        for attraction_pos in self.positions:
 
             agents = self.grid.get_neighbors(
                 attraction_pos,
@@ -202,7 +197,7 @@ class Themepark(Model):
 
         durations = []
 
-        for attraction_pos in positions:
+        for attraction_pos in self.positions:
 
             agents = self.grid.get_neighbors(
                 attraction_pos,
@@ -220,10 +215,10 @@ class Themepark(Model):
     def make_route(self):
         """Draw coordinates of a possible path."""
 
-        for i in range(len(path_coordinates)):
-            pos = path_coordinates[i]
+        for i in range(len(self.path_coordinates)):
+            pos = self.path_coordinates[i]
 
-            if pos not in positions:
+            if pos not in self.positions:
 
                 # Create path agent
                 path = Route(i, self, pos)
