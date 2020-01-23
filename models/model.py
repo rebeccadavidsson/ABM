@@ -10,6 +10,8 @@ import numpy as np
 from .route import get_coordinates, get_attraction_coordinates, Route
 from .customer import Customer
 from .attraction import Attraction
+from .monitor import Monitor
+
 
 WIDTH = 36
 HEIGHT = 36
@@ -53,6 +55,8 @@ class Themepark(Model):
         self.add_customers(self.N_cust)
 
         self.running = True
+
+        self.monitor = Monitor(MAX_TIME,NUM_ATTRACTIONS, positions)
 
         # Dynamic datacollector (werkt niet :( )
         # self.datacollector = DataCollector(self.datacollection_dict())

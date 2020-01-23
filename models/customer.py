@@ -36,15 +36,20 @@ class Customer(Agent):
         self.waited_period = 0
         self.current_a = None
         self.sadness_score = 0
+        self.in_attraction = False
+
 
         self.strategy = strategy
         if self.strategy == "Random":
-            self.has_app = False
+            self.has_app = True
         elif self.strategy == "Knowledge":
             self.has_app = True
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
+
+        self.guided = True
+
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -72,6 +77,7 @@ class Customer(Agent):
         # goals.append(attractions[3])
         # goals.append(attractions[4])
         # goals.append(attractions[5])
+
         return goals
 
     def move(self):
@@ -149,13 +155,18 @@ class Customer(Agent):
                 if attraction.pos == self.pos:
                     self.current_a = attraction
 
-            self.current_a.ride_time += 1
+            # self.current_a. += 1
             self.waited_period += 1
 
         # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
 
             if self.waitingtime <= self.waited_period:
+
+                # # reset ride time
+                # if self.current_a is not None:
+                #     attraction = self.current_a
+                #     attraction.ride_time = 0
 
                 # Update goals and attraction
                 for attraction in self.goals:
@@ -182,6 +193,7 @@ class Customer(Agent):
                     self.waiting = False
 
             if self.waitingtime == self.waited_period:
+
                 self.current_a = None
 
         if self.waiting is False:
@@ -398,9 +410,13 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-
+        print(best, "best")
         if best is not None:
             self.destination = best
+
+
+        if self.guided is True and best is not None:
+            self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
 
     def step(self):
         """
@@ -409,7 +425,10 @@ class Customer(Agent):
 
         # Update customer choice of destination while walking,
         # only for those who have the app
+
+
         if self.has_app is True and self.checked_app is False:
+            print("hoi")
             self.update_choice()
             self.checked_app = True
 
