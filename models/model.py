@@ -55,7 +55,7 @@ class Themepark(Model):
 
         self.running = True
 
-        self.monitor = Monitor()
+        self.monitor = Monitor(MAX_TIME,NUM_ATTRACTIONS, positions)
 
         # Dynamic datacollector (werkt niet :( )
         # self.datacollector = DataCollector(self.datacollection_dict())

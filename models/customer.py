@@ -39,9 +39,10 @@ class Customer(Agent):
 
         self.strategy = strategy
         if self.strategy == "Random":
-            self.has_app = False
+            self.has_app = True
         elif self.strategy == "Knowledge":
             self.has_app = True
+        self.guided = True
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
@@ -72,6 +73,7 @@ class Customer(Agent):
         # goals.append(attractions[3])
         # goals.append(attractions[4])
         # goals.append(attractions[5])
+
         return goals
 
     def move(self):
@@ -398,9 +400,13 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-
+        print(best, "best")
         if best is not None:
             self.destination = best
+
+
+        if self.guided is True and best is not None:
+            self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
 
     def step(self):
         """
@@ -409,7 +415,10 @@ class Customer(Agent):
 
         # Update customer choice of destination while walking,
         # only for those who have the app
+
+
         if self.has_app is True and self.checked_app is False:
+            print("hoi")
             self.update_choice()
             self.checked_app = True
 
