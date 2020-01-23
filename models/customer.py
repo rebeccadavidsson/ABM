@@ -32,6 +32,7 @@ class Customer(Agent):
         self.waitingtime = None
         self.waiting = False
         self.total_ever_waited = 0
+        self.nmbr_attractions = 0
 
         # Start waited period with zero
         self.waited_period = 0
@@ -172,10 +173,6 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
-                # increment number of rides taken
-                if self.current_a is not None:
-                    self.current_a.rides_taken += 1
-
 
                 # # reset ride time
                 # if self.current_a is not None:
@@ -208,6 +205,14 @@ class Customer(Agent):
 
             if self.waitingtime == self.waited_period:
 
+                # increment number of rides taken of attraction
+                # if self.current_a is not None:
+                self.current_a.rides_taken += 1
+
+                # increment number of rides taken of customer
+                self.nmbr_attractions += 1
+
+                self.waited_period = 0
                 self.current_a = None
                 self.destination = self.closest_by().pos
                 self.waiting = False
