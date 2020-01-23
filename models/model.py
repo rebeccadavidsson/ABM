@@ -11,16 +11,17 @@ from .route import get_coordinates, get_attraction_coordinates, Route
 from .customer import Customer
 from .attraction import Attraction
 from .monitor import Monitor
-
+import pickle
 
 WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
-MAX_TIME = 500
+MAX_TIME = 400
 RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
+
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme):
@@ -50,6 +51,17 @@ class Themepark(Model):
         self.penalty_per = PENALTY_PERCENTAGE
 
         self.running = True
+        self.data = []
+        self.data_customers = []
+
+        self.data_dict = {}
+        i = 0
+        for attraction in self.get_attractions():
+            self.data_dict[attraction.unique_id] = ({
+                                "id" : attraction.unique_id,
+                               "length": attraction.attraction_duration,
+                               "waiting_list": []})
+            i += 1
 
 
 
@@ -160,9 +172,21 @@ class Themepark(Model):
                     attraction = agent
 
             attraction.N_current_cust = counter
-            counter_total[attraction_pos] = counter
+            counter_total[attraction.unique_id] = counter
 
         return list(counter_total.values())
+
+    def calc_waiting_time(self):
+
+        counter_total = {}
+
+        attractions = self.get_attractions()
+        for attraction in attractions:
+
+            counter_total[attraction.unique_id] = attraction.current_waitingtime
+
+        return counter_total
+
 
     def calculate_people_sorted(self):
         """
@@ -228,11 +252,6 @@ class Themepark(Model):
 
                 self.grid.place_agent(path, pos)
 
-    def final(self):
-        """ Return data """
-        print("RUN HAS ENDED")
-        quit()
-
     def get_themepark_score(self):
         """
         Get current waiting time of the themepark
@@ -245,8 +264,51 @@ class Themepark(Model):
         return total_current
 
 
+    def get_data_customers(self):
+
+        data = {}
+        agents = self.grid.get_neighbors(
+            mid_point,
+            moore=True,
+            radius=RADIUS,
+            include_center=True)
+
+        for agent in agents:
+            if type(agent) is Customer:
+                data[agent.unique_id] = {
+                "totalwaited": agent.total_ever_waited,
+                "visited_attractions": agent.nmbr_attractions,
+                "strategy": agent.strategy
+                }
+        return data
+
+
+    def final(self):
+        """ Return data """
+
+        cust_data = self.get_data_customers()
+
+        pickle.dump(self.data_dict, open("data/attractions.p", 'wb'))
+        pickle.dump(cust_data, open("data/customers.p", 'wb'))
+
+        print()
+        print("RUN HAS ENDED")
+        quit()
+
+    def save_data(self):
+        """Save data of all attractions and customers."""
+
+        # Get info
+        waitinglines = self.calc_waiting_time()
+
+        for i in range(len(self.attractions)):
+            self.data_dict[i]["waiting_list"].append(waitinglines.get(i))
+
+
     def step(self):
         """Advance the model by one step."""
+
+        # print(pickle.load(open('data/attractions.p', 'rb')))
         if self.totalTOTAL < MAX_TIME:
             self.totalTOTAL += 1
             self.schedule.step()
@@ -268,5 +330,8 @@ class Themepark(Model):
                 self.cust_ids += 1
                 self.add_customers(1, added=True)
                 self.total_steps = 0
+
+            self.save_data()
+
         else:
             self.final()
