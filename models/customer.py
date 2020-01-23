@@ -415,6 +415,7 @@ class Customer(Agent):
 
         if self.waiting is True:
             self.sadness_score += 1
+
         self.move()
 
         # TODO: Voor elke stap de wachttijd laten afnemen
