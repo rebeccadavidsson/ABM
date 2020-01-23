@@ -171,7 +171,7 @@ class Customer(Agent):
                         self.sadness_score -= 20
                         if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
-                        attraction.calculate_waiting_time()
+                        # attraction.calculate_waiting_time()
 
                     break
 
