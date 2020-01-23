@@ -17,7 +17,7 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 0
-MAX_TIME = 20
+MAX_TIME = 400
 RADIUS = int(WIDTH/2)
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
@@ -276,7 +276,7 @@ class Themepark(Model):
             if type(agent) is Customer:
                 data[agent.unique_id] = {
                 "totalwaited": agent.total_ever_waited,
-                "visited_attractions": "TODO",
+                "visited_attractions": agent.nmbr_attractions,
                 "strategy": agent.strategy
                 }
         return data
