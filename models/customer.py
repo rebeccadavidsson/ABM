@@ -38,7 +38,6 @@ class Customer(Agent):
         self.sadness_score = 0
         self.in_attraction = False
 
-
         self.strategy = strategy
         if self.strategy == "Random":
             self.has_app = False
@@ -54,6 +53,7 @@ class Customer(Agent):
         # Random if customer has the app
         self.goals = self.get_goals()
         self.reached_goals = False
+        self.history = self.make_history()
 
         self.leaving = False
 
@@ -80,6 +80,30 @@ class Customer(Agent):
 
         return goals
 
+    def make_history(self):
+        history = {}
+        attractions = self.model.get_attractions()
+        for attraction in range(len(attractions)):
+            history[attraction] = 0
+
+        return history
+
+    def penalty(self, current_attraction):
+
+        total_difference_sum = 0
+        for attraction in self.model.get_attractions():
+            difference = current_attraction - self.history[attraction]
+
+            total_difference_sum += difference
+
+        if total_difference_sum < 0:
+            total_difference_sum = 0
+
+
+        penalty = total_difference_sum * self.model.penalty_per
+
+        return penalty
+        
     def move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood),
@@ -162,6 +186,11 @@ class Customer(Agent):
         if self.waitingtime is not None:
 
             if self.waitingtime <= self.waited_period:
+
+                # increment number of rides taken
+                if self.current_a is not None:
+                    self.current_a.rides_taken += 1
+
 
                 # # reset ride time
                 # if self.current_a is not None:
@@ -410,7 +439,7 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-        print(best, "best")
+        # print(best, "best")
         if best is not None:
             self.destination = best
 
@@ -428,7 +457,7 @@ class Customer(Agent):
 
 
         if self.has_app is True and self.checked_app is False:
-            print("hoi")
+            # print("hoi")
             self.update_choice()
             self.checked_app = True
 

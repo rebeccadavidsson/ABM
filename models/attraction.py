@@ -24,6 +24,7 @@ class Attraction(Agent):
         self.cust_in_line = 0
         self.memory = []
         self.ride_time = 0
+        self.rides_taken = 0
 
     def calculate_waiting_time(self):
         '''

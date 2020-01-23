@@ -21,7 +21,7 @@ NUM_ATTRACTIONS = 7
 MAX_TIME = 500
 RADIUS = int(WIDTH/2)
 METHOD = "circle"
-
+PENALTY_PERCENTAGE = 5
 
 x_list, y_list, positions = get_attraction_coordinates(WIDTH, HEIGHT, NUM_ATTRACTIONS, METHOD)
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
@@ -53,6 +53,7 @@ class Themepark(Model):
         self.make_attractions()
         self.make_route()
         self.add_customers(self.N_cust)
+        self.penalty_per = PENALTY_PERCENTAGE
 
         self.running = True
 
@@ -234,6 +235,18 @@ class Themepark(Model):
         """ Return data """
         print("RUN HAS ENDED")
         quit()
+
+    def get_themepark_score(self):
+        """
+        Get current waiting time of the themepark
+        """
+        attractions = self.get_attractions()
+        total_current = 0
+        for attraction in attractions:
+            total_current += attraction.current_waitingtime
+
+        return total_current
+
 
     def step(self):
         """Advance the model by one step."""
