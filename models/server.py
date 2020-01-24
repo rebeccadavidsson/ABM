@@ -10,7 +10,7 @@ from .attraction import Attraction
 
 width = 36
 height = 36
-N_cust = 15
+N_cust = 50
 pixel_ratio = 20
 num_agents = 15
 

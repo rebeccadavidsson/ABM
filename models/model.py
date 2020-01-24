@@ -136,7 +136,8 @@ class Themepark(Model):
 
         for i in range(N_cust):
 
-            pos_temp = random.choice(self.starting_positions)
+            # pos_temp = random.choice(self.starting_positions)
+            pos_temp = [random.randint(0,WIDTH-1),random.randint(0,HEIGHT-1)]
             rand_x, rand_y = pos_temp[0], pos_temp[1]
 
             pos = (rand_x, rand_y)
@@ -324,12 +325,12 @@ class Themepark(Model):
 
             self.total_steps += 1
 
-            if self.total_steps > random.randrange(10, 20) and \
-               self.cust_ids < self.N_cust * 2 and \
-               self.totalTOTAL < int(MAX_TIME/1.3):
-                self.cust_ids += 1
-                self.add_customers(1, added=True)
-                self.total_steps = 0
+            # if self.total_steps > random.randrange(10, 20) and \
+            #    self.cust_ids < self.N_cust * 2 and \
+            #    self.totalTOTAL < int(MAX_TIME/1.3):
+            #     self.cust_ids += 1
+            #     self.add_customers(1, added=True)
+            #     self.total_steps = 0
 
             self.save_data()
 
