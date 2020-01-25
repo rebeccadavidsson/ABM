@@ -55,13 +55,12 @@ class Themepark(Model):
         self.data_customers = []
 
         self.data_dict = {}
-        i = 0
+
         for attraction in self.get_attractions():
             self.data_dict[attraction.unique_id] = ({
-                                "id" : attraction.unique_id,
+                               "id": attraction.unique_id,
                                "length": attraction.attraction_duration,
                                "waiting_list": []})
-            i += 1
 
 
 
