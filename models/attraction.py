@@ -75,6 +75,7 @@ class Attraction(Agent):
 
         return counter
 
+
     def run_attraction(self, amount):
         """Customers enter attraction and leave waiting line."""
 

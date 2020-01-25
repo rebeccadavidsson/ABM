@@ -1,13 +1,13 @@
 from mesa import Agent
 import random
 import math
+from .route import Route
 import numpy as np
-from .route import get_coordinates, Route
-from .attraction import Attraction
 # from model import calculate_people
 
 WIDTH = 36
 HEIGHT = 36
+MEMORY = 3
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
@@ -65,8 +65,8 @@ class Customer(Agent):
             self.checked_app = False
             self.destination = self.search_best_option()
 
-        self.memory_strategy = 1
-
+        self.memory_strategy = MEMORY
+        self.memory_succeses = []
 
     def get_goals(self):
         """Set random goals."""
@@ -191,12 +191,6 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
-
-                # # reset ride time
-                # if self.current_a is not None:
-                #     attraction = self.current_a
-                #     attraction.ride_time = 0
-
                 # Update goals and attraction
                 for attraction in self.model.get_attractions():
 
@@ -211,15 +205,6 @@ class Customer(Agent):
                             attraction.N_current_cust -= 1
                         # attraction.calculate_waiting_time()
 
-                    # break
-
-                # Check if agent needs to leave or go to new goal
-                # if len(self.goals) > 0:
-                #     self.get_destination()
-                # elif self.leaving is False:
-                #     self.leaving = True
-                #     self.destination = random.choice(starting_positions)
-                #     self.waiting = False
 
             if self.waitingtime == self.waited_period:
                 if self.current_a is not None:
@@ -233,6 +218,11 @@ class Customer(Agent):
                 self.nmbr_attractions += 1
                 self.total_ever_waited += self.waited_period
                 self.waited_period = 0
+
+                # Update memory
+                self.update_memory()
+
+                # Set current attraction back to None when customer leaves.
                 self.current_a = None
                 if self.strategy == "Closest_by":
                     self.destination = self.closest_by().pos
@@ -468,14 +458,40 @@ class Customer(Agent):
         if self.guided is True and best is not None:
             self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
 
+    def update_memory(self):
+        """
+        Update an agents memory and change strategy based on memory.
+        """
+
+        # If all past steps weren't succesful, change strategy
+        if len(self.memory_succeses) >= self.memory_strategy:
+            if all(x == self.memory_succeses[0] for x in self.memory_succeses) is True:
+                if self.strategy == "Random":
+                    self.strategy = "Closest_by"
+                else:
+                    self.strategy = "Random"
+                    
+                self.memory_succeses.append(1)
+                self.memory_succeses.pop()
+        else:
+
+            # Determine if strategy was succesful.
+            # Take into account: waitingtimes of all other attractions.
+            waitinglines = self.get_waiting_lines()
+
+            # if succes:
+            if waitinglines.get(self.current_a.unique_id) == min(waitinglines.values()):
+                self.memory_succeses.append(1)
+
+            # No succes
+            else:
+                self.memory_succeses.append(0)
+
+
     def step(self):
         """
         This method should move the customer using the `random_move()` method.
         """
-
-        # Update customer choice of destination while walking,
-        # only for those who have the app
-
 
         if self.has_app is True and self.checked_app is False:
             self.update_choice()
@@ -485,10 +501,6 @@ class Customer(Agent):
             self.sadness_score += 1
 
         self.move()
-
-        # TODO: Voor elke stap de wachttijd laten afnemen
-        # if self.current_a:
-        #     print(self.current_a.unique_id)
 
     def closest_by(self):
         """
@@ -500,6 +512,8 @@ class Customer(Agent):
 
         # add waitingtimes
         waiting_times = self.get_waiting_lines()
+        # print(len(predictions.keys()))
+        # print(predictions, waiting_times, "PRINT")
         for i in range(len(predictions.keys())):
             predictions[i] += waiting_times[i]
 

@@ -1,11 +1,8 @@
-from mesa import Model, Agent
-from mesa.space import SingleGrid
+from mesa import Model
 from mesa.space import MultiGrid
-from mesa.time import RandomActivation, BaseScheduler
+from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
-import matplotlib.pylab as plt
 import random
-import numpy as np
 from .route import get_coordinates, get_attraction_coordinates, Route
 from .customer import Customer
 from .attraction import Attraction
@@ -44,23 +41,20 @@ class Themepark(Model):
         self.schedule_Customer = BaseScheduler(self)
         self.totalTOTAL = 0
         self.attractions = self.make_attractions()
-        # self.make_attractions()
-        # self.make_route()
-        self.add_customers(self.N_cust)
-
         self.running = True
         self.data = []
         self.data_customers = []
         self.park_score = []
         self.data_dict = {}
+        self.hist_random_strat = []
+        self.hist_close_strat = []
+        self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
             self.data_dict[attraction.unique_id] = ({
                                "id": attraction.unique_id,
                                "length": attraction.attraction_duration,
                                "waiting_list": []})
-
-
 
         # Dynamic datacollector (werkt niet :( )
         # self.datacollector = DataCollector(self.datacollection_dict())
@@ -261,7 +255,39 @@ class Themepark(Model):
         return total_current
 
 
+    def get_strategy_history(self):
+        """ Update history with how many customers chose which strategy """
+
+        customers = self.get_customers()
+        randomstrat, closebystrat = 0, 0
+
+        for customer in customers:
+            if customer.strategy == "Random":
+                randomstrat += 1
+            elif customer.strategy == "Closest_by":
+                closebystrat += 1
+
+        self.hist_random_strat.append(randomstrat)
+        self.hist_close_strat.append(closebystrat)
+
+    def get_customers(self):
+        agents = self.grid.get_neighbors(
+            mid_point,
+            moore=True,
+            radius=RADIUS,
+            include_center=True)
+            
+        customers = []
+
+        # Count customer agents
+        for agent in agents:
+            if type(agent) == Customer:
+                customers.append(agent)
+        return customers
+
+
     def get_data_customers(self):
+        """ Return dictionary with data of customers """
 
         data = {}
         agents = self.grid.get_neighbors(
@@ -285,14 +311,20 @@ class Themepark(Model):
 
         cust_data = self.get_data_customers()
 
-        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
-        pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
+        # pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
+        # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
+        # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
+
+        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
+        pickle.dump(self.park_score, open("data/park_score.p", "wb"))
+        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
+        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
         print()
-        # quit()
+        quit()
 
     def save_data(self):
         """Save data of all attractions and customers."""
@@ -326,6 +358,7 @@ class Themepark(Model):
             self.total_steps += 1
 
             self.save_data()
+            self.get_strategy_history()
 
         else:
             self.final()
