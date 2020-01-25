@@ -22,7 +22,9 @@ class Customer(Agent):
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
+        self.current_a = None
         self.strategy = strategy
+        self.history = self.make_history()
 
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
@@ -39,7 +41,6 @@ class Customer(Agent):
 
         # Start waited period with zero
         self.waited_period = 0
-        self.current_a = None
         self.sadness_score = 0
         self.in_attraction = False
 
@@ -59,7 +60,6 @@ class Customer(Agent):
         # Random if customer has the app
         self.goals = self.get_goals()
         self.reached_goals = False
-        self.history = self.make_history()
 
         self.leaving = False
 
@@ -94,24 +94,32 @@ class Customer(Agent):
 
     def make_history(self):
         history = {}
-        attractions = self.model.get_attractions()
+        attractions = self.model.attractions
         for attraction in range(len(attractions)):
-            history[attraction] = 0
-
+            history[attractions[attraction]] = 0
+        print(history)
         return history
 
     def penalty(self, current_attraction):
+        """
+        This method calculates a penalty for attractions that were visited more
+        often than other attractions
+        """
 
         total_difference_sum = 0
-        for attraction in self.model.get_attractions():
-            difference = current_attraction - self.history[attraction]
+        if current_attraction == 0:
+            return 0
+        for i in range(len(self.model.attractions.values())):
+            attraction = self.model.attractions[i]
+
+            difference = self.history[current_attraction] - self.history[attraction]
 
             total_difference_sum += difference
 
         if total_difference_sum < 0:
             total_difference_sum = 0
 
-
+        # print(total_difference_sum, "penalty diff sum of attraction", current_attraction.unique_id)
         penalty = total_difference_sum * self.model.penalty_per
 
         return penalty
@@ -230,6 +238,8 @@ class Customer(Agent):
                 #     self.waiting = False
 
             if self.waitingtime == self.waited_period:
+                if self.current_a is not None:
+                    self.history[self.current_a] += 1
 
                 # increment number of rides taken of attraction
                 # if self.current_a is not None:
@@ -248,6 +258,7 @@ class Customer(Agent):
                         self.destination = random.choice(self.positions)
 
                 self.waiting = False
+                self.waited_period = 0
 
         if self.waiting is False:
             return True
@@ -361,9 +372,6 @@ class Customer(Agent):
 
     def strategy_time():
         pass
-
-
-
 
     def search_best_option(self):
         """
@@ -500,11 +508,26 @@ class Customer(Agent):
         #     print(self.current_a.unique_id)
 
     def closest_by(self):
+        """
+        This method returns the attraction closest by the customer
+        Adds a deterministic penalty per attraction based on the penalty method.
+        """
+
         predictions = self.get_walking_distances()
+
+        maxval = max(predictions.values())
+        for attraction_nr in predictions:
+            penalty = self.penalty(self.model.attractions[attraction_nr])
+
+            predictions[attraction_nr] =  predictions[attraction_nr] + maxval * (penalty/100)
+
+
         minval = min(predictions.values())
         res = [k for k, v in predictions.items() if v==minval]
         if len(res) is 1:
             predicted_attraction = res[0]
         else:
             predicted_attraction = random.choice(res)
+        attraction_object = self.model.get_attractions()[predicted_attraction]
+
         return self.model.attractions[predicted_attraction]
