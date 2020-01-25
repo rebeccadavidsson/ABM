@@ -26,6 +26,7 @@ class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme):
         self.theme = theme
         self.N_attr = N_attr
+        self.penalty_per = PENALTY_PERCENTAGE
         self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
@@ -47,7 +48,6 @@ class Themepark(Model):
         self.make_attractions()
         self.make_route()
         self.add_customers(self.N_cust)
-        self.penalty_per = PENALTY_PERCENTAGE
 
         self.running = True
 
