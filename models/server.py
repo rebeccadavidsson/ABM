@@ -13,6 +13,7 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 15
+max_time = 200
 
 
 def agent_draw(agent):
@@ -135,8 +136,9 @@ model_params = {
     "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust * 2, 1),
     "strategy": UserSettableParameter('choice', 'Strategy choice', value='Closest_by',
                                       choices=['Random', 'Closest_by']),
-    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='circle',
+    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
+    "max_time": max_time
 }
 
 server = ModularServer(

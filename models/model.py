@@ -14,18 +14,16 @@ import pickle
 
 WIDTH = 36
 HEIGHT = 36
-RADIUS = 15
-NUM_OBSTACLES = 0
-MAX_TIME = 200
 RADIUS = int(WIDTH/2)
+NUM_OBSTACLES = 0
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
 
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy, theme):
-        print(theme)
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time):
         self.theme = theme
+        self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
         self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
@@ -46,14 +44,14 @@ class Themepark(Model):
         self.schedule_Customer = BaseScheduler(self)
         self.totalTOTAL = 0
         self.attractions = self.make_attractions()
-        self.make_attractions()
+        # self.make_attractions()
         # self.make_route()
         self.add_customers(self.N_cust)
 
         self.running = True
         self.data = []
         self.data_customers = []
-
+        self.park_score = []
         self.data_dict = {}
 
         for attraction in self.get_attractions():
@@ -80,7 +78,7 @@ class Themepark(Model):
 
         self.total_waited_time = 0
 
-        self.monitor = Monitor(MAX_TIME, self.N_attr, self.positions)
+        self.monitor = Monitor(self.max_time, self.N_attr, self.positions)
 
     # def datacollection_dict(self):
     #     """ Returns a dictionary for the DataCollector. """
@@ -99,7 +97,6 @@ class Themepark(Model):
         for i in range(self.N_attr):
 
             pos = (self.x_list[i], self.y_list[i])
-
             if self.grid.is_cell_empty(pos):
                 # print("Creating ATTRACTION agent {2} at ({0}, {1})"
                 #       .format(x_list[i], y_list[i], i))
@@ -288,12 +285,14 @@ class Themepark(Model):
 
         cust_data = self.get_data_customers()
 
-        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
+        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
+        pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
-        quit()
+        print()
+        # quit()
 
     def save_data(self):
         """Save data of all attractions and customers."""
@@ -304,12 +303,14 @@ class Themepark(Model):
         for i in range(len(self.attractions)):
             self.data_dict[i]["waiting_list"].append(waitinglines.get(i))
 
+        self.park_score.append(sum(waitinglines.values()))
+
+
 
     def step(self):
         """Advance the model by one step."""
 
-        # print(pickle.load(open('data/attractions.p', 'rb')))
-        if self.totalTOTAL < MAX_TIME:
+        if self.totalTOTAL < self.max_time:
             self.totalTOTAL += 1
             self.schedule.step()
             self.datacollector.collect(self)

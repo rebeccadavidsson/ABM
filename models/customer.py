@@ -312,7 +312,6 @@ class Customer(Agent):
         indicates that attraction3 has the shortest waiting line.
         """
         people = self.model.calculate_people_sorted()
-        print(people, "people")
         return people
 
     def get_score(self, distances, waitinglines):
@@ -498,7 +497,6 @@ class Customer(Agent):
         """
 
         predictions = self.get_walking_distances()
-        waitingtimes = self.get_waiting_lines()
 
         # add waitingtimes
         waiting_times = self.get_waiting_lines()
@@ -509,10 +507,7 @@ class Customer(Agent):
         for attraction_nr in predictions:
             penalty = self.penalty(self.model.attractions[attraction_nr])
 
-            predictions[attraction_nr] = predictions[attraction_nr] + \
-                                        maxval * (penalty/100) + \
-                                        waitingtimes.get(attraction_nr) * 10 # TODO IK SNAPTE DEZE FORMULE NIET
-
+            predictions[attraction_nr] = predictions[attraction_nr] + maxval * (penalty/100)
 
         minval = min(predictions.values())
         res = [k for k, v in predictions.items() if v==minval]
