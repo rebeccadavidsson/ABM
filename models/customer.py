@@ -24,6 +24,7 @@ class Customer(Agent):
         self.positions = positions
         self.current_a = None
         self.strategy = strategy
+        self.history = self.make_history()
 
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
