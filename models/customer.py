@@ -23,18 +23,20 @@ class Customer(Agent):
         self.y_list = y_list
         self.positions = positions
         self.current_a = None
+        self.strategy = strategy
 
+        if self.strategy == 'Random':
+            self.destination = random.choice(positions)
+            while self.destination is self.pos:
+                self.destination = random.choice(positions)
 
-        # self.destination = random.choice(positions)
-        # while self.destination is self.pos:
-        #     self.destination = random.choice(positions)
-        self.history = self.make_history()
-
-        self.destination = self.closest_by().pos
+        if self.strategy == 'Closest_by':
+            self.destination = self.closest_by().pos
 
         self.waitingtime = None
         self.waiting = False
         self.total_ever_waited = 0
+        self.nmbr_attractions = 0
 
         # Start waited period with zero
         self.waited_period = 0
@@ -204,11 +206,6 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
-                # increment number of rides taken
-                if self.current_a is not None:
-
-                    self.current_a.rides_taken += 1
-
 
                 # # reset ride time
                 # if self.current_a is not None:
@@ -243,9 +240,22 @@ class Customer(Agent):
                 if self.current_a is not None:
                     self.history[self.current_a] += 1
 
-                # TODO: If strategy = closest_by
-                self.destination = self.closest_by().pos
+                # increment number of rides taken of attraction
+                # if self.current_a is not None:
+                self.current_a.rides_taken += 1
+
+                # increment number of rides taken of customer
+                self.nmbr_attractions += 1
+                self.total_ever_waited += self.waited_period
+                self.waited_period = 0
                 self.current_a = None
+                if self.strategy == "Closest_by":
+                    self.destination = self.closest_by().pos
+                if self.strategy == 'Random':
+                    self.destination = random.choice(self.positions)
+                    while self.destination is self.pos:
+                        self.destination = random.choice(self.positions)
+
                 self.waiting = False
                 self.waited_period = 0
 
@@ -470,7 +480,6 @@ class Customer(Agent):
         # print(best, "best")
         if best is not None:
             self.destination = best
-
 
         if self.guided is True and best is not None:
             self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
