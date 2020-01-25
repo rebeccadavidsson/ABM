@@ -3,7 +3,6 @@ from mesa.space import SingleGrid
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation, BaseScheduler
 from mesa.datacollection import DataCollector
-from collections import Counter
 import matplotlib.pylab as plt
 import random
 import numpy as np
@@ -25,6 +24,7 @@ PENALTY_PERCENTAGE = 5
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme):
+        print(theme)
         self.theme = theme
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
@@ -47,7 +47,7 @@ class Themepark(Model):
         self.totalTOTAL = 0
         self.attractions = self.make_attractions()
         self.make_attractions()
-        self.make_route()
+        # self.make_route()
         self.add_customers(self.N_cust)
 
         self.running = True
@@ -323,13 +323,6 @@ class Themepark(Model):
                 attraction.update_memory()
 
             self.total_steps += 1
-
-            # if self.total_steps > random.randrange(10, 20) and \
-            #    self.cust_ids < self.N_cust * 2 and \
-            #    self.totalTOTAL < int(MAX_TIME/1.3):
-            #     self.cust_ids += 1
-            #     self.add_customers(1, added=True)
-            #     self.total_steps = 0
 
             self.save_data()
 

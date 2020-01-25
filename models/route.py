@@ -6,7 +6,7 @@ import math
 WIDTH = 36
 HEIGHT = 36
 NUM_CLUSTERS = 3
-MAX = 4
+MAX = 2
 starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
 
 
@@ -72,24 +72,23 @@ def get_attraction_coordinates(width, height, num_attractions, method):
             total.append((xlist[i], ylist[i]))
 
         counter = 0
-        for i in range(len(total)):
 
-            while counter < num_attractions - NUM_CLUSTERS:
+        while counter < num_attractions - NUM_CLUSTERS:
 
-                current_clust = random.choice(total)
+            current_clust = random.choice(total)
+            x_r = random.randrange(-MAX, MAX)
+            y_r = random.randrange(-MAX, MAX)
+            coordinate = (current_clust[0] + x_r, current_clust[1] + y_r)
+            while coordinate in total:
                 x_r = random.randrange(-MAX, MAX)
                 y_r = random.randrange(-MAX, MAX)
                 coordinate = (current_clust[0] + x_r, current_clust[1] + y_r)
-                while coordinate in total:
-                    x_r = random.randrange(-MAX, MAX)
-                    y_r = random.randrange(-MAX, MAX)
-                    coordinate = (current_clust[0] + x_r, current_clust[1] + y_r)
 
-                xlist.append(coordinate[0])
-                ylist.append(coordinate[1])
-                total.append(coordinate)
+            xlist.append(coordinate[0])
+            ylist.append(coordinate[1])
+            total.append(coordinate)
 
-                counter += 1
+            counter += 1
 
     return xlist, ylist, total
 

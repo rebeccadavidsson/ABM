@@ -4,8 +4,6 @@ import math
 import numpy as np
 from .route import get_coordinates, Route
 from .attraction import Attraction
-from scipy.spatial import distance
-import heapq
 # from model import calculate_people
 
 WIDTH = 36
@@ -72,20 +70,6 @@ class Customer(Agent):
 
     def get_goals(self):
         """Set random goals."""
-        #
-        # attractions = self.model.get_attractions()
-        # r = random.randint(1, len(attractions))
-        # goals = []
-        # for i in range(r):
-        #     rand_choice = random.choice(attractions)
-        #     goals.append(rand_choice)
-        #     attractions.remove(rand_choice)
-        # # goals.append(attractions[3])
-        # # goals.append(attractions[4])
-        # # goals.append(attractions[5])
-        # print("goals = ", goals)
-        # return goals
-
         goals = []
         attractions = self.model.get_attractions()
         for attr in attractions:
@@ -97,7 +81,7 @@ class Customer(Agent):
         attractions = self.model.attractions
         for attraction in range(len(attractions)):
             history[attractions[attraction]] = 0
-        print(history)
+        # print(history)
         return history
 
     def penalty(self, current_attraction):
@@ -256,7 +240,6 @@ class Customer(Agent):
                     self.destination = random.choice(self.positions)
                     while self.destination is self.pos:
                         self.destination = random.choice(self.positions)
-
                 self.waiting = False
                 self.waited_period = 0
 
@@ -514,12 +497,15 @@ class Customer(Agent):
         """
 
         predictions = self.get_walking_distances()
+        waitingtimes = self.get_waiting_lines()
 
         maxval = max(predictions.values())
         for attraction_nr in predictions:
             penalty = self.penalty(self.model.attractions[attraction_nr])
 
-            predictions[attraction_nr] =  predictions[attraction_nr] + maxval * (penalty/100)
+            predictions[attraction_nr] = predictions[attraction_nr] + \
+                                        maxval * (penalty/100) + \
+                                        waitingtimes.get(attraction_nr) * 10 # TODO IK SNAPTE DEZE FORMULE NIET
 
 
         minval = min(predictions.values())
@@ -529,5 +515,7 @@ class Customer(Agent):
         else:
             predicted_attraction = random.choice(res)
         attraction_object = self.model.get_attractions()[predicted_attraction]
+        # dit kan volgens mij ook:
+        # attraction_object = self.attractions[predicted_attraction]
 
         return self.model.attractions[predicted_attraction]
