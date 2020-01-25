@@ -312,6 +312,7 @@ class Customer(Agent):
         indicates that attraction3 has the shortest waiting line.
         """
         people = self.model.calculate_people_sorted()
+        print(people, "people")
         return people
 
     def get_score(self, distances, waitinglines):
@@ -498,6 +499,11 @@ class Customer(Agent):
 
         predictions = self.get_walking_distances()
         waitingtimes = self.get_waiting_lines()
+
+        # add waitingtimes
+        waiting_times = self.get_waiting_lines()
+        for i in range(len(predictions.keys())):
+            predictions[i] += waiting_times[i]
 
         maxval = max(predictions.values())
         for attraction_nr in predictions:
