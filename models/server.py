@@ -1,7 +1,7 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
-from mesa.visualization.modules import ChartModule
+from mesa.visualization.modules import PieChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 from .model import Themepark
 from .customer import Customer
@@ -96,7 +96,7 @@ class HistogramModule(VisualizationElement):
 
 # class ChartModule(VisualizationElement):
 #     package_includes = ["Chart.min.js"]
-#     local_includes = ["HistogramModule.js"]
+#     local_includes = ["ChartModule.js"]
 #
 #     def __init__(self, canvas_height, canvas_width):
 #         self.canvas_height = canvas_height
@@ -117,7 +117,7 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-chart = ChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
+chart = PieChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
                     {"Label": "Attraction2", "Color": "#303F9F"},
                     {"Label": "Attraction3", "Color": "#7B1FA2"},
                     {"Label": "Attraction4", "Color": "#D81B60"},
