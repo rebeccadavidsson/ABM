@@ -10,9 +10,10 @@ from .attraction import Attraction
 
 width = 36
 height = 36
-N_cust = 15
+N_cust = 50
 pixel_ratio = 20
-num_agents = 7
+num_agents = 15
+max_time = 800
 
 
 def agent_draw(agent):
@@ -60,12 +61,12 @@ def agent_draw(agent):
             portrayal["Filled"] = "true"
             portrayal["r"] = 0.65
 
-        if agent.sadness_score > 60:
-            portrayal["Color"] = "red"
-        elif agent.sadness_score > 40:
+        if agent.strategy == "Closest_by":
+            portrayal["Color"] = "blue"
+        elif agent.strategy == "Random":
             portrayal["Color"] = "orange"
-        else:
-            portrayal["Color"] = "green"
+            portrayal["Layer"] = 3
+
 
         # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
         # portrayal["Shape"] = "starlight.png"
@@ -132,14 +133,18 @@ model_params = {
     "height": height,
     "width": width,
     "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
-    "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust, 1),
+    "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust * 2, 1),
     "strategy": UserSettableParameter('choice', 'Strategy choice', value='Random',
-                                      choices=['Random', 'Knowledge', 'Guided']),
+                                      choices=['Random', 'Closest_by']),
+    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
+                                      choices=['random', 'circle', 'cluster']),
+    "max_time": max_time
 }
 
 server = ModularServer(
     Themepark,
-    [grid, histogram, chart],
+    # [grid, histogram, chart],
+    [grid, histogram],
     "Theme Park Model",
     model_params,
 )

@@ -24,6 +24,7 @@ class Attraction(Agent):
         self.cust_in_line = 0
         self.memory = []
         self.ride_time = 0
+        self.rides_taken = 0
 
     def calculate_waiting_time(self):
         '''
@@ -73,6 +74,7 @@ class Attraction(Agent):
                 counter += 1
 
         return counter
+
 
     def run_attraction(self, amount):
         """Customers enter attraction and leave waiting line."""

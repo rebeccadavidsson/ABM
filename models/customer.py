@@ -1,16 +1,13 @@
 from mesa import Agent
 import random
 import math
+from .route import Route
 import numpy as np
-from .route import get_coordinates, Route
-from .attraction import Attraction
-from scipy.spatial import distance
-import heapq
 # from model import calculate_people
 
 WIDTH = 36
 HEIGHT = 36
-NUM_OBSTACLES = 20
+MEMORY = 5
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
@@ -23,33 +20,42 @@ class Customer(Agent):
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
+        self.current_a = None
+        self.strategy = strategy
+        self.history = self.make_history()
 
-        self.destination = random.choice(positions)
-        while self.destination is self.pos:
+        if self.strategy == 'Random':
             self.destination = random.choice(positions)
+            while self.destination is self.pos:
+                self.destination = random.choice(positions)
+
+        if self.strategy == 'Closest_by':
+            self.destination = self.closest_by().pos
+
+        self.changed_strategy = False
 
         self.waitingtime = None
         self.waiting = False
         self.total_ever_waited = 0
+        self.nmbr_attractions = 0
 
         # Start waited period with zero
         self.waited_period = 0
-        self.current_a = None
         self.sadness_score = 0
         self.in_attraction = False
 
-
         self.strategy = strategy
         if self.strategy == "Random":
-            self.has_app = True
+            self.has_app = False
         elif self.strategy == "Knowledge":
             self.has_app = True
+        elif self.strategy == "Closest_by":
+            self.has_app = False
         else:
             raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
             quit()
 
-        self.guided = True
-
+        self.guided = False
 
         # Random if customer has the app
         self.goals = self.get_goals()
@@ -61,24 +67,48 @@ class Customer(Agent):
             self.checked_app = False
             self.destination = self.search_best_option()
 
-        self.memory_strategy = 1
-
+        self.memory_strategy = MEMORY
+        self.memory_succeses = []
 
     def get_goals(self):
         """Set random goals."""
-
-        attractions = self.model.get_attractions()
-        r = random.randint(1, len(attractions))
         goals = []
-        for i in range(r):
-            rand_choice = random.choice(attractions)
-            goals.append(rand_choice)
-            attractions.remove(rand_choice)
-        # goals.append(attractions[3])
-        # goals.append(attractions[4])
-        # goals.append(attractions[5])
-
+        attractions = self.model.get_attractions()
+        for attr in attractions:
+            goals.append(attr)
         return goals
+
+    def make_history(self):
+        history = {}
+        attractions = self.model.attractions
+        for attraction in range(len(attractions)):
+            history[attractions[attraction]] = 0
+        # print(history)
+        return history
+
+    def penalty(self, current_attraction):
+        """
+        This method calculates a penalty for attractions that were visited more
+        often than other attractions
+        """
+
+        total_difference_sum = 0
+        if current_attraction == 0:
+            return 0
+        for i in range(len(self.model.attractions.values())):
+            attraction = self.model.attractions[i]
+
+            difference = self.history[current_attraction] - self.history[attraction]
+
+            total_difference_sum += difference
+
+        if total_difference_sum < 0:
+            total_difference_sum = 0
+
+        # print(total_difference_sum, "penalty diff sum of attraction", current_attraction.unique_id)
+        penalty = total_difference_sum * self.model.penalty_per
+
+        return penalty
 
     def move(self):
         '''
@@ -163,38 +193,47 @@ class Customer(Agent):
 
             if self.waitingtime <= self.waited_period:
 
-                # # reset ride time
-                # if self.current_a is not None:
-                #     attraction = self.current_a
-                #     attraction.ride_time = 0
-
                 # Update goals and attraction
-                for attraction in self.goals:
+                for attraction in self.model.get_attractions():
 
                     if attraction.pos == self.pos:
 
                         # set checked_app = False so app can be checked at the
                         # first step when cstomer walks away from an attraction.
-                        self.checked_app = False
-                        self.goals.remove(attraction)
-                        self.sadness_score -= 20
+                        # self.checked_app = False
+                        # self.goals.remove(attraction)
+                        # self.sadness_score -= 20
                         if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
                         # attraction.calculate_waiting_time()
 
-                    break
-
-                # Check if agent needs to leave or go to new goal
-                if len(self.goals) > 0:
-                    self.get_destination()
-                elif self.leaving is False:
-                    self.leaving = True
-                    self.destination = random.choice(starting_positions)
-                    self.waiting = False
 
             if self.waitingtime == self.waited_period:
+                if self.current_a is not None:
+                    self.history[self.current_a] += 1
 
+                # increment number of rides taken of attraction
+                # if self.current_a is not None:
+                self.current_a.rides_taken += 1
+
+                # increment number of rides taken of customer
+                self.nmbr_attractions += 1
+                self.total_ever_waited += self.waited_period
+                self.waited_period = 0
+
+                # Update memory
+                self.update_memory()
+
+                # Set current attraction back to None when customer leaves.
                 self.current_a = None
+                if self.strategy == "Closest_by":
+                    self.destination = self.closest_by().pos
+                if self.strategy == 'Random':
+                    self.destination = random.choice(self.positions)
+                    while self.destination is self.pos:
+                        self.destination = random.choice(self.positions)
+                self.waiting = False
+                self.waited_period = 0
 
         if self.waiting is False:
             return True
@@ -290,6 +329,10 @@ class Customer(Agent):
         # Start with best solution
         temp = scores.get(index)
 
+        if index > len(self.positions):
+            print('\033[93m' + "There was no best choice... Index =" + str(index) + '\033[0m')
+            index = len(self.positions)
+
         for i in range(index, len(scores) + 1):
 
             if not scores.get(i + 1):
@@ -298,14 +341,12 @@ class Customer(Agent):
                 return i + 1
             else:
                 return i
+
     def strategy_distance():
         pass
 
     def strategy_time():
         pass
-
-
-
 
     def search_best_option(self):
         """
@@ -333,6 +374,8 @@ class Customer(Agent):
 
         while self.positions[best_choice] not in goals_positions and index < len(self.positions):
             best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            if best_choice is None:
+                print('\033[93m' + "There was no best choice...?" + '\033[0m')
             index += 1
 
         # Best choice is found!!!
@@ -410,25 +453,55 @@ class Customer(Agent):
 
         # Check again for best option
         best = self.search_best_option()
-        print(best, "best")
+        # print(best, "best")
         if best is not None:
             self.destination = best
 
-
         if self.guided is True and best is not None:
             self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
+
+    def update_memory(self):
+        """
+        Update an agents memory and change strategy based on memory.
+        """
+        counter = 0
+
+        # If all past steps weren't succesful, change strategy
+        if len(self.memory_succeses) >= self.memory_strategy:
+            for num in self.memory_succeses:
+                if num == 0:
+                    counter += 1
+
+            if counter == self.memory_strategy and self.changed_strategy is False:
+                if self.strategy == "Random":
+                    self.strategy = "Closest_by"
+                else:
+                    self.strategy = "Random"
+
+                self.changed_strategy = True
+                self.memory_succeses.append(1)
+                self.memory_succeses.pop()
+        else:
+
+            # Determine if strategy was succesful.
+            # Take into account: waitingtimes of all other attractions.
+            waitinglines = self.get_waiting_lines()
+
+            # if succes:
+            if waitinglines.get(self.current_a.unique_id) == min(waitinglines.values()):
+                self.memory_succeses.append(1)
+
+            # No succes
+            else:
+                self.memory_succeses.append(0)
+
 
     def step(self):
         """
         This method should move the customer using the `random_move()` method.
         """
 
-        # Update customer choice of destination while walking,
-        # only for those who have the app
-
-
         if self.has_app is True and self.checked_app is False:
-            print("hoi")
             self.update_choice()
             self.checked_app = True
 
@@ -437,6 +510,35 @@ class Customer(Agent):
 
         self.move()
 
-        # TODO: Voor elke stap de wachttijd laten afnemen
-        # if self.current_a:
-        #     print(self.current_a.unique_id)
+    def closest_by(self):
+        """
+        This method returns the attraction closest by the customer
+        Adds a deterministic penalty per attraction based on the penalty method.
+        """
+
+        predictions = self.get_walking_distances()
+
+        # add waitingtimes
+        waiting_times = self.get_waiting_lines()
+        # print(len(predictions.keys()))
+        # print(predictions, waiting_times, "PRINT")
+        for i in range(len(predictions.keys())):
+            predictions[i] += waiting_times[i]
+
+        maxval = max(predictions.values())
+        for attraction_nr in predictions:
+            penalty = self.penalty(self.model.attractions[attraction_nr])
+
+            predictions[attraction_nr] = predictions[attraction_nr] + maxval * (penalty/100)
+
+        minval = min(predictions.values())
+        res = [k for k, v in predictions.items() if v==minval]
+        if len(res) is 1:
+            predicted_attraction = res[0]
+        else:
+            predicted_attraction = random.choice(res)
+        attraction_object = self.model.get_attractions()[predicted_attraction]
+        # dit kan volgens mij ook:
+        # attraction_object = self.attractions[predicted_attraction]
+
+        return self.model.attractions[predicted_attraction]

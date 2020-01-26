@@ -1,11 +1,16 @@
-# ABM
-Agent Based Modelling UvA (2020)
+# Agent Based Modelling UvA (2020): Theme Park Dynamics
+In this project, ABM us used to simulate visitors of a theme park. The focus will be on distances between attractions and waiting lines. A visualization of a theme park is made with a [visualization toolkit of Mesa](https://mesa.readthedocs.io/en/master/apis/visualization.html).
 
 ### Requirements
 All requirements can be installed with:
 ```
 pip install -r requirements.txt
 ```
+Installing:
+* Mesa
+* matplotlib
+* numpy
+* pickle
 
 ### Repository
 
@@ -23,6 +28,7 @@ mesa runserver
 * ```attraction.py```: includes the agent Attraction.
 * ```customer.py```: includes the agent Customer and helper functions such as ```get_destination()```.
 * ```model.py```: includes the model Themepark and defines the Mesa grid and schedule.
+* ```monitor.py```: makes predictions of an agent's move based on distance and wating time.
 * ```route.py```: calculates coordinates of attractions and adds possible obstacles.
 * ```server.py```: launches the mesa visualization.
 
