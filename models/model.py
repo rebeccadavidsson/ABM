@@ -136,6 +136,8 @@ class Themepark(Model):
             #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
+
+            # self.strategy = random.choice(["Random", "Closest_by"])
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy)
             self.schedule_Customer.add(a)
 
@@ -276,7 +278,7 @@ class Themepark(Model):
             moore=True,
             radius=RADIUS,
             include_center=True)
-            
+
         customers = []
 
         # Count customer agents

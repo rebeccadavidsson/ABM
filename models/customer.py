@@ -7,7 +7,7 @@ import numpy as np
 
 WIDTH = 36
 HEIGHT = 36
-MEMORY = 3
+MEMORY = 5
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
@@ -31,6 +31,8 @@ class Customer(Agent):
 
         if self.strategy == 'Closest_by':
             self.destination = self.closest_by().pos
+
+        self.changed_strategy = False
 
         self.waitingtime = None
         self.waiting = False
@@ -462,15 +464,21 @@ class Customer(Agent):
         """
         Update an agents memory and change strategy based on memory.
         """
+        counter = 0
 
         # If all past steps weren't succesful, change strategy
         if len(self.memory_succeses) >= self.memory_strategy:
-            if all(x == self.memory_succeses[0] for x in self.memory_succeses) is True:
+            for num in self.memory_succeses:
+                if num == 0:
+                    counter += 1
+
+            if counter == self.memory_strategy and self.changed_strategy is False:
                 if self.strategy == "Random":
                     self.strategy = "Closest_by"
                 else:
                     self.strategy = "Random"
-                    
+
+                self.changed_strategy = True
                 self.memory_succeses.append(1)
                 self.memory_succeses.pop()
         else:
