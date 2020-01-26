@@ -3,10 +3,10 @@ from mesa.space import MultiGrid
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 import random
-from .route import get_coordinates, get_attraction_coordinates, Route
-from .customer import Customer
-from .attraction import Attraction
-from .monitor import Monitor
+from route import get_coordinates, get_attraction_coordinates, Route
+from customer import Customer
+from attraction import Attraction
+from monitor import Monitor
 import pickle
 
 WIDTH = 36
@@ -18,11 +18,12 @@ PENALTY_PERCENTAGE = 5
 
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time):
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, memory):
         self.theme = theme
         self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
+        self.memory = memory
         self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
@@ -97,7 +98,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust)
+                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust, self.memory)
                 attractions[i] = a
                 # print(a.waiting_time, "waitingtime")
                 self.schedule_Attraction.add(a)
@@ -138,7 +139,7 @@ class Themepark(Model):
                 i = self.cust_ids
 
             # self.strategy = random.choice(["Random", "Closest_by"])
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.memory)
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
@@ -317,16 +318,16 @@ class Themepark(Model):
         # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
 
-        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
-        pickle.dump(self.park_score, open("data/park_score.p", "wb"))
-        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
+        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
+        pickle.dump(self.park_score, open("../data/park_score_mem{}.p".format(self.memory), "wb"))
+        pickle.dump(self.hist_random_strat, open("../data/strategy_random.p", "wb"))
+        pickle.dump(self.hist_close_strat, open("../data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
         print()
-        quit()
+        # quit()
 
     def save_data(self):
         """Save data of all attractions and customers."""

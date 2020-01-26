@@ -1,16 +1,16 @@
 from mesa import Agent
 import random
-from .route import get_attraction_coordinates, Route
+from route import get_attraction_coordinates, Route
 
 WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 80
-MEMORY = 5
+# MEMORY = 5
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, waiting_time, customer_capacity, pos, name, N_cust, heading=(1, 0)):
+    def __init__(self, unique_id, model, waiting_time, customer_capacity, pos, name, N_cust, memory, heading=(1, 0)):
         super().__init__(unique_id, model)
         self.name = name
         self.pos = pos
@@ -25,6 +25,7 @@ class Attraction(Agent):
         self.memory = []
         self.ride_time = 0
         self.rides_taken = 0
+        self.memory_init = memory
 
     def calculate_waiting_time(self):
         '''
@@ -52,7 +53,7 @@ class Attraction(Agent):
         Updates the memory of the waitingtimes of the last MEMORY timesteps
         """
         self.memory.append(self.current_waitingtime)
-        if len(self.memory) == MEMORY + 1:
+        if len(self.memory) == self.memory_init + 1:
             self.memory.remove(self.memory[0])
 
     def customers_inside(self):

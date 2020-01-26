@@ -143,8 +143,8 @@ model_params = {
 
 server = ModularServer(
     Themepark,
-    # [grid, histogram, chart],
-    [grid, histogram],
+    [grid, histogram, chart],
+    # [grid, histogram],
     "Theme Park Model",
     model_params,
 )
