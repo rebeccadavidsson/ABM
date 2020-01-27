@@ -89,7 +89,6 @@ def get_attraction_coordinates(width, height, num_attractions, method):
             total.append(coordinate)
 
             counter += 1
-
     return xlist, ylist, total
 
 

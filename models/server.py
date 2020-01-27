@@ -21,7 +21,10 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 15
-max_time = 800
+max_time = 400
+STEPS = max_time
+MEMORY = 6
+
 
 
 def agent_draw(agent):
@@ -52,28 +55,19 @@ def agent_draw(agent):
     elif type(agent) is Customer:
 
         portrayal["Layer"] = 1
+        portrayal["Shape"] = "circle"
+        portrayal["Filled"] = "true"
+        portrayal["r"] = 0.65
 
         if agent.waiting is False:
             portrayal["text"] = agent.unique_id
             portrayal["text_color"] = "black"
 
-        # Determine if customer has the app or not
-        if agent.has_app is True:
-            portrayal["Shape"] = "rect"
-            portrayal["Color"] = "green"
-            portrayal["Filled"] = "false"
-            portrayal["w"] = 0.5
-            portrayal["h"] = 0.5
-        else:
-            portrayal["Shape"] = "circle"
-            portrayal["Filled"] = "true"
-            portrayal["r"] = 0.65
-
         if agent.strategy == "Closest_by":
             portrayal["Color"] = "blue"
         elif agent.strategy == "Random":
             portrayal["Color"] = "orange"
-            portrayal["Layer"] = 3
+            # portrayal["Layer"] = 3
 
 
         # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
@@ -147,7 +141,11 @@ model_params = {
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
+<<<<<<< HEAD
     "memory": UserSettableParameter("slider", "Customer memory", 1, 1, 9, 1)
+=======
+    "memory": MEMORY
+>>>>>>> 8b6a1fd518b7068d5b803de4284ee33cfe5442f0
 }
 
 server = ModularServer(

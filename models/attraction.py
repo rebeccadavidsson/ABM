@@ -8,7 +8,7 @@ WIDTH = 36
 HEIGHT = 36
 RADIUS = 15
 NUM_OBSTACLES = 80
-# MEMORY = 5
+MEMORY = 5
 
 
 class Attraction(Agent):
