@@ -13,7 +13,7 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 15
-max_time = 400
+max_time = 500
 STEPS = max_time
 MEMORY = 6
 
