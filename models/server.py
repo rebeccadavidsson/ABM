@@ -21,7 +21,7 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 15
-max_time = 400
+max_time = 500
 STEPS = max_time
 MEMORY = 6
 
@@ -141,11 +141,7 @@ model_params = {
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
-<<<<<<< HEAD
     "memory": UserSettableParameter("slider", "Customer memory", 1, 1, 9, 1)
-=======
-    "memory": MEMORY
->>>>>>> 8b6a1fd518b7068d5b803de4284ee33cfe5442f0
 }
 
 server = ModularServer(
