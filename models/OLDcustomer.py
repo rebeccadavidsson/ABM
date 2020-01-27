@@ -34,15 +34,38 @@ class Customer(Agent):
             self.destination = self.closest_by().pos
 
         self.changed_strategy = False
+
         self.waitingtime = None
         self.waiting = False
         self.total_ever_waited = 0
         self.nmbr_attractions = 0
+
+        # Start waited period with zero
         self.waited_period = 0
         self.sadness_score = 0
         self.in_attraction = False
+
         self.strategy = strategy
+        if self.strategy == "Random":
+            self.has_app = False
+        elif self.strategy == "Knowledge":
+            self.has_app = True
+        elif self.strategy == "Closest_by":
+            self.has_app = False
+        else:
+            raise Exception('\033[93m' + "This method is not implemented!!!" + '\033[0m')
+            quit()
+
+        self.guided = False
+
+        # Random if customer has the app
         self.goals = self.get_goals()
+        self.reached_goals = False
+
+        if self.has_app is True:
+            self.checked_app = False
+            self.destination = self.search_best_option()
+
         self.memory_strategy = self.memory
         self.memory_succeses = []
 
@@ -81,6 +104,7 @@ class Customer(Agent):
         if total_difference_sum < 0:
             total_difference_sum = 0
 
+        # print(total_difference_sum, "penalty diff sum of attraction", current_attraction.unique_id)
         penalty = total_difference_sum * self.model.penalty_per
 
         return penalty
@@ -277,6 +301,148 @@ class Customer(Agent):
 
         return scores
 
+    def helpers_best_choice(self, distances, waitinglines, index):
+        """
+        Helpers function for search_best_option().
+        Returns an index of the best choice.
+        """
+
+        scores = self.get_score(distances, waitinglines)
+
+        # Start with best solution
+        temp = scores.get(index)
+
+        if index > len(self.positions):
+            print('\033[93m' + "There was no best choice... Index =" + str(index) + '\033[0m')
+            index = len(self.positions)
+
+        for i in range(index, len(scores) + 1):
+
+            if not scores.get(i + 1):
+                return i
+            if scores.get(i + 1) < scores.get(i):
+                return i + 1
+            else:
+                return i
+
+    def strategy_distance():
+        pass
+
+    def strategy_time():
+        pass
+
+    def search_best_option(self):
+        """
+        Get best choice of attraction based on watingtime and distance.
+        Returns a position of the best attraction.
+        Start with best solution; shortest distance and shortest waiting line,
+        if this solution is not in list of goals, go to second best solution.
+        So: ONLY includes attractions in personal GOALS LIST.
+        """
+
+        distances = self.get_walking_distances()
+        waitinglines = self.get_waiting_lines()
+
+        goals_positions = []
+        [goals_positions.append(goal.pos) for goal in self.goals]
+
+        # Start with best solution and check if this solution is in goals
+        index = 0
+
+        best_choice = self.helpers_best_choice(distances, waitinglines, index)
+
+        # Empty goals list, TODO
+        if goals_positions == []:
+            return None
+
+        while self.positions[best_choice] not in goals_positions and index < len(self.positions):
+            best_choice = self.helpers_best_choice(distances, waitinglines, index)
+            if best_choice is None:
+                print('\033[93m' + "There was no best choice...?" + '\033[0m')
+            index += 1
+
+        # Best choice is found!!!
+        return self.positions[best_choice]
+
+    def get_shortest_dest(self):
+        """
+        Get destination from list of goals
+        with SHORTEST WATINGTIME for people with the app.
+        Not based on walking distance.
+        """
+
+        if len(self.goals) == 1:
+            self.destination = self.goals[0].pos
+            self.goals = []
+
+            return None, None
+        else:
+            destinations, waiting_lines = [], []
+            [destinations.append(attraction) for attraction in self.goals]
+
+            # Get minimum watingtime
+            waiting_lines = []
+            [waiting_lines.append(dest.current_waitingtime) for dest in destinations]
+
+            minimum = min(waiting_lines)
+
+            return destinations[waiting_lines.index(minimum)].pos, waiting_lines
+
+    def get_destination(self):
+        '''
+        Gives the agent a new destination based on goal and waiting time.
+        '''
+        dest, waiting_lines = self.get_shortest_dest()
+
+        if dest is not None:
+
+            # Change current destination to new destination
+            self.destination = dest
+
+        # If new destination is current attraction choose second closest
+        if self.pos == self.destination:
+
+            if self.has_app is True:
+                second_shortest = sorted(waiting_lines)[1]
+            else:
+                # TODO: Ik weet niet of dit nou helemaal goed gaat, even checken
+                # of dit mag met gewoon random eentje kiezen als die persoon
+                # de app niet heeft en dus niet weet wat de kortste wachtrij is.
+                second_shortest = random.choice(waiting_lines)
+            # check if two waiting times are of same length
+            indexi = []
+            for i in range(len(waiting_lines)):
+                if waiting_lines[i] == second_shortest:
+                    indexi.append(i)
+            if len(indexi) > 1:
+                # TODO: volgens mij kan deze hele for-loop weg...
+                for i in indexi:
+                    if self.positions[i] != self.pos:
+                        self.destination = self.positions[i]
+                        break
+            else:
+                self.destination = self.positions[waiting_lines.index(second_shortest)]
+
+        self.waiting = False
+        self.waited_period = 0
+        return False
+
+    def update_choice(self):
+        """
+        Update customers choice of destination at every move, mainly for people
+        who have the app.
+        Destination choice can change based on knowledge about waitingtimes.
+        """
+
+        # Check again for best option
+        best = self.search_best_option()
+        # print(best, "best")
+        if best is not None:
+            self.destination = best
+
+        if self.guided is True and best is not None:
+            self.destination = self.model.monitor.make_prediction(self.model.totalTOTAL,self.goals, self.get_walking_distances(),)
+
     def update_memory(self):
         """
         Update an agents memory and change strategy based on memory.
@@ -323,6 +489,10 @@ class Customer(Agent):
         """
         This method should move the customer using the `random_move()` method.
         """
+
+        if self.has_app is True and self.checked_app is False:
+            self.update_choice()
+            self.checked_app = True
 
         if self.waiting is True:
             self.sadness_score += 1
