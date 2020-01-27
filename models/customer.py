@@ -9,6 +9,7 @@ WIDTH = 36
 HEIGHT = 36
 MEMORY = 5
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
+chances = [0.1, 0.2, 0.3, 0.4, 0.5]
 
 
 class Customer(Agent):
@@ -47,6 +48,7 @@ class Customer(Agent):
         self.goals = self.get_goals()
         self.memory_strategy = self.memory
         self.memory_succeses = []
+        self.changes_memory = []
 
     def get_goals(self):
         """Set random goals."""
@@ -285,6 +287,7 @@ class Customer(Agent):
                 if num == 0:
                     counter += 1
 
+            # Change strategy
             if counter == self.memory_strategy and self.changed_strategy is False:
                 if self.strategy == "Random":
                     self.strategy = "Closest_by"
@@ -352,7 +355,7 @@ class Customer(Agent):
             predictions[attraction_nr] = predictions[attraction_nr] + maxval * (penalty/100)
 
         minval = min(predictions.values())
-        res = [k for k, v in predictions.items() if v==minval]
+        res = [k for k, v in predictions.items() if v == minval]
         if len(res) is 1:
             predicted_attraction = res[0]
         else:
