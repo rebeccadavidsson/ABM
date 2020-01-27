@@ -44,6 +44,7 @@ class Customer(Agent):
         self.waited_period = 0
         self.sadness_score = 0
         self.in_attraction = False
+        self.in_attraction_list = []
 
         self.strategy = strategy
         if self.strategy == "Random":
@@ -178,21 +179,18 @@ class Customer(Agent):
     def check_move(self):
         """ Checks if a move can be done, given a new position."""
 
-        if self.pos == self.destination:
-
-            # Check which attraction
-            attractions = self.model.get_attractions()
-            for attraction in attractions:
-                if attraction.pos == self.pos:
-                    self.current_a = attraction
-
-            # self.current_a. += 1
-            self.waited_period += 1
-
-        # CHANGE DIRECTION if waitingtime is met
         if self.waitingtime is not None:
 
+            # set in ride to true false
+            if self.current_a is not None:
+                if self.waited_period == self.waitingtime - self.current_a.attraction_duration:
+                    self.in_attraction = True
+
+            # CHANGE DIRECTION if waitingtime is met
             if self.waitingtime <= self.waited_period:
+
+                # when attraction is left set self.attraction to false
+                self.in_attraction = False
 
                 # Update goals and attraction
                 for attraction in self.model.get_attractions():
@@ -236,6 +234,17 @@ class Customer(Agent):
                 self.waiting = False
                 self.waited_period = 0
 
+        if self.pos == self.destination:
+
+            # Check which attraction
+            attractions = self.model.get_attractions()
+            for attraction in attractions:
+                if attraction.pos == self.pos:
+                    self.current_a = attraction
+
+            # self.current_a. += 1
+            self.waited_period += 1
+
         if self.waiting is False:
             return True
         return False
@@ -252,26 +261,12 @@ class Customer(Agent):
                 attraction = i
                 break
 
-        self.waitingtime = attraction.current_waitingtime
-
         # Update waitingtime of attraction
         attraction.N_current_cust += 1
         attraction.calculate_waiting_time()
 
-        # # get number of customers in line
-        waiting_lines = self.model.calculate_people()
-
-        # get attraction durations
-        durations = self.model.get_durations()
-
-        # get current attraction from destination
-        index = self.positions.index(self.destination)
-
-        # calculate waitingtime
-        waitingtime = durations[index] * waiting_lines[index]
-
         # add waiting time to agent
-        self.waitingtime = waitingtime
+        self.waitingtime = attraction.current_waitingtime
 
     def get_walking_distances(self):
         """
@@ -514,6 +509,11 @@ class Customer(Agent):
 
         if self.waiting is True:
             self.sadness_score += 1
+
+        if self.in_attraction is True:
+            self.in_attraction_list.append(1)
+        else:
+            self.in_attraction_list.append(0)
 
         self.move()
 
