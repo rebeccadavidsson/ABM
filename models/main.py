@@ -4,7 +4,10 @@ Haal overal de punt weg voor alle imports in customer, route en model.
 """
 
 from mesa import Model, Agent
-from model import Themepark
+try:
+    from .model import Themepark
+except ModuleNotFoundError:
+    from model import Themepark
 import pickle
 
 width = 36
