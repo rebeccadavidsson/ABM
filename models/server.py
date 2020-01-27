@@ -14,6 +14,9 @@ N_cust = 50
 pixel_ratio = 20
 num_agents = 15
 max_time = 400
+STEPS = max_time
+MEMORY = 6
+
 
 
 def agent_draw(agent):
@@ -138,13 +141,14 @@ model_params = {
                                       choices=['Random', 'Closest_by']),
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
-    "max_time": max_time
+    "max_time": max_time,
+    "memory": MEMORY
 }
 
 server = ModularServer(
     Themepark,
-    # [grid, histogram, chart],
-    [grid, histogram],
+    [grid, histogram, chart],
+    # [grid, histogram],
     "Theme Park Model",
     model_params,
 )

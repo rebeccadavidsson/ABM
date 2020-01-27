@@ -19,17 +19,20 @@ PENALTY_PERCENTAGE = 5
 # HARDCODED COORDINATES for cluster theme:
 xlist, ylist, positions = [30, 15, 24, 28, 24, 23, 21, 14, 21, 25, 24, 30, 20, 27, 27], [25, 6, 7, 24, 6, 4, 5, 6, 4, 4, 5, 24, 6, 22, 25], [(30, 25), (15, 6), (24, 7), (28, 24), (24, 6), (23, 4), (21, 5), (14, 6), (21, 4), (25, 4), (24, 5), (30, 24), (20, 6), (27, 22), (27, 25)]
 
+
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time):
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, memory):
         self.theme = theme
         self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
+        self.memory = memory
 
         if self.theme == "cluster":
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
         else:
             self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
+
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
         self.N_attr = N_attr    # num of attraction agents
@@ -103,7 +106,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust)
+                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust, self.memory)
                 attractions[i] = a
                 # print(a.waiting_time, "waitingtime")
                 self.schedule_Attraction.add(a)
@@ -144,7 +147,7 @@ class Themepark(Model):
                 i = self.cust_ids
 
             # self.strategy = random.choice(["Random", "Closest_by"])
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.memory)
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
@@ -325,11 +328,11 @@ class Themepark(Model):
         # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
 
-        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
-        pickle.dump(self.park_score, open("data/park_score.p", "wb"))
-        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
+        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
+        pickle.dump(self.park_score, open("../data/park_score_mem{}.p".format(self.memory), "wb"))
+        pickle.dump(self.hist_random_strat, open("../data/strategy_random.p", "wb"))
+        pickle.dump(self.hist_close_strat, open("../data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")

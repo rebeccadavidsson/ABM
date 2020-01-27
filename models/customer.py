@@ -7,12 +7,12 @@ import numpy as np
 
 WIDTH = 36
 HEIGHT = 36
-MEMORY = 3
+MEMORY = 5
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, memory):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
@@ -23,6 +23,7 @@ class Customer(Agent):
         self.current_a = None
         self.strategy = strategy
         self.history = self.make_history()
+        self.memory = memory
 
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
@@ -67,7 +68,7 @@ class Customer(Agent):
             self.checked_app = False
             self.destination = self.search_best_option()
 
-        self.memory_strategy = MEMORY
+        self.memory_strategy = self.memory
         self.memory_succeses = []
 
     def get_goals(self):
