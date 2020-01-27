@@ -4,7 +4,10 @@ Haal overal de punt weg voor alle imports in customer, route en model.
 """
 
 from mesa import Model, Agent
-from model import Themepark
+try:
+    from .model import Themepark
+except ModuleNotFoundError:
+    from model import Themepark
 import pickle
 
 width = 36
@@ -14,7 +17,7 @@ pixel_ratio = 20
 num_agents = 15
 strategy = "Closest_by"
 theme = "cluster"
-steps = 400
+steps = 100
 RUNS = 8
 
 memory = [2,3,4,5,6,7,8,9]

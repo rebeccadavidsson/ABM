@@ -3,10 +3,16 @@ from mesa.space import MultiGrid
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 import random
-from .route import get_coordinates, get_attraction_coordinates, Route
-from .customer import Customer
-from .attraction import Attraction
-from .monitor import Monitor
+try:
+    from .route import get_coordinates, get_attraction_coordinates, Route
+    from .customer import Customer
+    from .attraction import Attraction
+    from .monitor import Monitor
+except:
+    from route import get_coordinates, get_attraction_coordinates, Route
+    from customer import Customer
+    from attraction import Attraction
+    from monitor import Monitor
 import pickle
 
 WIDTH = 36
@@ -57,6 +63,7 @@ class Themepark(Model):
         self.data_dict = {}
         self.hist_random_strat = []
         self.hist_close_strat = []
+        self.all_rides_list = []
         self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
@@ -324,20 +331,29 @@ class Themepark(Model):
 
         cust_data = self.get_data_customers()
 
+        agents = self.get_customers()
+        self.all_rides_list = [0] * len(agents[0].in_attraction_list)
+        for agent in agents:
+            for i in range(len(agent.in_attraction_list)):
+                self.all_rides_list[i] += agent.in_attraction_list[i]
+
+        print(self.all_rides_list)
+
+
         # pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
         # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
 
-        pickle.dump(self.data_dict, open("/data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("/data/customers2.p", 'wb'))
-        pickle.dump(self.park_score, open("/data/park_score_mem{}.p".format(self.memory), "wb"))
-        pickle.dump(self.hist_random_strat, open("/data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("/data/strategy_close.p", "wb"))
+        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
+        pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
+        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
+        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
         print()
-        # quit()
+        quit()
 
     def save_data(self):
         """Save data of all attractions and customers."""
