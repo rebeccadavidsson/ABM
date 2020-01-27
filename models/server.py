@@ -3,10 +3,18 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import PieChartModule
 from mesa.visualization.UserParam import UserSettableParameter
-from .model import Themepark
-from .customer import Customer
-from .route import Route
-from .attraction import Attraction
+try:
+    from model import Themepark
+    from customer import Customer
+    from route import Route
+    from attraction import Attraction
+except ModuleNotFoundError:
+    from .model import Themepark
+    from .customer import Customer
+    from .route import Route
+    from .attraction import Attraction
+
+
 
 width = 36
 height = 36
@@ -138,7 +146,8 @@ model_params = {
                                       choices=['Random', 'Closest_by']),
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
-    "max_time": max_time
+    "max_time": max_time,
+    "memory": UserSettableParameter("slider", "Customer memory", 1, 1, 9, 1)
 }
 
 server = ModularServer(

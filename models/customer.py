@@ -1,7 +1,10 @@
 from mesa import Agent
 import random
 import math
-from route import Route
+try:
+    from .route import Route
+except:
+    from route import Route
 import numpy as np
 # from model import calculate_people
 
