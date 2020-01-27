@@ -1,6 +1,6 @@
 from mesa import Agent
 import random
-from .route import get_attraction_coordinates, Route
+from route import get_attraction_coordinates, Route
 
 WIDTH = 36
 HEIGHT = 36

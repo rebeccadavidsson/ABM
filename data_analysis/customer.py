@@ -1,7 +1,7 @@
 from mesa import Agent
 import random
 import math
-from .route import Route
+from route import Route
 import numpy as np
 # from model import calculate_people
 
@@ -500,7 +500,6 @@ class Customer(Agent):
             # No succes
             else:
                 self.memory_succeses.append(0)
-
 
     def step(self):
         """

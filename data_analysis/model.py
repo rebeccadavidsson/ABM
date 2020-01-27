@@ -3,10 +3,10 @@ from mesa.space import MultiGrid
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 import random
-from .route import get_coordinates, get_attraction_coordinates, Route
-from .customer import Customer
-from .attraction import Attraction
-from .monitor import Monitor
+from route import get_coordinates, get_attraction_coordinates, Route
+from customer import Customer
+from attraction import Attraction
+from monitor import Monitor
 import pickle
 
 WIDTH = 36

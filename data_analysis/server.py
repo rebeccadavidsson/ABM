@@ -3,10 +3,10 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import PieChartModule
 from mesa.visualization.UserParam import UserSettableParameter
-from .model import Themepark
-from .customer import Customer
-from .route import Route
-from .attraction import Attraction
+from model import Themepark
+from customer import Customer
+from route import Route
+from attraction import Attraction
 
 width = 36
 height = 36
