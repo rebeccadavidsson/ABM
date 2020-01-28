@@ -64,6 +64,9 @@ class Themepark(Model):
         self.hist_random_strat = []
         self.hist_close_strat = []
         self.all_rides_list = []
+        self.strategy_composition = self.make_strategy_composition()
+        self.memory = 5
+
         self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
@@ -99,6 +102,11 @@ class Themepark(Model):
     #
     #     return dict
 
+    def make_strategy_composition(self):
+        dict = {0:0.10, 0.25:0.20, 0.5:0.30, 0.75:0.25, 1:0.15}
+
+
+        return dict
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -140,6 +148,25 @@ class Themepark(Model):
     def add_customers(self, N_cust, added=False):
         """ Initialize customers on random positions."""
 
+        weights_list = []
+
+
+        for i in range(round(N_cust*self.strategy_composition[0.0])):
+            weights_list.append(0)
+
+        for i in range(round(N_cust*self.strategy_composition[0.25])):
+            weights_list.append(0.25)
+
+        for i in range(round(N_cust*self.strategy_composition[0.5])):
+            weights_list.append(0.5)
+
+        for i in range(round(N_cust*self.strategy_composition[0.75])):
+            weights_list.append(0.75)
+
+        for i in range(round(N_cust*self.strategy_composition[1.0])):
+            weights_list.append(1.0)
+
+
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -156,6 +183,7 @@ class Themepark(Model):
             # self.strategy = random.choice(["Random", "Closest_by"])
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight)
             self.schedule_Customer.add(a)
+            a.weight = weights_list[i]
 
             self.grid.place_agent(a, pos)
 
