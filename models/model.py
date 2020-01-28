@@ -22,6 +22,7 @@ RADIUS = int(WIDTH/2)
 NUM_OBSTACLES = 0
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
+STRATEGIES = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 # HARDCODED COORDINATES for cluster theme:
 xlist, ylist, positions = [12, 21, 26, 11, 9, 25, 25, 26, 20, 12, 11, 21], [17, 26, 13, 17, 18, 12, 11, 12, 28, 16, 18, 29], [(12, 17), (21, 26), (26, 13), (11, 17), (9, 18), (25, 12), (25, 11), (26, 12), (20, 28), (12, 16), (11, 18), (21, 29)]
@@ -34,6 +35,7 @@ class Themepark(Model):
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
         self.weight = weight
+        self.strategies = STRATEGIES
 
         if self.theme == "cluster":
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
@@ -65,9 +67,10 @@ class Themepark(Model):
         self.hist_random_strat = []
         self.hist_close_strat = []
         self.all_rides_list = []
+        self.strategy_composition = self.make_strategy_composition()
+        self.memory = 5
         self.customer_score = []
-
-        self.add_customers(self.N_cust)
+        self.customers = self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
             self.data_dict[attraction.unique_id] = ({
@@ -75,33 +78,43 @@ class Themepark(Model):
                                "length": attraction.attraction_duration,
                                "waiting_list": []})
 
-        # Dynamic datacollector (werkt niet :( )
-        # self.datacollector = DataCollector(self.datacollection_dict())
-
-        # Hardcoded datacollector
         self.datacollector = DataCollector(
-            {"Attraction1": lambda m: self.schedule_Attraction.agents[0].customers_inside(),
-            "Attraction2": lambda m: self.schedule_Attraction.agents[1].customers_inside(),
-            "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside(),
-            "Attraction4": lambda m: self.schedule_Attraction.agents[3].customers_inside(),
-            "Attraction5": lambda m: self.schedule_Attraction.agents[4].customers_inside(),
-            "Attraction6": lambda m: self.schedule_Attraction.agents[5].customers_inside(),
-            "Attraction7": lambda m: self.schedule_Attraction.agents[6].customers_inside()
+            {"0.00": lambda m: self.strategy_counter(self.strategies[0]),
+            "0.25": lambda m: self.strategy_counter(self.strategies[1]),
+            "0.50": lambda m: self.strategy_counter(self.strategies[2]),
+            "0.75": lambda m: self.strategy_counter(self.strategies[3]),
+            "1.00": lambda m: self.strategy_counter(self.strategies[4]),
             })
 
         self.total_waited_time = 0
 
         self.monitor = Monitor(self.max_time, self.N_attr, self.positions)
 
-    # def datacollection_dict(self):
-    #     """ Returns a dictionary for the DataCollector. """
-    #
-    #     dict = {}
-    #     for i in range(self.N_attr):
-    #         dict["Attraction{}".format(i)] = lambda m: self.schedule_Attraction.agents[i].customers_inside()
-    #
-    #     return dict
 
+    def strategy_counter(self, strategy):
+        counter_total = {}
+
+        for attraction_pos in self.positions:
+
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=0,
+                include_center=True
+            )
+
+            counter = 0
+            for agent in self.customers:
+                if agent.weight == strategy:
+                    counter += 1
+
+        return counter
+
+    def make_strategy_composition(self):
+        dict = {self.strategies[0]: 0.20, self.strategies[1]:0.20, self.strategies[2]:0.20,
+                        self.strategies[3]:0.20, self.strategies[4]:0.20}
+
+        return dict
 
     def make_attractions(self):
         """ Initialize attractions on fixed position."""
@@ -140,6 +153,25 @@ class Themepark(Model):
     def add_customers(self, N_cust, added=False):
         """ Initialize customers on random positions."""
 
+        weights_list = []
+
+        # GEHARDCODE EN LELIJK SORRYYYYY
+        for i in range(round(N_cust*self.strategy_composition[0.0])):
+            weights_list.append(0)
+
+        for i in range(round(N_cust*self.strategy_composition[0.25])):
+            weights_list.append(0.25)
+
+        for i in range(round(N_cust*self.strategy_composition[0.5])):
+            weights_list.append(0.5)
+
+        for i in range(round(N_cust*self.strategy_composition[0.75])):
+            weights_list.append(0.75)
+
+        for i in range(round(N_cust*self.strategy_composition[1.0])):
+            weights_list.append(1.0)
+
+        cust_list = []
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -156,8 +188,12 @@ class Themepark(Model):
             # self.strategy = random.choice(["Random", "Closest_by"])
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight)
             self.schedule_Customer.add(a)
+            a.weight = weights_list[i]
 
             self.grid.place_agent(a, pos)
+            cust_list.append(a)
+
+        return cust_list
 
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
@@ -226,26 +262,6 @@ class Themepark(Model):
             attraction.N_current_cust = counter
             counter_total[attraction.unique_id] = counter
         return counter_total
-
-    def get_durations(self):
-        """ Get duratiosn of every attraction in a list """
-
-        durations = []
-
-        for attraction_pos in self.positions:
-
-            agents = self.grid.get_neighbors(
-                attraction_pos,
-                moore=True,
-                radius=0,
-                include_center=True
-            )
-
-            for agent in agents:
-                if type(agent) is Attraction:
-                    durations.append(agent.attraction_duration)
-
-        return durations
 
     def make_route(self):
         """Draw coordinates of a possible path."""
@@ -340,6 +356,7 @@ class Themepark(Model):
         customers = self.get_customers()
 
         scores = []
+
         for customer in customers:
             history = customer.history
             values = list(history.values())
@@ -353,25 +370,35 @@ class Themepark(Model):
         scores = np.interp(scores, (min(scores), max(scores)), (1, 10))
         return np.mean(scores)
 
+    def get_history_list(self):
+
+        customers = self.get_customers()
+
+        histories = {}
+
+        for customer in customers:
+            history = customer.history
+            values = list(history.values())
+            histories[customer.unique_id] = values
+        return histories
+
     def final(self):
         """ Return data """
-        # print(self.happinesses)
-        # print(self.park_score)
-
-        hapiness = self.calc_hapiness()
 
         cust_data = self.get_data_customers()
-        agents = self.get_customers()
-        self.all_rides_list = [0] * len(agents[0].in_attraction_list)
-        for agent in agents:
-            for i in range(len(agent.in_attraction_list)):
-                self.all_rides_list[i] += agent.in_attraction_list[i]
+        histories = self.get_history_list()
 
-
-        # pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
-        # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
+        pickle.dump(cust_data, open("data/customers.p", 'wb'))
         pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
-        pickle.dump(hapiness, open("data/hapiness.p", "wb"))
+        pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
+        pickle.dump(histories, open("data/cust_history.p", 'wb'))
+
+        # agents = self.get_customers()
+        # self.all_rides_list = [0] * len(agents[0].in_attraction_list)
+        # for agent in agents:
+        #     for i in range(len(agent.in_attraction_list)):
+        #         self.all_rides_list[i] += agent.in_attraction_list[i]
+        # pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
         # pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
         # pickle.dump(cust_data, open("data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))

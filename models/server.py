@@ -1,7 +1,7 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
-from mesa.visualization.modules import PieChartModule
+from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 try:
     from model import Themepark
@@ -16,10 +16,10 @@ except ModuleNotFoundError:
 
 width = 36
 height = 36
-N_cust = 15
+N_cust = 120
 pixel_ratio = 20
 num_agents = 12
-max_time = 300
+max_time = 520
 STEPS = max_time
 MEMORY = 6
 
@@ -60,12 +60,22 @@ def agent_draw(agent):
         if agent.waiting is False:
             portrayal["text"] = agent.unique_id
             portrayal["text_color"] = "black"
+        #
+        # if agent.strategy == "Closest_by":
+        #     portrayal["Color"] = "blue"
+        # elif agent.strategy == "Random":
+        #     portrayal["Color"] = "orange"
 
-        if agent.strategy == "Closest_by":
-            portrayal["Color"] = "blue"
-        elif agent.strategy == "Random":
-            portrayal["Color"] = "orange"
-            # portrayal["Layer"] = 3
+        if agent.weight == 0.0:
+             portrayal["Color"] = "#F6412D"
+        elif agent.weight == 0.25:
+             portrayal["Color"] = "#FF5607"
+        elif agent.weight == 0.5:
+             portrayal["Color"] = "#FF9800"
+        elif agent.weight == 0.75:
+             portrayal["Color"] = "#FFC100"
+        elif agent.weight == 1.0:
+             portrayal["Color"] = "#FFEC19"
 
 
         # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
@@ -118,16 +128,16 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-chart = PieChartModule([{"Label": "Attraction1", "Color": "#AA0000"},
-                    {"Label": "Attraction2", "Color": "#303F9F"},
-                    {"Label": "Attraction3", "Color": "#7B1FA2"},
-                    {"Label": "Attraction4", "Color": "#D81B60"},
-                    {"Label": "Attraction5", "Color": "#2E7D32"},
-                    {"Label": "Attraction6", "Color": "#F4511E"},
-                    {"Label": "Attraction7", "Color": "#F9A825"}], data_collector_name='datacollector')
+chart = ChartModule([
+                    {"Label": "0.00", "Color": "#F6412D"},
+                    {"Label": "0.25", "Color": "#FF5607"},
+                    {"Label": "0.50", "Color": "#FF9800"},
+                    {"Label": "0.75", "Color": "#FFC100"},
+                    {"Label": "1.00", "Color": "#FFEC19"},
+                    ], data_collector_name='datacollector')
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
-                            "Attraction4", "Attraction5", "Attraction6", "Attraction7"], 20, 50)
+                            "Attraction4", "Attraction5"], 20, 50)
 
 model_params = {
     "height": height,
@@ -136,7 +146,7 @@ model_params = {
     "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust * 2, 1),
     "strategy": UserSettableParameter('choice', 'Strategy choice', value='Closest_by',
                                       choices=['Random', 'Closest_by']),
-    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
+    "theme": UserSettableParameter('choice', 'Theme park lay-out', value='circle',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
     "weight": UserSettableParameter("slider", "Weight of waitingtime", 0, 0, 1, 0.25)
