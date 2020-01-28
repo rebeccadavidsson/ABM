@@ -141,7 +141,7 @@ model_params = {
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
-    "weight": UserSettableParameter("slider", "Customer memory", 0, 1, 0.5, 0.25)
+    "weight": UserSettableParameter("slider", "Weight of waitingtime", 0, 0, 1, 0.25)
 }
 
 server = ModularServer(
