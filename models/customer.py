@@ -27,6 +27,7 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
+        self.init_weight = None
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:
@@ -67,7 +68,7 @@ class Customer(Agent):
         attractions = self.model.attractions
         for attraction in range(len(attractions)):
             history[attractions[attraction]] = 0
-        # print(history)
+
         return history
 
     def penalty(self, current_attraction):
@@ -185,7 +186,8 @@ class Customer(Agent):
                 self.waited_period = 0
 
                 # Update memory
-                self.update_strategy()
+                if self.init_weight is None:
+                    self.update_strategy()
 
                 # Set current attraction back to None when customer leaves.
                 self.current_a = None
@@ -202,7 +204,8 @@ class Customer(Agent):
         if self.pos == self.destination:
 
             if self.waited_period == 0:
-                self.update_strategy()
+                if self.init_weight is None:
+                    self.update_strategy()
 
             # Check which attraction
             attractions = self.model.get_attractions()
@@ -381,8 +384,7 @@ class Customer(Agent):
 
         # add waitingtimes
         waiting_times = self.get_waiting_lines()
-        # print(len(predictions.keys()))
-        # print(predictions, waiting_times, "PRINT")
+
         for i in range(len(predictions.keys())):
 
             if self.weight is None:

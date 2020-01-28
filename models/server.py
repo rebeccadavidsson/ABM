@@ -14,17 +14,14 @@ except ModuleNotFoundError:
     from .route import Route
     from .attraction import Attraction
 
-
-
 width = 36
 height = 36
-N_cust = 50
+N_cust = 12
 pixel_ratio = 20
-num_agents = 15
-max_time = 500
+num_agents = 12
+max_time = 520
 STEPS = max_time
 MEMORY = 6
-
 
 
 def agent_draw(agent):
@@ -44,12 +41,9 @@ def agent_draw(agent):
     elif type(agent) is Attraction:
         portrayal["Color"] = "purple"
         portrayal["Shape"] = "circle"
-
-        # portrayal["Shape"] = "attraction.jpg"
-        # portrayal["Filled"] = "false"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
-        portrayal["text"] = str(agent.current_waitingtime) + ":" + str(agent.unique_id)
+        portrayal["text"] = str(agent.current_waitingtime)
         portrayal["text_color"] = "black"
 
     elif type(agent) is Customer:
@@ -62,11 +56,6 @@ def agent_draw(agent):
         if agent.waiting is False:
             portrayal["text"] = agent.unique_id
             portrayal["text_color"] = "black"
-        #
-        # if agent.strategy == "Closest_by":
-        #     portrayal["Color"] = "blue"
-        # elif agent.strategy == "Random":
-        #     portrayal["Color"] = "orange"
 
         if agent.weight == 0.0:
              portrayal["Color"] = "#F6412D"
@@ -107,26 +96,6 @@ class HistogramModule(VisualizationElement):
         data = model.calculate_people()
         return data
 
-# class ChartModule(VisualizationElement):
-#     package_includes = ["Chart.min.js"]
-#     local_includes = ["ChartModule.js"]
-#
-#     def __init__(self, canvas_height, canvas_width):
-#         self.canvas_height = canvas_height
-#         self.canvas_width = canvas_width
-#         self.data_collector_name = "datacollector"
-#         self.data = []
-#         new_element = "new ChartModule({}, {}, {})"
-#         new_element = new_element.format(["Attraction1", "Attraction2", "Attraction3"],canvas_width,
-#                                          canvas_height,
-#                                          self.data)
-#         self.js_code = "elements.push(" + new_element + ");"
-#
-#     def render(self, model):
-#         """Render a histogram with HistogramModule.js"""
-#
-#         data = model.calculate_people()
-#         return data
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
