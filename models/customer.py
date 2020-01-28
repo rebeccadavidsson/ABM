@@ -49,6 +49,7 @@ class Customer(Agent):
         self.memory_strategy = MEMORY
         self.memory_succeses = []
         self.changes_memory = []
+        # self.several_weights = [0,0.25, 0.5, 0.75, 1]
 
 
     def get_goals(self):
@@ -350,9 +351,10 @@ class Customer(Agent):
         # print(predictions, waiting_times, "PRINT")
         for i in range(len(predictions.keys())):
 
-            if self.weight is not None:
+            if self.weight is None:
                 predictions[i] = predictions[i] + waiting_times[i]
             else:
+                print(self.weight)
                 predictions[i] = predictions[i] * (1 - self.weight) + waiting_times[i] * self.weight
 
 

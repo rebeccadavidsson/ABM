@@ -58,11 +58,11 @@ RUNS = 8
 
 
 
-file2 = pickle.load(open('data/strategy_close.p', 'rb'))
-file2 = [float(i)/max(file2) for i in file2]
-file = pickle.load(open('data/strategy_random.p', 'rb'))
-file = [float(i)/max(file) for i in file]
-park_score = pickle.load(open('data/park_score.p', 'rb'))
+file2 = pickle.load(open('../data/strategy_close.p', 'rb'))
+# file2 = [float(i)/max(file2) for i in file2]
+file = pickle.load(open('../data/strategy_random.p', 'rb'))
+# file = [float(i)/max(file) for i in file]
+park_score = pickle.load(open('../data/park_score.p', 'rb'))
 park_score = [float(i)/max(park_score) for i in park_score]
 
 # plt.title("Memory = 5")
@@ -78,11 +78,11 @@ park_score = [float(i)/max(park_score) for i in park_score]
 # pickle.dump(random_data, open("data/random_scores.p", 'wb'))
 # pickle.dump(close_data, open("data/close_scores.p", 'wb'))
 
-file2 = pickle.load(open('data/close_scores.p', 'rb'))
+file2 = pickle.load(open('../data/close_scores.p', 'rb'))
 # file2 = [float(i)/max(file2) for i in file2]
-file = pickle.load(open('data/random_scores.p', 'rb'))
+file = pickle.load(open('../data/random_scores.p', 'rb'))
 # file = [float(i)/max(file) for i in file]
-park_score = pickle.load(open('data/park_scores.p', 'rb'))
+park_score = pickle.load(open('../data/park_scores.p', 'rb'))
 # park_score = [float(i)/max(park_score) for i in park_score]
 
 arrays = [np.array(x) for x in file]
