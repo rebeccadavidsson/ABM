@@ -12,22 +12,19 @@ MEMORY = 5
 
 
 class Attraction(Agent):
-    def __init__(self, unique_id, model, waiting_time, customer_capacity, pos, name, N_cust, memory, heading=(1, 0)):
+    def __init__(self, unique_id, model, pos, name, N_cust, weight):
         super().__init__(unique_id, model)
         self.name = name
         self.pos = pos
         self.model = model
-        self.waiting_time = waiting_time
         self.attraction_duration = 10
         self.current_waitingtime = 0
         self.N_current_cust = 0
-        self.cust_capacity = customer_capacity
         self.cust_in_attr = 0
         self.cust_in_line = 0
         self.memory = []
         self.ride_time = 0
         self.rides_taken = 0
-        self.memory_init = memory
 
     def calculate_waiting_time(self):
         '''
@@ -49,14 +46,6 @@ class Attraction(Agent):
             self.current_waitingtime = waitingtime
         else:
             self.current_waitingtime += self.attraction_duration
-
-    def update_memory(self):
-        """
-        Updates the memory of the waitingtimes of the last MEMORY timesteps
-        """
-        self.memory.append(self.current_waitingtime)
-        if len(self.memory) == self.memory_init + 1:
-            self.memory.remove(self.memory[0])
 
     def customers_inside(self):
         """Determine the amount of customers inside the Attraction agent."""
