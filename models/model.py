@@ -38,7 +38,7 @@ class Themepark(Model):
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
         else:
             self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
-        print(self.x_list, self.y_list, self.positions)
+
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
         self.N_attr = N_attr    # num of attraction agents
@@ -380,7 +380,7 @@ class Themepark(Model):
 
         pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
         pickle.dump(cust_data, open("data/customers2.p", 'wb'))
-        pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
+        # pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
         pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
         pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
 
