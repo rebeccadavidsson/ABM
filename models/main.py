@@ -2,7 +2,7 @@
 OM DEZE TE KUNNEN RUNNEN :
 Haal overal de punt weg voor alle imports in customer, route en model.
 """
-
+import numpy as np
 from mesa import Model, Agent
 try:
     from .model import Themepark
@@ -14,36 +14,40 @@ width = 36
 height = 36
 N_cust = 50
 pixel_ratio = 20
-num_agents = 15
+num_agents = 12
 theme = "cluster"
 strategy = "Closest_by"
-steps = 100
-RUNS = 8
+steps = 300
+RUNS = 5
+strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
+strategy_data = {}
+hapiness_data = {}
 
-# memory = [2,3,4,5,6,7,8,9]
-memory = 5
-strategies = [0, 0.25, 0.5, 0.75, 1]
+for run in strategies:
+    variation_data, hapiness_scores = [], []
 
+    for j in range(RUNS):
+        print("RUN ", j, run)
+        park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, run)
 
-variation_data = []
+        for i in range(steps + 1):
+            print("step", i)
+            park.step()
 
-for run in range(RUNS):
-    print("RUN ", run)
-    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies[run])
+        print("Number of run:", run)
 
-    for i in range(steps + 1):
-        print("step", i)
-        park.step()
+        score = pickle.load(open("data/park_score.p", 'rb'))
+        hapiness = pickle.load(open("data/hapiness.p", 'rb'))
 
-    print("Number of run:", run)
+        variation_data.append(score)
+        hapiness_scores.append(hapiness)
 
-    file = pickle.load(open('data/park_score.p', 'rb'))
+    strategy_data[run] = variation_data
+    hapiness_data[run] = hapiness_scores
+    print(strategy_data, hapiness_data)
 
-    # file = pickle.load(open('../data/park_score_mem{}.p'.format(memory[run]), 'rb'))
-
-    variation_data.append(file)
-
-pickle.dump(variation_data, open("data/park_scores.p", 'wb'))
+pickle.dump(strategy_data, open("data/park_scores.p", 'wb'))
+pickle.dump(hapiness_data, open("data/hapiness_scores.p", 'wb'))
 
 # print(variation_data)
-pickle.dump(variation_data, open("../data/variation_data_mem{}.p".format(memory[run]), 'wb'))
+# pickle.dump(variation_data, open("../data/variation_data_mem{}.p".format(memory[run]), 'wb'))

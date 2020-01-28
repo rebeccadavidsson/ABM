@@ -64,7 +64,7 @@ class Customer(Agent):
         attractions = self.model.attractions
         for attraction in range(len(attractions)):
             history[attractions[attraction]] = 0
-        # print(history)
+
         return history
 
     def penalty(self, current_attraction):
@@ -346,8 +346,7 @@ class Customer(Agent):
 
         # add waitingtimes
         waiting_times = self.get_waiting_lines()
-        # print(len(predictions.keys()))
-        # print(predictions, waiting_times, "PRINT")
+
         for i in range(len(predictions.keys())):
 
             if self.weight is not None:

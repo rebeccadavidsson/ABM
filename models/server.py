@@ -14,17 +14,14 @@ except ModuleNotFoundError:
     from .route import Route
     from .attraction import Attraction
 
-
-
 width = 36
 height = 36
-N_cust = 50
+N_cust = 15
 pixel_ratio = 20
-num_agents = 15
-max_time = 500
+num_agents = 12
+max_time = 300
 STEPS = max_time
 MEMORY = 6
-
 
 
 def agent_draw(agent):
@@ -49,7 +46,8 @@ def agent_draw(agent):
         # portrayal["Filled"] = "false"
         portrayal["Layer"] = 2
         portrayal["r"] = 1
-        portrayal["text"] = str(agent.current_waitingtime) + ":" + str(agent.unique_id)
+        portrayal["text"] = str(agent.current_waitingtime)
+        # portrayal["text"] = agent.pos
         portrayal["text_color"] = "black"
 
     elif type(agent) is Customer:

@@ -3,6 +3,7 @@ from mesa.space import MultiGrid
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 import random
+import numpy as np
 try:
     from .route import get_coordinates, get_attraction_coordinates, Route
     from .customer import Customer
@@ -23,7 +24,7 @@ mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
 
 # HARDCODED COORDINATES for cluster theme:
-xlist, ylist, positions = [32, 11, 5, 11, 12, 10, 6, 30, 6, 9, 13, 4, 7, 10, 31], [29, 28, 8, 26, 25, 26, 8, 28, 9, 24, 25, 7, 10, 25, 27], [(32, 29), (11, 28), (5, 8), (11, 26), (12, 25), (10, 26), (6, 8), (30, 28), (6, 9), (9, 24), (13, 25), (4, 7), (7, 10), (10, 25), (31, 27)]
+xlist, ylist, positions = [12, 21, 26, 11, 9, 25, 25, 26, 20, 12, 11, 21], [17, 26, 13, 17, 18, 12, 11, 12, 28, 16, 18, 29], [(12, 17), (21, 26), (26, 13), (11, 17), (9, 18), (25, 12), (25, 11), (26, 12), (20, 28), (12, 16), (11, 18), (21, 29)]
 
 
 class Themepark(Model):
@@ -38,7 +39,7 @@ class Themepark(Model):
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
         else:
             self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
-
+        self.happinesses = []
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
         self.N_attr = N_attr    # num of attraction agents
@@ -64,6 +65,8 @@ class Themepark(Model):
         self.hist_random_strat = []
         self.hist_close_strat = []
         self.all_rides_list = []
+        self.customer_score = []
+
         self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
@@ -108,14 +111,11 @@ class Themepark(Model):
 
             pos = (self.x_list[i], self.y_list[i])
             if self.grid.is_cell_empty(pos):
-                # print("Creating ATTRACTION agent {2} at ({0}, {1})"
-                #       .format(x_list[i], y_list[i], i))
 
-                # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
                 a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust, self.weight)
                 attractions[i] = a
-                # print(a.waiting_time, "waitingtime")
+
                 self.schedule_Attraction.add(a)
                 self.grid.place_agent(a, pos)
         return attractions
@@ -278,8 +278,7 @@ class Themepark(Model):
         if total_rides == 0:
             return total_rides
 
-        return (total_wait / total_rides) * 100
-
+        return (total_wait / total_rides)
 
     def get_strategy_history(self):
         """ Update history with how many customers chose which strategy """
@@ -311,7 +310,6 @@ class Themepark(Model):
                 customers.append(agent)
         return customers
 
-
     def get_data_customers(self):
         """ Return dictionary with data of customers """
 
@@ -331,35 +329,59 @@ class Themepark(Model):
                 }
         return data
 
+    def calc_hapiness(self):
+        """
+        Calculate mean hapiness of all customers, based on:
+
+        - How many rides were taken
+        - Number of times in the same attraction
+        - Total waiting time
+        """
+        customers = self.get_customers()
+
+        scores = []
+        for customer in customers:
+            history = customer.history
+            values = list(history.values())
+            total_rides = sum(values)
+
+            if total_rides != 0:
+                scores.append(total_rides / self.N_attr - self.totalTOTAL / customer.total_ever_waited)
+            else:
+                return None
+
+        scores = np.interp(scores, (min(scores), max(scores)), (1, 10))
+        return np.mean(scores)
 
     def final(self):
         """ Return data """
+        # print(self.happinesses)
+        # print(self.park_score)
+
+        hapiness = self.calc_hapiness()
 
         cust_data = self.get_data_customers()
-
         agents = self.get_customers()
         self.all_rides_list = [0] * len(agents[0].in_attraction_list)
         for agent in agents:
             for i in range(len(agent.in_attraction_list)):
                 self.all_rides_list[i] += agent.in_attraction_list[i]
 
-        print(self.all_rides_list)
-
 
         # pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
         # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
-        # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
-
-        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
+        pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
+        pickle.dump(hapiness, open("data/hapiness.p", "wb"))
+        # pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
+        # pickle.dump(cust_data, open("data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
-        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
+        # pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
+        # pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
         print()
-        quit()
+        # quit()
 
     def save_data(self):
         """Save data of all attractions and customers."""
@@ -371,6 +393,7 @@ class Themepark(Model):
             self.data_dict[i]["waiting_list"].append(waitinglines.get(i))
 
         self.park_score.append(sum(waitinglines.values()))
+        self.happinesses.append(self.calc_hapiness())
 
     def step(self):
         """Advance the model by one step."""
