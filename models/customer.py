@@ -12,11 +12,10 @@ WIDTH = 36
 HEIGHT = 36
 MEMORY = 5
 starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
-chances = [0.1, 0.2, 0.3, 0.4, 0.5]
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, memory):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
@@ -27,8 +26,7 @@ class Customer(Agent):
         self.current_a = None
         self.strategy = strategy
         self.history = self.make_history()
-        self.memory = memory
-
+        self.weight = weight
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:
@@ -46,12 +44,12 @@ class Customer(Agent):
         self.sadness_score = 0
         self.in_attraction = False
         self.in_attraction_list = []
-
         self.strategy = strategy
         self.goals = self.get_goals()
-        self.memory_strategy = self.memory
+        self.memory_strategy = MEMORY
         self.memory_succeses = []
         self.changes_memory = []
+
 
     def get_goals(self):
         """Set random goals."""
@@ -292,10 +290,12 @@ class Customer(Agent):
 
             # Change strategy
             if counter == self.memory_strategy and self.changed_strategy is False:
-                if self.strategy == "Random":
-                    self.strategy = "Closest_by"
-                else:
-                    self.strategy = "Random"
+                # ___________________________________________________
+                # COMMMENTEN als je niet strategie wilt veranderen
+                # if self.strategy == "Random":
+                #     self.strategy = "Closest_by"
+                # else:
+                #     self.strategy = "Random"
 
                 self.changed_strategy = True
                 self.memory_succeses.append(1)
@@ -349,7 +349,12 @@ class Customer(Agent):
         # print(len(predictions.keys()))
         # print(predictions, waiting_times, "PRINT")
         for i in range(len(predictions.keys())):
-            predictions[i] += waiting_times[i]
+
+            if self.weight is not None:
+                predictions[i] = predictions[i] + waiting_times[i]
+            else:
+                predictions[i] = predictions[i] * (1 - self.weight) + waiting_times[i] * self.weight
+
 
         maxval = max(predictions.values())
         for attraction_nr in predictions:

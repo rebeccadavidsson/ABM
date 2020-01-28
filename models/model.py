@@ -23,22 +23,22 @@ mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
 
 # HARDCODED COORDINATES for cluster theme:
-xlist, ylist, positions = [30, 15, 24, 28, 24, 23, 21, 14, 21, 25, 24, 30, 20, 27, 27], [25, 6, 7, 24, 6, 4, 5, 6, 4, 4, 5, 24, 6, 22, 25], [(30, 25), (15, 6), (24, 7), (28, 24), (24, 6), (23, 4), (21, 5), (14, 6), (21, 4), (25, 4), (24, 5), (30, 24), (20, 6), (27, 22), (27, 25)]
+xlist, ylist, positions = [32, 11, 5, 11, 12, 10, 6, 30, 6, 9, 13, 4, 7, 10, 31], [29, 28, 8, 26, 25, 26, 8, 28, 9, 24, 25, 7, 10, 25, 27], [(32, 29), (11, 28), (5, 8), (11, 26), (12, 25), (10, 26), (6, 8), (30, 28), (6, 9), (9, 24), (13, 25), (4, 7), (7, 10), (10, 25), (31, 27)]
 
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, memory):
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, weight):
         self.theme = theme
         self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
-        self.memory = memory
+        self.weight = weight
 
         if self.theme == "cluster":
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
         else:
             self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
-
+        print(self.x_list, self.y_list, self.positions)
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
         self.N_attr = N_attr    # num of attraction agents
@@ -113,7 +113,7 @@ class Themepark(Model):
 
                 # TODO vet leuke namen verzinnen voor de attracties
                 name = str(i)
-                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust, self.memory)
+                a = Attraction(i, self, self.waiting_times[i], self.customer_capacity[i], pos, name, self.N_cust, self.weight)
                 attractions[i] = a
                 # print(a.waiting_time, "waitingtime")
                 self.schedule_Attraction.add(a)
@@ -154,7 +154,7 @@ class Themepark(Model):
                 i = self.cust_ids
 
             # self.strategy = random.choice(["Random", "Closest_by"])
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.memory)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight)
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
@@ -268,11 +268,17 @@ class Themepark(Model):
             - TODO
         """
         attractions = self.get_attractions()
-        total_current = 0
+        total_wait, total_rides = 0, 0
         for attraction in attractions:
-            total_current += attraction.current_waitingtime
+            total_wait += attraction.current_waitingtime
 
-        return total_current
+            if attraction.current_a is not None:
+                total_rides += 1
+
+        if total_rides == 0:
+            return total_rides
+
+        return (total_wait / total_rides) * 100
 
 
     def get_strategy_history(self):
@@ -365,8 +371,6 @@ class Themepark(Model):
             self.data_dict[i]["waiting_list"].append(waitinglines.get(i))
 
         self.park_score.append(sum(waitinglines.values()))
-
-
 
     def step(self):
         """Advance the model by one step."""

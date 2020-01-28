@@ -136,12 +136,12 @@ model_params = {
     "width": width,
     "N_attr": UserSettableParameter("slider", "Number of attractions", num_agents, 1, num_agents, 1),
     "N_cust": UserSettableParameter("slider", "Number of customers", int(N_cust/1.5), 1, N_cust * 2, 1),
-    "strategy": UserSettableParameter('choice', 'Strategy choice', value='Random',
+    "strategy": UserSettableParameter('choice', 'Strategy choice', value='Closest_by',
                                       choices=['Random', 'Closest_by']),
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='cluster',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
-    "memory": UserSettableParameter("slider", "Customer memory", 1, 1, 9, 1)
+    "weight": UserSettableParameter("slider", "Customer memory", 0, 1, 0.5, 0.25)
 }
 
 server = ModularServer(
