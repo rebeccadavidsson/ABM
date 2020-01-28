@@ -49,6 +49,8 @@ class Customer(Agent):
         self.memory_strategy = MEMORY
         self.memory_succeses = []
         self.changes_memory = []
+        self.strategy_choice = [0,0,0,0,0]
+        self.prediction_strategies = self.prediction_all_strategies()
         # self.several_weights = [0,0.25, 0.5, 0.75, 1]
 
 
@@ -183,7 +185,7 @@ class Customer(Agent):
                 self.waited_period = 0
 
                 # Update memory
-                self.update_memory()
+                self.update_strategy()
 
                 # Set current attraction back to None when customer leaves.
                 self.current_a = None
@@ -198,6 +200,9 @@ class Customer(Agent):
                 self.waited_period = 0
 
         if self.pos == self.destination:
+
+            if self.waited_period == 0:
+                self.update_strategy()
 
             # Check which attraction
             attractions = self.model.get_attractions()
@@ -277,7 +282,7 @@ class Customer(Agent):
 
         return scores
 
-    def update_memory(self):
+    def update_strategy2(self):
         """
         Update an agents memory and change strategy based on memory.
         """
@@ -322,6 +327,35 @@ class Customer(Agent):
                 self.memory_succeses.append(0)            
 
 
+    def update_strategy(self):
+
+        strategy_ranking = {}
+        queues = self.get_waiting_lines()
+        chosen_strategy = self.weight
+
+        if self.current_a is not None:
+            # for attraction in queues.keys():
+            #     if queues[attraction] < queues[self.current_a.unique_id]:
+            #         print("VERKEERDE STRATEGY, attraction:", attraction, "nr:", self.unique_id)
+            for strategy in self.prediction_strategies.keys():
+                attraction = self.prediction_strategies[strategy][0]
+                if queues[attraction.unique_id] < queues[self.current_a.unique_id] and not strategy == chosen_strategy:
+                    # strategy_ranking[strategy] = queues[attraction.unique_id] + self.prediction_strategies[strategy][1]
+                    strategy_ranking[strategy] = queues[attraction.unique_id]
+
+            if len(strategy_ranking.values()) > 0:
+                minval = min(strategy_ranking.values())
+                res = [k for k, v in strategy_ranking.items() if v == minval]
+                if len(res) is 1:
+                    best_strat = res[0]
+                else:
+                    best_strat = random.choice(res)
+                self.weight = best_strat
+
+
+
+
+
     def step(self):
         """
         This method should move the customer using the `random_move()` method.
@@ -354,7 +388,6 @@ class Customer(Agent):
             if self.weight is None:
                 predictions[i] = predictions[i] + waiting_times[i]
             else:
-                print(self.weight)
                 predictions[i] = predictions[i] * (1 - self.weight) + waiting_times[i] * self.weight
 
 
@@ -373,5 +406,46 @@ class Customer(Agent):
         attraction_object = self.model.get_attractions()[predicted_attraction]
         # dit kan volgens mij ook:
         # attraction_object = self.attractions[predicted_attraction]
+        self.prediction_strategies = self.prediction_all_strategies()
 
         return self.model.attractions[predicted_attraction]
+
+
+    def prediction_all_strategies(self):
+
+        prediction_per_strategy = {}
+
+        predictions = self.get_walking_distances()
+
+
+        # add waitingtimes
+        waiting_times = self.get_waiting_lines()
+        # print(len(predictions.keys()))
+        # print(predictions, waiting_times, "PRINT")
+        for weight in self.model.strategies:
+            for i in range(len(predictions.keys())):
+
+                if self.weight is None:
+                    predictions[i] = predictions[i] + waiting_times[i]
+                else:
+                    predictions[i] = predictions[i] * (1 - weight) + waiting_times[i] * weight
+
+
+            maxval = max(predictions.values())
+            for attraction_nr in predictions:
+                penalty = self.penalty(self.model.attractions[attraction_nr])
+
+                predictions[attraction_nr] = predictions[attraction_nr] + maxval * (penalty/100)
+
+            minval = min(predictions.values())
+            res = [k for k, v in predictions.items() if v == minval]
+            if len(res) is 1:
+                predicted_attraction = res[0]
+            else:
+                predicted_attraction = random.choice(res)
+            attraction_object = self.model.get_attractions()[predicted_attraction]
+            # dit kan volgens mij ook:
+            # attraction_object = self.attractions[predicted_attraction]
+            predictions = self.get_walking_distances()
+            prediction_per_strategy[weight] = [self.model.attractions[predicted_attraction], predictions[predicted_attraction]]
+        return prediction_per_strategy
