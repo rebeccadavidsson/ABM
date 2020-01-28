@@ -37,13 +37,13 @@ for run in range(RUNS):
 
     print("Number of run:", run)
 
-    file = pickle.load(open('data/park_score.p', 'rb'))
+    file = pickle.load(open('../data/park_score.p', 'rb'))
 
     # file = pickle.load(open('../data/park_score_mem{}.p'.format(memory[run]), 'rb'))
 
     variation_data.append(file)
 
-pickle.dump(variation_data, open("data/park_scores.p", 'wb'))
+pickle.dump(variation_data, open("../data/park_scores.p", 'wb'))
 
 # print(variation_data)
 pickle.dump(variation_data, open("../data/variation_data_mem{}.p".format(memory[run]), 'wb'))

@@ -406,11 +406,11 @@ class Themepark(Model):
         # pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("../data/park_score.p", "wb"))
 
-        pickle.dump(self.data_dict, open("data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers2.p", 'wb'))
+        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
         # pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
-        pickle.dump(self.hist_random_strat, open("data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("data/strategy_close.p", "wb"))
+        pickle.dump(self.hist_random_strat, open("../data/strategy_random.p", "wb"))
+        pickle.dump(self.hist_close_strat, open("../data/strategy_close.p", "wb"))
 
         print()
         print("RUN HAS ENDED")
