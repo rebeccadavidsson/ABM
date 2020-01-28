@@ -42,7 +42,7 @@ def agent_draw(agent):
         # portrayal["r"] = 0.15
 
     elif type(agent) is Attraction:
-        portrayal["Color"] = "blue"
+        portrayal["Color"] = "purple"
         portrayal["Shape"] = "circle"
 
         # portrayal["Shape"] = "attraction.jpg"
