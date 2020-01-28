@@ -21,6 +21,7 @@ RADIUS = int(WIDTH/2)
 NUM_OBSTACLES = 0
 mid_point = (int(WIDTH/2), int(HEIGHT/2))
 PENALTY_PERCENTAGE = 5
+STRATEGIES = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 # HARDCODED COORDINATES for cluster theme:
 xlist, ylist, positions = [32, 11, 5, 11, 12, 10, 6, 30, 6, 9, 13, 4, 7, 10, 31], [29, 28, 8, 26, 25, 26, 8, 28, 9, 24, 25, 7, 10, 25, 27], [(32, 29), (11, 28), (5, 8), (11, 26), (12, 25), (10, 26), (6, 8), (30, 28), (6, 9), (9, 24), (13, 25), (4, 7), (7, 10), (10, 25), (31, 27)]
@@ -33,6 +34,8 @@ class Themepark(Model):
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
         self.weight = weight
+        self.strategies = STRATEGIES
+
 
         if self.theme == "cluster":
             self.x_list, self.y_list, self.positions = xlist, ylist, positions
@@ -67,7 +70,8 @@ class Themepark(Model):
         self.strategy_composition = self.make_strategy_composition()
         self.memory = 5
 
-        self.add_customers(self.N_cust)
+
+        self.customers = self.add_customers(self.N_cust)
 
         for attraction in self.get_attractions():
             self.data_dict[attraction.unique_id] = ({
@@ -80,13 +84,11 @@ class Themepark(Model):
 
         # Hardcoded datacollector
         self.datacollector = DataCollector(
-            {"Attraction1": lambda m: self.schedule_Attraction.agents[0].customers_inside(),
-            "Attraction2": lambda m: self.schedule_Attraction.agents[1].customers_inside(),
-            "Attraction3": lambda m: self.schedule_Attraction.agents[2].customers_inside(),
-            "Attraction4": lambda m: self.schedule_Attraction.agents[3].customers_inside(),
-            "Attraction5": lambda m: self.schedule_Attraction.agents[4].customers_inside(),
-            "Attraction6": lambda m: self.schedule_Attraction.agents[5].customers_inside(),
-            "Attraction7": lambda m: self.schedule_Attraction.agents[6].customers_inside()
+            {"0.00": lambda m: self.strategy_counter(self.strategies[0]),
+            "0.25": lambda m: self.strategy_counter(self.strategies[1]),
+            "0.50": lambda m: self.strategy_counter(self.strategies[2]),
+            "0.75": lambda m: self.strategy_counter(self.strategies[3]),
+            "1.00": lambda m: self.strategy_counter(self.strategies[4]),
             })
 
         self.total_waited_time = 0
@@ -102,9 +104,32 @@ class Themepark(Model):
     #
     #     return dict
 
-    def make_strategy_composition(self):
-        dict = {0:0.10, 0.25:0.20, 0.5:0.30, 0.75:0.25, 1:0.15}
+    def strategy_counter(self, strategy):
+        counter_total = {}
 
+        for attraction_pos in self.positions:
+
+            agents = self.grid.get_neighbors(
+                attraction_pos,
+                moore=True,
+                radius=0,
+                include_center=True
+            )
+
+
+            counter = 0
+            for agent in self.customers:
+
+
+                if agent.weight == strategy:
+                    counter += 1
+
+        # print(counter, "counter", "strat", strategy)
+        return counter
+
+    def make_strategy_composition(self):
+        dict = {self.strategies[0]: 0.20, self.strategies[1]:0.20, self.strategies[2]:0.20,
+                        self.strategies[3]:0.20, self.strategies[4]:0.20}
 
         return dict
 
@@ -150,7 +175,7 @@ class Themepark(Model):
 
         weights_list = []
 
-
+        # GEHARDCODE EN LELIJK SORRYYYYY
         for i in range(round(N_cust*self.strategy_composition[0.0])):
             weights_list.append(0)
 
@@ -166,7 +191,7 @@ class Themepark(Model):
         for i in range(round(N_cust*self.strategy_composition[1.0])):
             weights_list.append(1.0)
 
-
+        cust_list = []
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -186,6 +211,9 @@ class Themepark(Model):
             a.weight = weights_list[i]
 
             self.grid.place_agent(a, pos)
+            cust_list.append(a)
+
+        return cust_list
 
     def calculate_people(self):
         """Calculate how many customers are in which attraction."""
