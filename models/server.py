@@ -62,11 +62,22 @@ def agent_draw(agent):
         if agent.waiting is False:
             portrayal["text"] = agent.unique_id
             portrayal["text_color"] = "black"
+        #
+        # if agent.strategy == "Closest_by":
+        #     portrayal["Color"] = "blue"
+        # elif agent.strategy == "Random":
+        #     portrayal["Color"] = "orange"
 
-        if agent.strategy == "Closest_by":
-            portrayal["Color"] = "blue"
-        elif agent.strategy == "Random":
-            portrayal["Color"] = "orange"
+        if agent.weight == 0.0:
+             portrayal["Color"] = "blue"
+        elif agent.weight == 0.25:
+             portrayal["Color"] = "red"
+        elif agent.weight == 0.5:
+             portrayal["Color"] = "orange"
+        elif agent.weight == 0.75:
+             portrayal["Color"] = "green"
+        elif agent.weight == 1.0:
+             portrayal["Color"] = "purple"
             # portrayal["Layer"] = 3
 
 
