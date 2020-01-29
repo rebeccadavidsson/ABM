@@ -16,7 +16,7 @@ num_agents = 12
 steps = 520
 RUNS = 65
 
-cust_d, score_d, hapiness_d, hist_d, strat_d = [], [], [], [], []
+cust_d, score_d, hapiness_d, hist_d, strat_d, score_ed = [], [], [], [], [],[]
 
 for j in range(RUNS):
 

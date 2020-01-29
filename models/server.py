@@ -2,6 +2,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
 from mesa.visualization.modules import PieChartModule
+from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 try:
     from model import Themepark
@@ -19,7 +20,7 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 12
-max_time = 100
+max_time = 10
 STEPS = max_time
 MEMORY = 6
 
@@ -106,6 +107,17 @@ chart = PieChartModule([
                     {"Label": "0.75", "Color": "#FFC100"},
                     {"Label": "1.00", "Color": "#FFEC19"},
                     ], data_collector_name='datacollector')
+linechart = ChartModule([
+                    {"Label": "0.00", "Color": "#F6412D"},
+                    {"Label": "0.25", "Color": "#FF5607"},
+                    {"Label": "0.50", "Color": "#FF9800"},
+                    {"Label": "0.75", "Color": "#FFC100"},
+                    {"Label": "1.00", "Color": "#FFEC19"},
+                    ], data_collector_name='datacollector')
+
+linechart_2 = ChartModule([
+                    {"Label": "score", "Color": "#F6412D"},
+                    ], data_collector_name='datacollector2')
 
 histogram = HistogramModule(["Attraction1", "Attraction2", "Attraction3",
                             "Attraction4", "Attraction5"], 20, 50)
@@ -125,7 +137,7 @@ model_params = {
 
 server = ModularServer(
     Themepark,
-    [grid, histogram, chart],
+    [grid, histogram, chart, linechart, linechart_2],
     # [grid, histogram],
     "Theme Park Model",
     model_params,
