@@ -6,15 +6,15 @@ import pickle
 
 width = 36
 height = 36
-N_cust = 50
+N_cust = 60
 pixel_ratio = 20
 theme = "cluster"
 strategy = "Closest_by"
 cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict = {}, {}, {}, {}, {}
 
-num_agents = 60
-steps = 320
-RUNS = 15
+num_agents = 12
+steps = 100
+RUNS = 1
 strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
 
 # num_agents = 12

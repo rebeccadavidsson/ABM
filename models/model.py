@@ -383,6 +383,16 @@ class Themepark(Model):
     def final(self):
         """ Return data """
 
+        attractions = self.get_attractions()
+        self.all_rides_list = [0] * len(attractions[0].in_attraction_list)
+        for attraction in attractions:
+            for i in range(len(attraction.in_attraction_list)):
+                self.all_rides_list[i] += attraction.in_attraction_list[i]
+
+        for i in range(len(self.all_rides_list)):
+            self.all_rides_list[i] /= self.N_attr
+        print(self.all_rides_list)
+
         cust_data = self.get_data_customers()
         histories = self.get_history_list()
 

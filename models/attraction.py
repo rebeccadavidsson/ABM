@@ -25,6 +25,7 @@ class Attraction(Agent):
         self.memory = []
         self.ride_time = 0
         self.rides_taken = 0
+        self.in_attraction_list = []
 
     def calculate_waiting_time(self):
         '''
@@ -82,3 +83,8 @@ class Attraction(Agent):
 
         if self.current_waitingtime > 0:
             self.current_waitingtime -= 1
+
+        if self.N_current_cust > 0:
+            self.in_attraction_list.append(1)
+        else:
+            self.in_attraction_list.append(0)
