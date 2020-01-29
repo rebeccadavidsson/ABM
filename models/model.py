@@ -386,11 +386,11 @@ class Themepark(Model):
         cust_data = self.get_data_customers()
         histories = self.get_history_list()
 
-        pickle.dump(self.datacollector.get_model_vars_dataframe(), open("data/stategy_history.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers.p", 'wb'))
-        pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
-        pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
-        pickle.dump(histories, open("data/cust_history.p", 'wb'))
+        pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/stategy_history.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers.p", 'wb'))
+        pickle.dump(self.park_score[-1], open("../data/park_score.p", "wb"))
+        pickle.dump(self.happinesses, open("../data/hapiness.p", "wb"))
+        pickle.dump(histories, open("../data/cust_history.p", 'wb'))
 
         print()
         print("RUN HAS ENDED")

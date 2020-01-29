@@ -327,7 +327,7 @@ class Customer(Agent):
 
             # No succes
             else:
-                self.memory_succeses.append(0)
+                self.memory_succeses.append(0)            
 
 
     def update_strategy(self):
