@@ -47,26 +47,26 @@ total.append(values[4])
 total.append(values2[4])
 
 # fill with colors
-# colors = ["lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue"]
-# ticks = STRATEGIES
-# fig, axes = plt.subplots()
-#
-# boxplot = axes.boxplot(total, patch_artist=True, widths=0.4, positions = [0.7, 1.3, 2.7, 3.3, 4.7, 5.3, 6.7, 7.3, 8.7, 9.3])
-# plt.xticks(x_pos + 1, STRATEGIES)
-# plt.xticks(range(1, len(ticks) * 2, 2), ticks)
-# for patch, color in zip(boxplot['boxes'], colors):
-#     patch.set_facecolor(color)
-#
-# custom_lines = [Line2D([0], [0], color="lightgreen", lw=4),
-#                 Line2D([0], [0], color="lightblue", lw=4)]
-#
-# # adding horizontal grid lines
-# axes.yaxis.grid(True)
-# axes.set_title("Average number of people with a specific strategy, runs=65")
-# axes.set_xlabel('Strategy')
-# axes.set_ylabel('Number of people')
-# axes.legend(custom_lines, ["Cluster", "Circle"])
-# plt.show()
+colors = ["lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue"]
+ticks = STRATEGIES
+fig, axes = plt.subplots()
+
+boxplot = axes.boxplot(total, patch_artist=True, widths=0.4, positions = [0.7, 1.3, 2.7, 3.3, 4.7, 5.3, 6.7, 7.3, 8.7, 9.3])
+plt.xticks(x_pos + 1, STRATEGIES)
+plt.xticks(range(1, len(ticks) * 2, 2), ticks)
+for patch, color in zip(boxplot['boxes'], colors):
+    patch.set_facecolor(color)
+
+custom_lines = [Line2D([0], [0], color="lightgreen", lw=4),
+                Line2D([0], [0], color="lightblue", lw=4)]
+
+# adding horizontal grid lines
+axes.yaxis.grid(True)
+axes.set_title("Average number of people with a specific strategy, runs=65")
+axes.set_xlabel('Strategy')
+axes.set_ylabel('Number of people')
+axes.legend(custom_lines, ["Cluster", "Circle"])
+plt.show()
 
 
 file = file[10]

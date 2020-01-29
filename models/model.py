@@ -30,13 +30,13 @@ xlist, ylist, positions = [12, 21, 26, 11, 9, 25, 25, 26, 20, 12, 11, 21], [17, 
 
 
 class Themepark(Model):
-    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, weight):
+    def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, weight, adaptive):
         self.theme = theme
         self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
         self.weight = weight
-        self.weight_init = None
+        self.adaptive = adaptive
         self.strategies = STRATEGIES
         self.x_list, self.y_list, self.positions = xlist, ylist, positions
         # self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
@@ -69,7 +69,6 @@ class Themepark(Model):
         self.memory = 5
         self.customer_score = []
         self.customers = self.add_customers(self.N_cust)
-
 
 
         for attraction in self.get_attractions():
@@ -182,7 +181,7 @@ class Themepark(Model):
         """ Initialize customers on random positions."""
 
         weights_list = []
-        if self.weight_init is None:
+        if self.adaptive is True:
             for i in range(round(N_cust*self.strategy_composition[0.0])):
                 weights_list.append(self.strategies[0])
 
@@ -205,7 +204,7 @@ class Themepark(Model):
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
-            pos_temp = [random.randint(0,WIDTH-1),random.randint(0,HEIGHT-1)]
+            pos_temp = [random.randint(0,WIDTH-1), random.randint(0,HEIGHT-1)]
             rand_x, rand_y = pos_temp[0], pos_temp[1]
 
             pos = (rand_x, rand_y)
@@ -215,7 +214,7 @@ class Themepark(Model):
             if added is True:
                 i = self.cust_ids
 
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight, self.adaptive)
             self.schedule_Customer.add(a)
             a.weight = weights_list[i]
 
@@ -433,7 +432,7 @@ class Themepark(Model):
 
         for i in range(len(self.all_rides_list)):
             self.all_rides_list[i] /= self.N_attr
-        print(self.all_rides_list)
+        print("ALL RIDES LIST", self.all_rides_list)
 
         cust_data = self.get_data_customers()
         for agent in agents:
