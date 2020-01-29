@@ -16,7 +16,7 @@ starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight, adaptive):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
@@ -28,7 +28,7 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
-        self.init_weight = self.weight
+        self.adaptive = adaptive
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:
@@ -178,8 +178,10 @@ class Customer(Agent):
             if self.waitingtime == self.waited_period:
                 if self.current_a is not None:
                     self.history[self.current_a] += 1
-                    self.update_strategy()
 
+                    # Only update when adaptive strategy is on
+                    if self.adaptive is True:
+                        self.update_strategy()
 
                 # increment number of rides taken of attraction
                 # if self.current_a is not None:
@@ -199,7 +201,7 @@ class Customer(Agent):
 
                 if self.strategy == "Closest_by":
                     self.destination = self.closest_by().pos
-                if self.strategy == 'Random':
+                elif self.strategy == 'Random':
                     self.destination = random.choice(self.positions)
                     while self.destination is self.pos:
                         self.destination = random.choice(self.positions)
@@ -427,7 +429,7 @@ class Customer(Agent):
 
         for i in range(len(predictions.keys())):
 
-            if self.weight is None:
+            if self.weight is "random":
                 predictions[i] = predictions[i] + waiting_times[i]
             else:
                 predictions[i] = predictions[i] * (1 - self.weight) + waiting_times[i] * self.weight
