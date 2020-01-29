@@ -1,6 +1,9 @@
 # Agent Based Modelling UvA (2020): Theme Park Dynamics
 In this project, ABM us used to simulate visitors of a theme park. The focus will be on distances between attractions and waiting lines. A visualization of a theme park is made with a [visualization toolkit of Mesa](https://mesa.readthedocs.io/en/master/apis/visualization.html).
 
+## Example visualization of model run
+![Alt Text](https://github.com/rebeccadavidsson/ABM/blob/master/abm.gif)
+
 ### Requirements
 All requirements can be installed with:
 ```

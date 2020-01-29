@@ -13,10 +13,10 @@ strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
 
 N_cust = 120
 num_agents = 12
-steps = 520
-RUNS = 65
+steps = 10
+RUNS = 2
 
-cust_d, score_d, hapiness_d, hist_d, strat_d = [], [], [], [], []
+cust_d, score_d, hapiness_d, hist_d, strat_d, score_ed = [], [], [], [], [],[]
 
 for j in range(RUNS):
 

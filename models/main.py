@@ -17,7 +17,7 @@ pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
 strategy = "Closest_by"
-steps = 100
+steps = 10
 RUNS = 1
 
 # memory = [2,3,4,5,6,7,8,9]
@@ -42,6 +42,7 @@ for run in range(RUNS):
     # file = pickle.load(open('../data/park_score_mem{}.p'.format(memory[run]), 'rb'))
 
     variation_data.append(file)
+
 
 pickle.dump(variation_data, open("../data/park_scores.p", 'wb'))
 

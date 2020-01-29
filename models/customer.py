@@ -6,6 +6,7 @@ try:
 except:
     from route import Route
 import numpy as np
+import math
 # from model import calculate_people
 
 WIDTH = 36
@@ -15,11 +16,12 @@ starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1
 
 
 class Customer(Agent):
-    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight):
+    def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight, adaptive):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
         self.unique_id = unique_id
+
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
@@ -27,7 +29,7 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
-        self.init_weight = None
+        self.adaptive = adaptive
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:
@@ -52,6 +54,7 @@ class Customer(Agent):
         self.changes_memory = []
         self.strategy_choice = [0,0,0,0,0]
         self.prediction_strategies = self.prediction_all_strategies()
+        self.strategy_swap_hist = 0
         # self.several_weights = [0,0.25, 0.5, 0.75, 1]
 
 
@@ -171,10 +174,15 @@ class Customer(Agent):
                     if attraction.pos == self.pos:
                         if attraction.N_current_cust > 0:
                             attraction.N_current_cust -= 1
+                            self.model.attraction_history[attraction][self.model.totalTOTAL] -=1
 
             if self.waitingtime == self.waited_period:
                 if self.current_a is not None:
                     self.history[self.current_a] += 1
+
+                    # Only update when adaptive strategy is on
+                    if self.adaptive is True:
+                        self.update_strategy()
 
                 # increment number of rides taken of attraction
                 # if self.current_a is not None:
@@ -186,15 +194,15 @@ class Customer(Agent):
                 self.waited_period = 0
 
                 # Update memory
-                if self.init_weight is None:
-                    self.update_strategy()
+                # if self.init_weight is None:
+                #     self.update_strategy()
 
                 # Set current attraction back to None when customer leaves.
                 self.current_a = None
 
                 if self.strategy == "Closest_by":
                     self.destination = self.closest_by().pos
-                if self.strategy == 'Random':
+                elif self.strategy == 'Random':
                     self.destination = random.choice(self.positions)
                     while self.destination is self.pos:
                         self.destination = random.choice(self.positions)
@@ -203,9 +211,8 @@ class Customer(Agent):
 
         if self.pos == self.destination:
 
-            if self.waited_period == 0:
-                if self.init_weight is None:
-                    self.update_strategy()
+            # if self.waited_period == 0:
+                # if self.init_weight is None:
 
             # Check which attraction
             attractions = self.model.get_attractions()
@@ -234,6 +241,8 @@ class Customer(Agent):
 
         # Update waitingtime of attraction
         attraction.N_current_cust += 1
+
+        self.model.attraction_history[attraction][self.model.totalTOTAL] +=1
         attraction.calculate_waiting_time()
 
         # add waiting time to agent
@@ -327,24 +336,69 @@ class Customer(Agent):
 
             # No succes
             else:
-                self.memory_succeses.append(0)            
+                self.memory_succeses.append(0)
 
+    def update_strategy3(self):
+
+            strategy_ranking = {}
+            queues = self.get_waiting_lines()
+            chosen_strategy = self.weight
+
+            if self.current_a is not None:
+                # for attraction in queues.keys():
+                #     if queues[attraction] < queues[self.current_a.unique_id]:
+                #         print("VERKEERDE STRATEGY, attraction:", attraction, "nr:", self.unique_id)
+                for strategy in self.prediction_strategies.keys():
+                    attraction = self.prediction_strategies[strategy][0]
+                    if queues[attraction.unique_id] < queues[self.current_a.unique_id] and not strategy == chosen_strategy:
+
+                        # strategy_ranking[strategy] = queues[attraction.unique_id] + self.prediction_strategies[strategy][1]
+                        strategy_ranking[strategy] = queues[attraction.unique_id]
+
+                if len(strategy_ranking.values()) > 0:
+                    minval = min(strategy_ranking.values())
+                    res = [k for k, v in strategy_ranking.items() if v == minval]
+                    if len(res) is 1:
+                        best_strat = res[0]
+                    else:
+                        best_strat = random.choice(res)
+                    self.weight = best_strat
 
     def update_strategy(self):
 
         strategy_ranking = {}
         queues = self.get_waiting_lines()
         chosen_strategy = self.weight
-
+        current_walking_distance = self.prediction_strategies[chosen_strategy][1]
+        current_arrival_time = math.ceil(self.prediction_strategies[chosen_strategy][2])
+        # print("chosen_strategy:", chosen_strategy, ",line:",
+        #         self.model.attraction_history[self.current_a][current_arrival_time],
+        #         "curr_time:", self.model.totalTOTAL, ",ID", self.unique_id, ",arrivaltime",
+        #         current_arrival_time)
         if self.current_a is not None:
-            # for attraction in queues.keys():
-            #     if queues[attraction] < queues[self.current_a.unique_id]:
-            #         print("VERKEERDE STRATEGY, attraction:", attraction, "nr:", self.unique_id)
+
             for strategy in self.prediction_strategies.keys():
+                if strategy == chosen_strategy:
+                    continue
+
                 attraction = self.prediction_strategies[strategy][0]
-                if queues[attraction.unique_id] < queues[self.current_a.unique_id] and not strategy == chosen_strategy:
-                    # strategy_ranking[strategy] = queues[attraction.unique_id] + self.prediction_strategies[strategy][1]
-                    strategy_ranking[strategy] = queues[attraction.unique_id]
+                arrival_time = math.ceil(self.prediction_strategies[strategy][2])
+                walking_distance = self.prediction_strategies[strategy][1]
+
+                if attraction == self.current_a:
+                    continue
+
+                if math.ceil(arrival_time) < self.model.totalTOTAL:
+
+                    queue_at_arrival = self.model.attraction_history[attraction][math.ceil(arrival_time)]
+                    if arrival_time + queue_at_arrival + attraction.attraction_duration < self.model.totalTOTAL:
+                        # print("strategy:", strategy, ",arrival_time:", arrival_time, ",attraction", attraction.unique_id)
+                        #
+                        # print("time after going on ride:", arrival_time + queue_at_arrival + attraction.attraction_duration)
+
+
+                        strategy_ranking[strategy] = arrival_time + queue_at_arrival
+
 
             if len(strategy_ranking.values()) > 0:
                 minval = min(strategy_ranking.values())
@@ -354,8 +408,7 @@ class Customer(Agent):
                 else:
                     best_strat = random.choice(res)
                 self.weight = best_strat
-
-
+                self.strategy_swap_hist += 1
 
 
 
@@ -379,7 +432,6 @@ class Customer(Agent):
         This method returns the attraction closest by the customer
         Adds a deterministic penalty per attraction based on the penalty method.
         """
-
         predictions = self.get_walking_distances()
 
         # add waitingtimes
@@ -387,7 +439,7 @@ class Customer(Agent):
 
         for i in range(len(predictions.keys())):
 
-            if self.weight is None:
+            if self.weight is "random":
                 predictions[i] = predictions[i] + waiting_times[i]
             else:
                 predictions[i] = predictions[i] * (1 - self.weight) + waiting_times[i] * self.weight
@@ -449,5 +501,7 @@ class Customer(Agent):
             # dit kan volgens mij ook:
             # attraction_object = self.attractions[predicted_attraction]
             predictions = self.get_walking_distances()
-            prediction_per_strategy[weight] = [self.model.attractions[predicted_attraction], predictions[predicted_attraction]]
+            arrival_time = self.model.totalTOTAL + predictions[predicted_attraction]
+            prediction_per_strategy[weight] = [self.model.attractions[predicted_attraction], predictions[predicted_attraction],
+                                                arrival_time]
         return prediction_per_strategy
