@@ -1,7 +1,7 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.ModularVisualization import VisualizationElement
-from mesa.visualization.modules import ChartModule
+from mesa.visualization.modules import PieChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 try:
     from model import Themepark
@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 width = 36
 height = 36
-N_cust = 12
+N_cust = 80
 pixel_ratio = 20
 num_agents = 12
 max_time = 520
@@ -99,7 +99,7 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-chart = ChartModule([
+chart = PieChartModule([
                     {"Label": "0.00", "Color": "#F6412D"},
                     {"Label": "0.25", "Color": "#FF5607"},
                     {"Label": "0.50", "Color": "#FF9800"},

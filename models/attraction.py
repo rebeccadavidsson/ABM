@@ -79,6 +79,6 @@ class Attraction(Agent):
 
         # print(self.ride_time)
         # self.calculate_waiting_time()
-
+        self.model.attraction_history[self][self.model.totalTOTAL] = self.N_current_cust
         if self.current_waitingtime > 0:
             self.current_waitingtime -= 1
