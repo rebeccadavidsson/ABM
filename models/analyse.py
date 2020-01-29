@@ -38,14 +38,52 @@ try:
 except:
     file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
     file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
-df = pd.DataFrame(file)
-# print(df)
-df.describe()
-# print(df[0].mean())
+files = [file, file2]
+
+def plot_strategies(files):
+    """
+    Transform data and plot strategies
+    """
+
+    for nr, file in enumerate(files):
+
+        fig, axs = plt.subplots(len(files))
+        df = pd.DataFrame(file)
+        means = {"0.00": [[] * 65] * 520, "0.25": [[] * 65] * 520, "0.50": [[] * 65] * 520, "0.75": [[] * 65] * 520, "1.00": [[] * 65] * 520}
+        # means = {"0.00": [], "0.25": [], "0.50": [], "0.75": [], "1.00": []}
+        # loop over all datasets in df
+        for i in range(len(df[0])):
+            print(len(df[0]))
+            # show all cols in dataset (0.00, 0.25, 0.50, 0.75, 1.00)
+            for col in df[0][i]:
+                # print(len(df[0][i][0]))
+
+                # put data in matrix depending on their column
+                for k, val in enumerate(list(df[0][i][col])):
+                    print(list(df[0][i][col]))
+                    print(len(list(df[0][i][col])))
+                    # quit()
+                    means[col][k][i].append(val)
+
+        for key in means:
+            # print(means[str(key)])
+
+            for y in range(65):
+                print(len(means[str(key)][y]))
+                # quit()
+                means[str(key)] = np.mean(means[str(key)][y])
+            # key_content = means[str(key)]
+            #
+            # for i in range(len(key_content)):
+            #     means[str(key)][i] = key_content[i] / 65
+            #
+            # print(nr)
+            axs[nr].plot(means[str(key)])
 
 
 
-
+plot_strategies(files)
+plt.show()
 
 
 
@@ -68,14 +106,14 @@ df.describe()
 # plt.show()
 
 # Plot all rides list
-plt.title("All rides")
-# for i in range(1, RUNS + 1):
-plt.plot(pickle.load(open('../data/all_rides.p', 'rb')))
-plt.ylabel("Rides")
-plt.xlabel("Step")
-# plt.legend(list(np.arange(1, RUNS + 1)))
-
-plt.show()
+# plt.title("All rides")
+# # for i in range(1, RUNS + 1):
+# plt.plot(pickle.load(open('../data/all_rides.p', 'rb')))
+# plt.ylabel("Rides")
+# plt.xlabel("Step")
+# # plt.legend(list(np.arange(1, RUNS + 1)))
+#
+# plt.show()
 
 # # Boxplot for score distributions
 # data = []
