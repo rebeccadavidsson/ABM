@@ -4,34 +4,73 @@ import numpy as np
 import seaborn as sns
 sns.set()
 
-data = {0: [446, 390, 413, 435, 387], 0.25: [453, 375, 407, 397, 394], 0.5: [418, 422, 416, 389, 471], 0.75: [412, 415, 437, 451, 417], 1: [415, 396, 435, 424, 426]}
-data2 = {0: [5.957641204754623, 4.994405392734679, 5.762115080302225, 6.572300482168601, 5.21518499265326], 0.25: [4.71287197513577, 5.476524434514284, 6.613457071961583, 5.080424884704873, 6.09731745411721], 0.5: [5.745025484526586, 6.508364300615824, 6.007355090963852, 5.159799785657042, 5.440491978543196], 0.75: [5.733864594465221, 6.003171544955535, 4.898015523753619, 6.347532029728398, 5.776858213075931], 1: [5.673771065932856, 5.5550717964445235, 5.588957298417885, 4.789181645043308, 5.5561914589096775]}
-strategies = [0, 0.25, 0.5, 0.75, 1]
-x_pos = np.arange(len(strategies))
+
+data = pickle.load(open('results/park_score_runs.p', 'rb'))
+data2 = pickle.load(open('results/hapiness_runs.p', 'rb'))
+
+STRATEGIES = ["0.00", "0.25", "0.50", "0.75", "1.00"]
+x_pos = np.arange(len(STRATEGIES))
 values = data.values()
 temp = []
 for x in values:
     temp.append(np.mean(x))
 
 values = data2.values()
+
 temp2 = []
 for x in values:
-    temp2.append(np.mean(x))
+    res = []
+    for i in x:
+        for j in i:
+            if j is not None:
+                res.append(j)
+    temp2.append(np.mean(res))
 
 temp = [float(i)/max(temp) for i in temp]
 temp2 = [float(i)/max(temp2) for i in temp2]
-plt.title("Theme park score for different strategies")
-plt.xlabel("Strategy (ratio waitingtime/distance)")
-plt.ylabel("Themepark score")
-plt.ylim(0.9, 1)
-plt.xticks(x_pos, strategies)
-plt.bar(x_pos+0.5, temp, width=0.4)
-plt.bar(x_pos, temp2, width=0.4)
-plt.legend(["Theme park score", "Customer hapiness"])
+
+li = list(data.values())
+flat_list = [item for sublist in li for item in sublist]
+
+labels = STRATEGIES
+men_means = temp
+women_means = temp2
+
+x = np.arange(len(labels))  # the label locations
+width = 0.35  # the width of the bars
+
+fig, ax = plt.subplots()
+rects1 = ax.bar(x - width/2, men_means, width, label='Park score')
+rects2 = ax.bar(x + width/2, women_means, width, label='Customer score')
+
+ax.set_ylabel('Scores')
+ax.set_xlabel('Strategy')
+ax.set_title('Average park score and customer score')
+ax.set_xticks(x)
+ax.set_ylim(0.96, 1.01)
+ax.set_xticklabels(labels)
+ax.legend()
+fig.tight_layout()
 plt.show()
 
+plt.boxplot(flat_list)
+plt.show()
 
+indexes = []
+for i in range(len(flat_list)):
+    if flat_list[i] >= 506:
+        indexes.append(i)
 
+file = pickle.load(open('results/stategy_history.p', 'rb'))
+# file = file.values()
+print(file)
+totals = []
+for i in indexes:
+    print(i)
+    print(file[i])
+    totals.append(file[i].iloc[319])
+
+print(totals)
 
 
 
@@ -89,7 +128,6 @@ plt.show()
 
 
 # file = pickle.load(open('../data/variation_data_mem8.p', 'rb'))
-# plt.title("Variation (Memory 5 and 8)")
 # plt.plot(file)
 # plt.ylabel("Park Score")
 # plt.xlabel("Step")
@@ -102,7 +140,6 @@ plt.show()
 # file2 = [float(i)/max(file2) for i in file2]
 # file = pickle.load(open('data/strategy_random.p', 'rb'))
 # file = [float(i)/max(file) for i in file]
-# park_score = pickle.load(open('data/park_score.p', 'rb'))
 # park_score = [float(i)/max(park_score) for i in park_score]
 
 # plt.title("Memory = 5")

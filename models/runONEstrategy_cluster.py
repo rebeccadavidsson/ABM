@@ -63,4 +63,4 @@ for run in strategies:
     pickle.dump(score_dict, open("results/park_score_runs.p", "wb"))
     pickle.dump(hapiness_dict, open("results/hapiness_runs.p", "wb"))
     pickle.dump(hist_dict, open("results/cust_history_runs.p", 'wb'))
-    pickle.dump(strategy_hist, open("results/stategy_history.p", 'wb'))
+    pickle.dump(strat_dict, open("results/stategy_history.p", 'wb'))
