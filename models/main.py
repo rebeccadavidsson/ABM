@@ -46,4 +46,4 @@ for run in range(RUNS):
 pickle.dump(variation_data, open("../data/park_scores.p", 'wb'))
 
 # print(variation_data)
-pickle.dump(variation_data, open("../data/variation_data_mem{}.p".format(memory[run]), 'wb'))
+pickle.dump(variation_data, open("../data/variation_data.p", 'wb'))

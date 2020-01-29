@@ -32,10 +32,12 @@ sns.set()
 # plt.show()
 
 
-
-file = pickle.load(open('data/stategy_history_cluster.p', 'rb'))
-file2 = pickle.load(open('data/stategy_history_circle.p', 'rb'))
-
+try:
+    file = pickle.load(open('data/stategy_history_cluster.p', 'rb'))
+    file2 = pickle.load(open('data/stategy_history_circle.p', 'rb'))
+except:
+    file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
+    file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
 df = pd.DataFrame(file)
 # print(df)
 df.describe()
@@ -66,14 +68,14 @@ df.describe()
 # plt.show()
 
 # Plot all rides list
-# plt.title("All rides")
-# # for i in range(1, RUNS + 1):
-# plt.plot(pickle.load(open('../data/all_rides.p', 'rb')))
-# plt.ylabel("Rides")
-# plt.xlabel("Step")
-# # plt.legend(list(np.arange(1, RUNS + 1)))
-#
-# plt.show()
+plt.title("All rides")
+# for i in range(1, RUNS + 1):
+plt.plot(pickle.load(open('../data/all_rides.p', 'rb')))
+plt.ylabel("Rides")
+plt.xlabel("Step")
+# plt.legend(list(np.arange(1, RUNS + 1)))
+
+plt.show()
 
 # # Boxplot for score distributions
 # data = []
