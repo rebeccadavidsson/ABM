@@ -383,26 +383,42 @@ class Themepark(Model):
     def final(self):
         """ Return data """
 
+        attractions = self.get_attractions()
+        self.all_rides_list = [0] * len(attractions[0].in_attraction_list)
+        for attraction in attractions:
+            for i in range(len(attraction.in_attraction_list)):
+                self.all_rides_list[i] += attraction.in_attraction_list[i]
+
+        for i in range(len(self.all_rides_list)):
+            self.all_rides_list[i] /= self.N_attr
+        print(self.all_rides_list)
+
         cust_data = self.get_data_customers()
         histories = self.get_history_list()
 
+        # save data
         try:
-            pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/stategy_history.p", 'wb'))
+            pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/strategy_history.p", 'wb'))
             pickle.dump(cust_data, open("../data/customers.p", 'wb'))
             pickle.dump(self.park_score[-1], open("../data/park_score.p", "wb"))
             pickle.dump(self.happinesses, open("../data/hapiness.p", "wb"))
             pickle.dump(histories, open("../data/cust_history.p", 'wb'))
-        except FileNotFoundError:
-            pickle.dump(self.datacollector.get_model_vars_dataframe(), open("data/stategy_history.p", 'wb'))
+        except:
+            pickle.dump(self.datacollector.get_model_vars_dataframe(), open("data/strategy_history.p", 'wb'))
             pickle.dump(cust_data, open("data/customers.p", 'wb'))
             pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
             pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
             pickle.dump(histories, open("data/cust_history.p", 'wb'))
 
+        try:
+            pickle.dump(self.all_rides_list, open("../data/all_rides.p", "wb"))
+        except:
+            pickle.dump(self.all_rides_list, open("data/all_rides.p", "wb"))
+
         print()
         print("RUN HAS ENDED")
         print()
-        # quit()
+
 
     def save_data(self):
         """Save data of all attractions and customers."""
