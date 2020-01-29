@@ -46,3 +46,7 @@ mesa runserver
 
 ## License
 This project is licensed under the GNU General Public License v3.0.
+
+## GIF
+
+![Alt Text](https://github.com/rebeccadavidsson/ABM/blob/master/ezgif.com-video-to-gif.gif)
