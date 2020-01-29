@@ -386,19 +386,11 @@ class Themepark(Model):
         cust_data = self.get_data_customers()
         histories = self.get_history_list()
 
-<<<<<<< HEAD
-        pickle.dump(self.data_dict, open("../data/attractions2.p", 'wb'))
-        pickle.dump(cust_data, open("../data/customers2.p", 'wb'))
-        # pickle.dump(self.park_score, open("data/park_score_mem{}.p".format(self.memory), "wb"))
-        pickle.dump(self.hist_random_strat, open("../data/strategy_random.p", "wb"))
-        pickle.dump(self.hist_close_strat, open("../data/strategy_close.p", "wb"))
-=======
-        pickle.dump(self.datacollector.get_model_vars_dataframe(), open("data/stategy_history.p", 'wb'))
-        pickle.dump(cust_data, open("data/customers.p", 'wb'))
-        pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
-        pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
-        pickle.dump(histories, open("data/cust_history.p", 'wb'))
->>>>>>> 967e6f02817cde4a7ce851d31896709e64a4661e
+        pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/stategy_history.p", 'wb'))
+        pickle.dump(cust_data, open("../data/customers.p", 'wb'))
+        pickle.dump(self.park_score[-1], open("../data/park_score.p", "wb"))
+        pickle.dump(self.happinesses, open("../data/hapiness.p", "wb"))
+        pickle.dump(histories, open("../data/cust_history.p", 'wb'))
 
         print()
         print("RUN HAS ENDED")
