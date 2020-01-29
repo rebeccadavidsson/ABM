@@ -12,10 +12,11 @@ theme = "cluster"
 strategy = "Closest_by"
 cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict = {}, {}, {}, {}, {}
 
-num_agents = 60
-steps = 320
-RUNS = 15
-strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
+num_agents = 12
+steps = 100
+RUNS = 1
+# strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
+strategies = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 # num_agents = 12
 # steps = 30
@@ -38,11 +39,18 @@ for run in strategies:
             print("step", i)
             park.step()
 
-        cust = pickle.load(open("data/customers.p", 'rb'))
-        score = pickle.load(open("data/park_score.p", "rb"))
-        hapiness = pickle.load(open("data/hapiness.p", "rb"))
-        hist = pickle.load(open("data/cust_history.p", 'rb'))
-        strategy_hist = pickle.load(open("data/stategy_history.p", 'rb'))
+        try:
+            cust = pickle.load(open("data/customers.p", 'rb'))
+            score = pickle.load(open("data/park_score.p", "rb"))
+            hapiness = pickle.load(open("data/hapiness.p", "rb"))
+            hist = pickle.load(open("data/cust_history.p", 'rb'))
+            strategy_hist = pickle.load(open("data/strategy_history.p", 'rb'))
+        except:
+            cust = pickle.load(open("../data/customers.p", 'rb'))
+            score = pickle.load(open("../data/park_score.p", "rb"))
+            hapiness = pickle.load(open("../data/hapiness.p", "rb"))
+            hist = pickle.load(open("../data/cust_history.p", 'rb'))
+            strategy_hist = pickle.load(open("../data/strategy_history.p", 'rb'))
 
         cust_d.append(cust)
         score_d.append(score)
@@ -59,8 +67,15 @@ for run in strategies:
     print(score_dict, hapiness_dict)
     print(strat_dict)
 
-pickle.dump(cust_dict, open("results/customers_runs.p", 'wb'))
-pickle.dump(score_dict, open("results/park_score_runs.p", "wb"))
-pickle.dump(hapiness_dict, open("results/hapiness_runs.p", "wb"))
-pickle.dump(hist_dict, open("results/cust_history_runs.p", 'wb'))
-pickle.dump(strategy_hist, open("results/stategy_history.p", 'wb'))
+try:
+    pickle.dump(cust_dict, open("results/customers_runs.p", 'wb'))
+    pickle.dump(score_dict, open("results/park_score_runs.p", "wb"))
+    pickle.dump(hapiness_dict, open("results/hapiness_runs.p", "wb"))
+    pickle.dump(hist_dict, open("results/cust_history_runs.p", 'wb'))
+    pickle.dump(strategy_hist, open("results/strategy_history.p", 'wb'))
+except:
+    pickle.dump(cust_dict, open("../results/customers_runs.p", 'wb'))
+    pickle.dump(score_dict, open("../results/park_score_runs.p", "wb"))
+    pickle.dump(hapiness_dict, open("../results/hapiness_runs.p", "wb"))
+    pickle.dump(hist_dict, open("../results/cust_history_runs.p", 'wb'))
+    pickle.dump(strategy_hist, open("../results/strategy_history.p", 'wb'))
