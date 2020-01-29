@@ -410,18 +410,6 @@ class Themepark(Model):
             pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
             pickle.dump(histories, open("data/cust_history.p", 'wb'))
 
-        # calculate rides per attraction
-        agents = self.get_customers()
-        self.all_rides_list = [0] * len(agents[0].in_attraction_list)
-        for agent in agents:
-            print(agent.in_attraction_list)
-            for i in range(len(agent.in_attraction_list)):
-                self.all_rides_list[i] += agent.in_attraction_list[i]
-
-        print(self.all_rides_list)
-        for i in range(len(self.all_rides_list)):
-            self.all_rides_list[i] = self.all_rides_list[i] / self.N_attr
-
         try:
             pickle.dump(self.all_rides_list, open("../data/all_rides.p", "wb"))
         except:
