@@ -423,8 +423,8 @@ class Themepark(Model):
                 # print("swap:",agent.strategy_swap_hist , "sum:",sum_attr)
 
 
-        plt.hist(hist_list)
-        plt.show()
+        # plt.hist(hist_list)
+        # plt.show()
 
         histories = self.get_history_list()
 

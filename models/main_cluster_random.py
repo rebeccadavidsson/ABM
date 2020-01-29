@@ -7,7 +7,7 @@ import pickle
 
 width = 36
 height = 36
-N_cust = 50
+N_cust = 120
 pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
