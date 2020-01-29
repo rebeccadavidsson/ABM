@@ -6,16 +6,16 @@ import pickle
 
 width = 36
 height = 36
-N_cust = 50
 pixel_ratio = 20
 theme = "cluster"
 strategy = "Closest_by"
 cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict = {}, {}, {}, {}, {}
 
-num_agents = 60
+N_cust = 60
+num_agents = 12
 steps = 320
 RUNS = 15
-strategies = [0, 0.25, 0.5, 0.75, 1, "Random"]
+strategies = [0, 0.25, 0.5, 0.75, 1]
 
 # num_agents = 12
 # steps = 30
@@ -59,8 +59,8 @@ for run in strategies:
     print(score_dict, hapiness_dict)
     print(strat_dict)
 
-pickle.dump(cust_dict, open("results/customers_runs.p", 'wb'))
-pickle.dump(score_dict, open("results/park_score_runs.p", "wb"))
-pickle.dump(hapiness_dict, open("results/hapiness_runs.p", "wb"))
-pickle.dump(hist_dict, open("results/cust_history_runs.p", 'wb'))
-pickle.dump(strategy_hist, open("results/stategy_history.p", 'wb'))
+    pickle.dump(cust_dict, open("results/customers_runs.p", 'wb'))
+    pickle.dump(score_dict, open("results/park_score_runs.p", "wb"))
+    pickle.dump(hapiness_dict, open("results/hapiness_runs.p", "wb"))
+    pickle.dump(hist_dict, open("results/cust_history_runs.p", 'wb'))
+    pickle.dump(strategy_hist, open("results/stategy_history.p", 'wb'))

@@ -27,7 +27,7 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
-        self.init_weight = None
+        self.init_weight = self.weight
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:
@@ -186,7 +186,7 @@ class Customer(Agent):
                 self.waited_period = 0
 
                 # Update memory
-                if self.init_weight is None:
+                if self.init_weight is not None:
                     self.update_strategy()
 
                 # Set current attraction back to None when customer leaves.
@@ -204,7 +204,7 @@ class Customer(Agent):
         if self.pos == self.destination:
 
             if self.waited_period == 0:
-                if self.init_weight is None:
+                if self.init_weight is not None:
                     self.update_strategy()
 
             # Check which attraction

@@ -416,15 +416,8 @@ class Themepark(Model):
             self.totalTOTAL += 1
             self.schedule.step()
             self.datacollector.collect(self)
-
             self.schedule_Customer.step()
             self.schedule_Attraction.step()
-
-            # update memory of attractions
-            # attractions = self.get_attractions()
-            # for attraction in attractions:
-            #     attraction.update_memory()
-
             self.total_steps += 1
 
             self.save_data()
