@@ -28,7 +28,7 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
-        self.init_weight = None
+        self.init_weight = self.weight
         if self.strategy == 'Random':
             self.destination = random.choice(positions)
             while self.destination is self.pos:

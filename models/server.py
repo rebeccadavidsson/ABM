@@ -16,10 +16,10 @@ except ModuleNotFoundError:
 
 width = 36
 height = 36
-N_cust = 80
+N_cust = 50
 pixel_ratio = 20
 num_agents = 12
-max_time = 520
+max_time = 100
 STEPS = max_time
 MEMORY = 6
 

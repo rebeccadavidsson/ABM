@@ -14,11 +14,11 @@ width = 36
 height = 36
 N_cust = 50
 pixel_ratio = 20
-num_agents = 15
+num_agents = 12
 theme = "cluster"
 strategy = "Closest_by"
 steps = 100
-RUNS = 8
+RUNS = 1
 
 # memory = [2,3,4,5,6,7,8,9]
 memory = 5
@@ -46,4 +46,4 @@ for run in range(RUNS):
 pickle.dump(variation_data, open("../data/park_scores.p", 'wb'))
 
 # print(variation_data)
-pickle.dump(variation_data, open("../data/variation_data_mem{}.p".format(memory[run]), 'wb'))
+pickle.dump(variation_data, open("../data/variation_data.p", 'wb'))
