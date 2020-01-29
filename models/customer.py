@@ -21,6 +21,7 @@ class Customer(Agent):
         self.pos = pos
         self.model = model
         self.unique_id = unique_id
+
         self.x_list = x_list
         self.y_list = y_list
         self.positions = positions
@@ -350,6 +351,7 @@ class Customer(Agent):
                 for strategy in self.prediction_strategies.keys():
                     attraction = self.prediction_strategies[strategy][0]
                     if queues[attraction.unique_id] < queues[self.current_a.unique_id] and not strategy == chosen_strategy:
+
                         # strategy_ranking[strategy] = queues[attraction.unique_id] + self.prediction_strategies[strategy][1]
                         strategy_ranking[strategy] = queues[attraction.unique_id]
 
@@ -362,33 +364,41 @@ class Customer(Agent):
                         best_strat = random.choice(res)
                     self.weight = best_strat
 
-
     def update_strategy(self):
 
         strategy_ranking = {}
         queues = self.get_waiting_lines()
         chosen_strategy = self.weight
         current_walking_distance = self.prediction_strategies[chosen_strategy][1]
-
+        current_arrival_time = math.ceil(self.prediction_strategies[chosen_strategy][2])
+        # print("chosen_strategy:", chosen_strategy, ",line:",
+        #         self.model.attraction_history[self.current_a][current_arrival_time],
+        #         "curr_time:", self.model.totalTOTAL, ",ID", self.unique_id, ",arrivaltime",
+        #         current_arrival_time)
         if self.current_a is not None:
-            # for attraction in queues.keys():
-            #     if queues[attraction] < queues[self.current_a.unique_id]:
-            #         print("VERKEERDE STRATEGY, attraction:", attraction, "nr:", self.unique_id)
+
             for strategy in self.prediction_strategies.keys():
+                if strategy == chosen_strategy:
+                    continue
+
                 attraction = self.prediction_strategies[strategy][0]
-                arrival_time = self.prediction_strategies[strategy][2]
+                arrival_time = math.ceil(self.prediction_strategies[strategy][2])
                 walking_distance = self.prediction_strategies[strategy][1]
+
+                if attraction == self.current_a:
+                    continue
+
                 if math.ceil(arrival_time) < self.model.totalTOTAL:
 
-                    # print(math.ceil(arrival_time), "arrivaltime")
-                    # print(self.model.totalTOTAL, "currenttime")
-                    # print(self.model.attraction_history[self.current_a], "hoi")
-                    # print("modeled",self.model.attraction_history[self.current_a][self.model.totalTOTAL],
-                    # self.current_a.N_current_cust, "currentcust in attr")
                     queue_at_arrival = self.model.attraction_history[attraction][math.ceil(arrival_time)]
-                if arrival_time + queue_at_arrival < self.model.totalTOTAL :
-                    # strategy_ranking[strategy] = queues[attraction.unique_id] + self.prediction_strategies[strategy][1]
-                    strategy_ranking[strategy] = arrival_time + queue_at_arrival
+                    if arrival_time + queue_at_arrival + attraction.attraction_duration < self.model.totalTOTAL:
+                        # print("strategy:", strategy, ",arrival_time:", arrival_time, ",attraction", attraction.unique_id)
+                        #
+                        # print("time after going on ride:", arrival_time + queue_at_arrival + attraction.attraction_duration)
+
+
+                        strategy_ranking[strategy] = arrival_time + queue_at_arrival
+
 
             if len(strategy_ranking.values()) > 0:
                 minval = min(strategy_ranking.values())

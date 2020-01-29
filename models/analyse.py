@@ -62,7 +62,7 @@ for i in range(len(flat_list)):
     if flat_list[i] >= 506:
         indexes.append(i)
 
-        
+
 # data = {0: [446, 390, 413, 435, 387], 0.25: [453, 375, 407, 397, 394], 0.5: [418, 422, 416, 389, 471], 0.75: [412, 415, 437, 451, 417], 1: [415, 396, 435, 424, 426]}
 # data2 = {0: [5.957641204754623, 4.994405392734679, 5.762115080302225, 6.572300482168601, 5.21518499265326], 0.25: [4.71287197513577, 5.476524434514284, 6.613457071961583, 5.080424884704873, 6.09731745411721], 0.5: [5.745025484526586, 6.508364300615824, 6.007355090963852, 5.159799785657042, 5.440491978543196], 0.75: [5.733864594465221, 6.003171544955535, 4.898015523753619, 6.347532029728398, 5.776858213075931], 1: [5.673771065932856, 5.5550717964445235, 5.588957298417885, 4.789181645043308, 5.5561914589096775]}
 # strategies = [0, 0.25, 0.5, 0.75, 1]
@@ -90,17 +90,58 @@ for i in range(len(flat_list)):
 # plt.show()
 
 
-# try:
-#     file = pickle.load(open('data/stategy_history_cluster.p', 'rb'))
-#     file2 = pickle.load(open('data/stategy_history_circle.p', 'rb'))
-# except:
-#     file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
-#     file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
-# df = pd.DataFrame(file)
-# # print(df)
-# df.describe()
-# # print(df[0].mean())
->>>>>>> cdaa732cf9963ac11c40dea85f368b3f94b36156
+try:
+    file = pickle.load(open('data/stategy_history_cluster.p', 'rb'))
+    file2 = pickle.load(open('data/stategy_history_circle.p', 'rb'))
+except:
+    file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
+    file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
+files = [file, file2]
+
+def plot_strategies(files):
+    """
+    Transform data and plot strategies
+    """
+
+    for nr, file in enumerate(files):
+
+        fig, axs = plt.subplots(len(files))
+        df = pd.DataFrame(file)
+        means = {"0.00": [[] * 65] * 520, "0.25": [[] * 65] * 520, "0.50": [[] * 65] * 520, "0.75": [[] * 65] * 520, "1.00": [[] * 65] * 520}
+        # means = {"0.00": [], "0.25": [], "0.50": [], "0.75": [], "1.00": []}
+        # loop over all datasets in df
+        for i in range(len(df[0])):
+            print(len(df[0]))
+            # show all cols in dataset (0.00, 0.25, 0.50, 0.75, 1.00)
+            for col in df[0][i]:
+                # print(len(df[0][i][0]))
+
+                # put data in matrix depending on their column
+                for k, val in enumerate(list(df[0][i][col])):
+                    print(list(df[0][i][col]))
+                    print(len(list(df[0][i][col])))
+                    # quit()
+                    means[col][k][i].append(val)
+
+        for key in means:
+            # print(means[str(key)])
+
+            for y in range(65):
+                print(len(means[str(key)][y]))
+                # quit()
+                means[str(key)] = np.mean(means[str(key)][y])
+            # key_content = means[str(key)]
+            #
+            # for i in range(len(key_content)):
+            #     means[str(key)][i] = key_content[i] / 65
+            #
+            # print(nr)
+            axs[nr].plot(means[str(key)])
+
+
+
+plot_strategies(files)
+plt.show()
 
 file = pickle.load(open('results/stategy_history.p', 'rb'))
 # file = file.values()
@@ -114,6 +155,7 @@ for i in indexes:
 print(totals)
 
 
+>>>>>>> a2db2c0fc9e4975bf9beb1286bcf8ac26e5f77ec
 
 
 
