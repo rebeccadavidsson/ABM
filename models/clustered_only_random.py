@@ -10,12 +10,12 @@ height = 36
 N_cust = 120
 pixel_ratio = 20
 num_agents = 12
-theme = "circle"
-strategy = "Closest_by"
+theme = "cluster"
+strategy = "Random"
 steps = 520
 RUNS = 65
-strategies = [0, 0.25, 0.5, 0.75, 1]
-adaptive = True
+strategies = None
+adaptive = False
 
 
 cust_d, score_d, hapiness_d, hist_d, strategy_d = [], [], [], [], []
@@ -48,18 +48,17 @@ for run in range(RUNS):
     hapiness_d.append(hapiness)
     hist_d.append(hist)
     strategy_d.append(strategy_hist)
-    print(strategy_d)
 
     # Tussendoor opslaan
     try:
-        pickle.dump(cust_d, open("results/customers_clust_main_strat.p", 'wb'))
-        pickle.dump(score_d, open("results/park_score_clust_main_strat.p", "wb"))
-        pickle.dump(hapiness_d, open("results/hapiness_clust_main_strat.p", "wb"))
-        pickle.dump(hist_d, open("results/cust_history_clust_main_strat.p", 'wb'))
-        pickle.dump(strategy_d, open("results/strategy_history_clust_main_strat.p", 'wb'))
+        pickle.dump(cust_d, open("results/customers_clust_main_rand.p", 'wb'))
+        pickle.dump(score_d, open("results/park_score_clust_main_rand.p", "wb"))
+        pickle.dump(hapiness_d, open("results/hapiness_clust_main_rand.p", "wb"))
+        pickle.dump(hist_d, open("results/cust_history_clust_main_rand.p", 'wb'))
+        pickle.dump(strategy_d, open("results/strategy_history_clust_main_rand.p", 'wb'))
     except:
-        pickle.dump(cust_d, open("../results/customers_clust_main_strat.p", 'wb'))
-        pickle.dump(score_d, open("../results/park_score_clust_main_strat.p", "wb"))
-        pickle.dump(hapiness_d, open("../results/hapiness_clust_main_strat.p", "wb"))
-        pickle.dump(hist_d, open("../results/cust_history_clust_main_strat.p", 'wb'))
-        pickle.dump(strategy_d, open("../results/strategy_history_clust_main_strat.p", 'wb'))
+        pickle.dump(cust_d, open("../results/customers_clust_main_rand.p", 'wb'))
+        pickle.dump(score_d, open("../results/park_score_clust_main_rand.p", "wb"))
+        pickle.dump(hapiness_d, open("../results/hapiness_clust_main_rand.p", "wb"))
+        pickle.dump(hist_d, open("../results/cust_history_clust_main_rand.p", 'wb'))
+        pickle.dump(strategy_d, open("../results/strategy_history_clust_main_rand.p", 'wb'))
