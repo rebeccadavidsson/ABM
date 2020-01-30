@@ -17,23 +17,20 @@ pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
 strategy = "Closest_by"
-<<<<<<< HEAD
-steps = 100
-=======
+
 steps = 10
->>>>>>> 7ecd80b60ace8a5f447bdb45559014ad0aba1045
 RUNS = 1
 
 # memory = [2,3,4,5,6,7,8,9]
 memory = 5
 strategies = [0, 0.25, 0.5, 0.75, 1]
-
+adaptive = True
 
 variation_data = []
 
 for run in range(RUNS):
     print("RUN ", run)
-    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies[run])
+    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies, adaptive)
 
     for i in range(steps + 1):
         print("step", i)
@@ -47,10 +44,6 @@ for run in range(RUNS):
 
     variation_data.append(file)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7ecd80b60ace8a5f447bdb45559014ad0aba1045
 pickle.dump(variation_data, open("../data/park_scores.p", 'wb'))
 
 # print(variation_data)

@@ -201,6 +201,8 @@ class Themepark(Model):
                 weights_list.append(self.weight)
 
         cust_list = []
+        # weight_counter = 0
+        # pick_weight = 0
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -209,12 +211,10 @@ class Themepark(Model):
 
             pos = (rand_x, rand_y)
 
-            # print("Creating CUSTOMER agent {2} at ({0}, {1})"
-            #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
 
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight, self.adaptive)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, weights_list[i], self.adaptive)
             self.schedule_Customer.add(a)
             a.weight = weights_list[i]
 
