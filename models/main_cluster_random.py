@@ -59,11 +59,11 @@ for run in range(RUNS):
         pickle.dump(hapiness_d, open("results/hapiness_clust_main_rand.p", "wb"))
         pickle.dump(hist_d, open("results/cust_history_clust_main_rand.p", 'wb'))
         pickle.dump(strategy_d, open("results/strategy_history_clust_main_rand.p", 'wb'))
-        pickle.dump(strategy_d, open("results/eff_score_clust_main_rand.p", 'wb'))
+        pickle.dump(dict2, open("results/eff_score_clust_main_rand.p", 'wb'))
     except:
         pickle.dump(cust_d, open("../results/customers_clust_main_rand.p", 'wb'))
         pickle.dump(score_d, open("../results/park_score_clust_main_rand.p", "wb"))
         pickle.dump(hapiness_d, open("../results/hapiness_clust_main_rand.p", "wb"))
         pickle.dump(hist_d, open("../results/cust_history_clust_main_rand.p", 'wb'))
         pickle.dump(strategy_d, open("../results/strategy_history_clust_main_rand.p", 'wb'))
-        pickle.dump(strategy_d, open("../results/eff_score_clust_main_rand.p", 'wb'))
+        pickle.dump(dict2, open("../results/eff_score_clust_main_rand.p", 'wb'))

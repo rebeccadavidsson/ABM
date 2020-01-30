@@ -37,7 +37,6 @@ for run in range(RUNS):
         hist = pickle.load(open("data/cust_history.p", 'rb'))
         strategy_hist = pickle.load(open("data/strategy_history.p", 'rb'))
         dict2_data = pickle.load(open("data/eff_score_history.p", 'rb'))
-
     except:
         cust = pickle.load(open("../data/customers.p", 'rb'))
         score = pickle.load(open("../data/park_score.p", "rb"))
@@ -45,7 +44,6 @@ for run in range(RUNS):
         hist = pickle.load(open("../data/cust_history.p", 'rb'))
         strategy_hist = pickle.load(open("../data/strategy_history.p", 'rb'))
         dict2_data = pickle.load(open("../data/eff_score_history.p", 'rb'))
-
 
     cust_d.append(cust)
     score_d.append(score)
