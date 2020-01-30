@@ -11,7 +11,7 @@ theme = "cluster"
 strategy = "Closest_by"
 cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict, dict_dict = {}, {}, {}, {}, {}, {}
 
-N_cust = 12
+N_cust = 120
 num_agents = 12
 steps = 520
 RUNS = 15

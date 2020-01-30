@@ -270,7 +270,13 @@ class Themepark(Model):
             else:
                 strategy = self.strategy
 
-            weight = weights_list[i]
+
+            print(weights_list)
+            # Deze if is omdat bij alleen random self.weight none is!
+            if weights_list == []:
+                weight = None
+            else:
+                weight = weights_list[i]
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
 
             self.schedule_Customer.add(a)
