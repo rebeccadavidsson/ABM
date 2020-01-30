@@ -29,14 +29,19 @@ class Customer(Agent):
         self.strategy = strategy
         self.history = self.make_history()
         self.weight = weight
+        if weight == "Random_test_4":
+            self.strategy = "Random_test_4"
         self.adaptive = adaptive
-        if self.strategy == 'Random':
+        self.all_strategies =  [x for x in self.model.strategies if x != 'Random_test_4']
+        if self.strategy == 'Random' or self.strategy == "Random_test_4":
             self.destination = random.choice(positions)
             while self.destination is self.pos:
                 self.destination = random.choice(positions)
 
         if self.strategy == 'Closest_by':
+
             self.destination = self.closest_by().pos
+
 
         self.changed_strategy = False
         self.waitingtime = None
@@ -53,6 +58,7 @@ class Customer(Agent):
         self.memory_succeses = []
         self.changes_memory = []
         self.strategy_choice = [0,0,0,0,0]
+
         self.prediction_strategies = self.prediction_all_strategies()
         self.strategy_swap_hist = 0
         # self.several_weights = [0,0.25, 0.5, 0.75, 1]
@@ -182,7 +188,9 @@ class Customer(Agent):
 
                     # Only update when adaptive strategy is on
                     if self.adaptive is True:
-                        self.update_strategy()
+                        if self.strategy is not "Random":
+                            if self.strategy is not "Random_test_4":
+                                self.update_strategy()
 
                 # increment number of rides taken of attraction
                 # if self.current_a is not None:
@@ -202,7 +210,7 @@ class Customer(Agent):
 
                 if self.strategy == "Closest_by":
                     self.destination = self.closest_by().pos
-                elif self.strategy == 'Random':
+                elif self.strategy == 'Random' or self.strategy == "Random_test_4":
                     self.destination = random.choice(self.positions)
                     while self.destination is self.pos:
                         self.destination = random.choice(self.positions)
@@ -476,7 +484,8 @@ class Customer(Agent):
         waiting_times = self.get_waiting_lines()
         # print(len(predictions.keys()))
         # print(predictions, waiting_times, "PRINT")
-        for weight in self.model.strategies:
+
+        for weight in self.all_strategies:
             for i in range(len(predictions.keys())):
 
                 if self.weight is None:

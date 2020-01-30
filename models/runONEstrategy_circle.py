@@ -45,6 +45,7 @@ for run in strategies:
             hapiness = pickle.load(open("data/hapiness.p", "rb"))
             hist = pickle.load(open("data/cust_history.p", 'rb'))
             strategy_hist = pickle.load(open("data/strategy_history.p", 'rb'))
+
         except:
             cust = pickle.load(open("../data/customers.p", 'rb'))
             score = pickle.load(open("../data/park_score.p", "rb"))
