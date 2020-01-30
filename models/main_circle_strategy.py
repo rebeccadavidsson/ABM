@@ -12,7 +12,7 @@ pixel_ratio = 20
 num_agents = 12
 theme = "circle"
 strategy = "Closest_by"
-steps = 520
+steps = 20
 RUNS = 65
 strategies = [0, 0.25, 0.5, 0.75, 1]
 adaptive = True
@@ -22,7 +22,7 @@ cust_d, score_d, hapiness_d, hist_d, strategy_d = [], [], [], [], []
 
 for run in range(RUNS):
     print("RUN ", run)
-    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies[run], adaptive)
+    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies, adaptive)
 
     for i in range(steps + 1):
         print("step", i)

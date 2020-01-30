@@ -85,9 +85,28 @@ class Themepark(Model):
             "1.00": lambda m: self.strategy_counter(self.strategies[4]),
             })
 
+        self.datacollector2 = DataCollector(
+            {"score": lambda m: self.make_score()})
+
         self.total_waited_time = 0
 
         self.monitor = Monitor(self.max_time, self.N_attr, self.positions)
+
+    def make_score(self):
+        ideal = {}
+        cust_in_row = 0
+        for i in range(len(self.get_attractions())):
+            ideal[i] = self.N_cust/self.N_attr
+            cust_in_row += self.get_attractions()[i].N_current_cust
+
+        tot_difference = 0
+        for i in range(len(self.get_attractions())):
+
+            difference = abs(cust_in_row/self.N_attr  - self.get_attractions()[i].N_current_cust)
+            tot_difference += difference
+
+        fraction_not_right = (tot_difference/self.N_cust)
+        return abs(1-(fraction_not_right)) * cust_in_row/self.N_cust
 
     def make_attr_hist(self):
         attraction_history = {}
@@ -161,24 +180,26 @@ class Themepark(Model):
         weights_list = []
         if self.adaptive is True:
             for i in range(round(N_cust*self.strategy_composition[0.0])):
-                weights_list.append(0)
+                weights_list.append(self.strategies[0])
 
             for i in range(round(N_cust*self.strategy_composition[0.25])):
-                weights_list.append(0.25)
+                weights_list.append(self.strategies[1])
 
             for i in range(round(N_cust*self.strategy_composition[0.5])):
-                weights_list.append(0.5)
+                weights_list.append(self.strategies[2])
 
             for i in range(round(N_cust*self.strategy_composition[0.75])):
-                weights_list.append(0.75)
+                weights_list.append(self.strategies[3])
 
             for i in range(round(N_cust*self.strategy_composition[1.0])):
-                weights_list.append(1.0)
+                weights_list.append(self.strategies[4])
         else:
             for i in range(round(N_cust)):
                 weights_list.append(self.weight)
 
         cust_list = []
+        # weight_counter = 0
+        # pick_weight = 0
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -187,12 +208,10 @@ class Themepark(Model):
 
             pos = (rand_x, rand_y)
 
-            # print("Creating CUSTOMER agent {2} at ({0}, {1})"
-            #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
 
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, self.weight, self.adaptive)
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, weights_list[i], self.adaptive)
             self.schedule_Customer.add(a)
             a.weight = weights_list[i]
 
@@ -431,12 +450,14 @@ class Themepark(Model):
         # save data
         try:
             pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/strategy_history.p", 'wb'))
+            pickle.dump(self.datacollector2.get_model_vars_dataframe(), open("../data/eff_score_history.p", 'wb'))
             pickle.dump(cust_data, open("../data/customers.p", 'wb'))
             pickle.dump(self.park_score[-1], open("../data/park_score.p", "wb"))
             pickle.dump(self.happinesses, open("../data/hapiness.p", "wb"))
             pickle.dump(histories, open("../data/cust_history.p", 'wb'))
         except:
             pickle.dump(self.datacollector.get_model_vars_dataframe(), open("data/strategy_history.p", 'wb'))
+            pickle.dump(self.datacollector2.get_model_vars_dataframe(), open("data/eff_score_history.p", 'wb'))
             pickle.dump(cust_data, open("data/customers.p", 'wb'))
             pickle.dump(self.park_score[-1], open("data/park_score.p", "wb"))
             pickle.dump(self.happinesses, open("data/hapiness.p", "wb"))
@@ -471,6 +492,8 @@ class Themepark(Model):
             self.totalTOTAL += 1
             self.schedule.step()
             self.datacollector.collect(self)
+            self.datacollector2.collect(self)
+
             self.schedule_Attraction.step()
 
             self.schedule_Customer.step()
@@ -489,6 +512,4 @@ class Themepark(Model):
             for key in self.attraction_history.keys():
                 y = self.attraction_history[key]
                 x = list(range(0, self.max_time))
-
-
             self.final()
