@@ -17,7 +17,6 @@ for x in values:
     temp.append(np.mean(x))
 
 values = data2.values()
-
 temp2 = []
 for x in values:
     res = []
