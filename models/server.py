@@ -20,7 +20,7 @@ height = 36
 N_cust = 50
 pixel_ratio = 20
 num_agents = 12
-max_time = 10
+max_time = 100
 STEPS = max_time
 MEMORY = 6
 
@@ -132,7 +132,8 @@ model_params = {
     "theme": UserSettableParameter('choice', 'Theme park lay-out', value='circle',
                                       choices=['random', 'circle', 'cluster']),
     "max_time": max_time,
-    "weight": UserSettableParameter("slider", "Weight of waitingtime", 0, 0, 1, 0.25)
+    "weight": UserSettableParameter("slider", "Weight of waitingtime", 0, 0, 1, 0.25),
+    "adaptive": True
 }
 
 server = ModularServer(
