@@ -9,11 +9,11 @@ height = 36
 pixel_ratio = 20
 theme = "cluster"
 strategy = "Closest_by"
-cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict = {}, {}, {}, {}, {}
+cust_dict, score_dict, hapiness_dict, hist_dict, strat_dict, dict_dict = {}, {}, {}, {}, {}, {}
 
-N_cust = 120
+N_cust = 12
 num_agents = 12
-steps = 420
+steps = 520
 RUNS = 15
 strategies = ["Random", 0, 0.25, 0.5, 0.75, 1]
 adaptive = False
@@ -69,19 +69,23 @@ for run in strategies:
     hapiness_dict[run] = hapiness_d
     hist_dict[run] = hist_d
     strat_dict[run] = strategy_d
+    dict_dict[run] = dict2
 
-    print(score_dict, hapiness_dict)
-    print(strat_dict)
+    # print(score_dict, hapiness_dict)
+    # print(strat_dict)
 
 try:
-    pickle.dump(cust_dict, open("results/customers_clust.p", 'wb'))
-    pickle.dump(score_dict, open("results/park_score_clust.p", "wb"))
-    pickle.dump(hapiness_dict, open("results/hapiness_clust.p", "wb"))
-    pickle.dump(hist_dict, open("results/cust_history_clust.p", 'wb'))
-    pickle.dump(strat_dict, open("results/strategy_history_clust.p", 'wb'))
+    pickle.dump(cust_dict, open("results/customers_clust_all_only_strat.p", 'wb'))
+    pickle.dump(score_dict, open("results/park_score_clust_all_only_strat.p", "wb"))
+    pickle.dump(hapiness_dict, open("results/hapiness_clust_all_only_strat.p", "wb"))
+    pickle.dump(hist_dict, open("results/cust_history_clust_all_only_strat.p", 'wb'))
+    pickle.dump(strat_dict, open("results/strategy_history_clust_all_only_strat.p", 'wb'))
+    pickle.dump(dict_dict, open("results/eff_score_clust_all_only_strat.p", 'wb'))
+
 except:
-    pickle.dump(cust_dict, open("../results/customers_clust.p", 'wb'))
-    pickle.dump(score_dict, open("../results/park_score_clust.p", "wb"))
-    pickle.dump(hapiness_dict, open("../results/hapiness_clust.p", "wb"))
-    pickle.dump(hist_dict, open("../results/cust_history_clust.p", 'wb'))
-    pickle.dump(strat_dict, open("../results/strategy_history_clust.p", 'wb'))
+    pickle.dump(cust_dict, open("../results/customers_clust_all_only_strat.p", 'wb'))
+    pickle.dump(score_dict, open("../results/park_score_clust_all_only_strat.p", "wb"))
+    pickle.dump(hapiness_dict, open("../results/hapiness_clust_all_only_strat.p", "wb"))
+    pickle.dump(hist_dict, open("../results/cust_history_clust_all_only_strat.p", 'wb'))
+    pickle.dump(strat_dict, open("../results/strategy_history_clust_all_only_strat.p", 'wb'))
+    pickle.dump(dict_dict, open("../results/eff_score_clust_all_only_strat.p", 'wb'))
