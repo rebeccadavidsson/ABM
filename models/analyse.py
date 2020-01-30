@@ -6,8 +6,8 @@ import pandas as pd
 sns.set()
 
 
-data = pickle.load(open('results/park_score_runs.p', 'rb'))
-data2 = pickle.load(open('results/hapiness_runs.p', 'rb'))
+data = pickle.load(open('../results/park_score_runs.p', 'rb'))
+data2 = pickle.load(open('../results/hapiness_runs.p', 'rb'))
 
 STRATEGIES = ["0.00", "0.25", "0.50", "0.75", "1.00"]
 x_pos = np.arange(len(STRATEGIES))
@@ -17,7 +17,6 @@ for x in values:
     temp.append(np.mean(x))
 
 values = data2.values()
-
 temp2 = []
 for x in values:
     res = []
@@ -153,9 +152,6 @@ for i in indexes:
     totals.append(file[i].iloc[319])
 
 print(totals)
-
-
->>>>>>> a2db2c0fc9e4975bf9beb1286bcf8ac26e5f77ec
 
 
 

@@ -183,6 +183,7 @@ class Customer(Agent):
                             self.model.attraction_history[attraction][self.model.totalTOTAL] -=1
 
             if self.waitingtime == self.waited_period:
+
                 if self.current_a is not None:
                     self.history[self.current_a] += 1
 
@@ -444,6 +445,8 @@ class Customer(Agent):
 
         # add waitingtimes
         waiting_times = self.get_waiting_lines()
+
+        # print(self.weight)
 
         for i in range(len(predictions.keys())):
 

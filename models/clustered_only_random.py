@@ -11,11 +11,11 @@ N_cust = 120
 pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
-strategy = "Random_test_4"
+strategy = "Random"
 steps = 520
 RUNS = 65
-strategies = [0, 0.25, 0.5, 0.75, 1]
-adaptive = True
+strategies = None
+adaptive = False
 
 
 cust_d, score_d, hapiness_d, hist_d, strategy_d, dict2 = [], [], [], [], [], []
@@ -54,19 +54,17 @@ for run in range(RUNS):
 
     # Tussendoor opslaan
     try:
-
-        pickle.dump(cust_d, open("results/customers_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(score_d, open("results/park_score_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hapiness_d, open("results/hapiness_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hist_d, open("results/cust_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(strategy_d, open("results/strategy_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(dict2, open("results/eff_score_clust_main_rand_noise.p", 'wb'))
+        pickle.dump(cust_d, open("results/customers_clusterd_only_random.p", 'wb'))
+        pickle.dump(score_d, open("results/park_score_clusterd_only_random.p", "wb"))
+        pickle.dump(hapiness_d, open("results/hapiness_clusterd_only_random.p", "wb"))
+        pickle.dump(hist_d, open("results/cust_history_clusterd_only_random.p", 'wb'))
+        pickle.dump(strategy_d, open("results/strategy_history_clusterd_only_random.p", 'wb'))
+        pickle.dump(dict2, open("results/eff_score_clusterd_only_random.p", 'wb'))
 
     except:
-
-        pickle.dump(cust_d, open("../results/customers_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(score_d, open("../results/park_score_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hapiness_d, open("../results/hapiness_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hist_d, open("../results/cust_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(strategy_d, open("../results/strategy_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(dict2, open("../results/eff_score_clust_main_rand_noise.p", 'wb'))
+        pickle.dump(cust_d, open("../results/customers_clusterd_only_random.p", 'wb'))
+        pickle.dump(score_d, open("../results/park_score_clusterd_only_random.p", "wb"))
+        pickle.dump(hapiness_d, open("../results/hapiness_clusterd_only_random.p", "wb"))
+        pickle.dump(hist_d, open("../results/cust_history_clusterd_only_random.p", 'wb'))
+        pickle.dump(strategy_d, open("../results/strategy_history_clusterd_only_random.p", 'wb'))
+        pickle.dump(dict2, open("../results/eff_score_clusterd_only_random.p", 'wb'))

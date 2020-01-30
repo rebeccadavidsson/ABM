@@ -11,7 +11,7 @@ N_cust = 120
 pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
-strategy = "Random_test_4"
+strategy = "Closest_by"
 steps = 520
 RUNS = 65
 strategies = [0, 0.25, 0.5, 0.75, 1]
@@ -37,6 +37,7 @@ for run in range(RUNS):
         hist = pickle.load(open("data/cust_history.p", 'rb'))
         strategy_hist = pickle.load(open("data/strategy_history.p", 'rb'))
         dict2_data = pickle.load(open("data/eff_score_history.p", 'rb'))
+
     except:
         cust = pickle.load(open("../data/customers.p", 'rb'))
         score = pickle.load(open("../data/park_score.p", "rb"))
@@ -45,6 +46,7 @@ for run in range(RUNS):
         strategy_hist = pickle.load(open("../data/strategy_history.p", 'rb'))
         dict2_data = pickle.load(open("../data/eff_score_history.p", 'rb'))
 
+
     cust_d.append(cust)
     score_d.append(score)
     hapiness_d.append(hapiness)
@@ -52,21 +54,20 @@ for run in range(RUNS):
     strategy_d.append(strategy_hist)
     dict2.append(dict2_data)
 
+
     # Tussendoor opslaan
     try:
-
-        pickle.dump(cust_d, open("results/customers_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(score_d, open("results/park_score_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hapiness_d, open("results/hapiness_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hist_d, open("results/cust_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(strategy_d, open("results/strategy_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(dict2, open("results/eff_score_clust_main_rand_noise.p", 'wb'))
+        pickle.dump(cust_d, open("results/customers_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(score_d, open("results/park_score_clusterd_diff_strat.p", "wb"))
+        pickle.dump(hapiness_d, open("results/hapiness_clusterd_diff_strat.p", "wb"))
+        pickle.dump(hist_d, open("results/cust_history_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(strategy_d, open("results/strategy_history_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(dict2, open("results/eff_score_clusterd_diff_strat.p", 'wb'))
 
     except:
-
-        pickle.dump(cust_d, open("../results/customers_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(score_d, open("../results/park_score_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hapiness_d, open("../results/hapiness_clust_main_rand_noise.p", "wb"))
-        pickle.dump(hist_d, open("../results/cust_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(strategy_d, open("../results/strategy_history_clust_main_rand_noise.p", 'wb'))
-        pickle.dump(dict2, open("../results/eff_score_clust_main_rand_noise.p", 'wb'))
+        pickle.dump(cust_d, open("../results/customers_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(score_d, open("../results/park_score_clusterd_diff_strat.p", "wb"))
+        pickle.dump(hapiness_d, open("../results/hapiness_clusterd_diff_strat.p", "wb"))
+        pickle.dump(hist_d, open("../results/cust_history_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(strategy_d, open("../results/strategy_history_clusterd_diff_strat.p", 'wb'))
+        pickle.dump(dict2, open("../results/eff_score_clusterd_diff_strat.p", 'wb'))

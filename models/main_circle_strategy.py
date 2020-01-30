@@ -7,7 +7,7 @@ import pickle
 
 width = 36
 height = 36
-N_cust = 50
+N_cust = 120
 pixel_ratio = 20
 num_agents = 12
 theme = "circle"
@@ -22,7 +22,7 @@ cust_d, score_d, hapiness_d, hist_d, strategy_d = [], [], [], [], []
 
 for run in range(RUNS):
     print("RUN ", run)
-    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies[run], adaptive)
+    park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies, adaptive)
 
     for i in range(steps + 1):
         print("step", i)

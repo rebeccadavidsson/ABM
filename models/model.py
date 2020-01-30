@@ -70,6 +70,7 @@ class Themepark(Model):
         self.memory = 5
         self.customer_score = []
         self.customers = self.add_customers(self.N_cust)
+        self.only_random = False
 
 
         for attraction in self.get_attractions():
@@ -110,9 +111,6 @@ class Themepark(Model):
         for i in range(len(self.get_attractions())):
             ideal[i] = self.N_cust/self.N_attr
             cust_in_row += self.get_attractions()[i].N_current_cust
-
-
-
 
         tot_difference = 0
         for i in range(len(self.get_attractions())):
@@ -244,11 +242,16 @@ class Themepark(Model):
 
 
         else:
-            for i in range(round(N_cust)):
-                weights_list.append(self.weight)
+            if self.strategy is not "Random":
+
+                # do what normally is done
+                for i in range(round(N_cust)):
+                    weights_list.append(self.weight)
 
 
         cust_list = []
+        # weight_counter = 0
+        # pick_weight = 0
         for i in range(N_cust):
 
             # pos_temp = random.choice(self.starting_positions)
@@ -257,8 +260,6 @@ class Themepark(Model):
 
             pos = (rand_x, rand_y)
 
-            # print("Creating CUSTOMER agent {2} at ({0}, {1})"
-            #       .format(rand_x, rand_y, i))
             if added is True:
                 i = self.cust_ids
             if self.strategy == "Random_test_4":
@@ -271,6 +272,7 @@ class Themepark(Model):
 
             weight = weights_list[i]
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
+
             self.schedule_Customer.add(a)
 
             self.grid.place_agent(a, pos)
