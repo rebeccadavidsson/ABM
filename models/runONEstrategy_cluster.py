@@ -20,7 +20,7 @@ adaptive = False
 
 
 for run in strategies:
-    cust_d, score_d, hapiness_d, hist_d, strategy_d = [], [], [], [], []
+    cust_d, score_d, hapiness_d, hist_d, strategy_d, dict2 = [], [], [], [], [], []
 
     for j in range(RUNS):
 
@@ -45,18 +45,24 @@ for run in strategies:
             hapiness = pickle.load(open("data/hapiness.p", "rb"))
             hist = pickle.load(open("data/cust_history.p", 'rb'))
             strategy_hist = pickle.load(open("data/strategy_history.p", 'rb'))
+            dict2_data = pickle.load(open("data/eff_score_history.p", 'rb'))
+
         except:
             cust = pickle.load(open("../data/customers.p", 'rb'))
             score = pickle.load(open("../data/park_score.p", "rb"))
             hapiness = pickle.load(open("../data/hapiness.p", "rb"))
             hist = pickle.load(open("../data/cust_history.p", 'rb'))
             strategy_hist = pickle.load(open("../data/strategy_history.p", 'rb'))
+            dict2_data = pickle.load(open("../data/eff_score_history.p", 'rb'))
+
 
         cust_d.append(cust)
         score_d.append(score)
         hapiness_d.append(hapiness)
         hist_d.append(hist)
         strategy_d.append(strategy_hist)
+        dict2.append(dict2_data)
+
 
     cust_dict[run] = cust_d
     score_dict[run] = score_d
