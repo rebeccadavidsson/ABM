@@ -16,11 +16,9 @@ num_agents = 12
 steps = 520
 RUNS = 65
 
-<<<<<<< HEAD
-cust_d, score_d, hapiness_d, hist_d, strat_d = [], [], [], [], []
-=======
+
 cust_d, score_d, hapiness_d, hist_d, strat_d, score_ed = [], [], [], [], [],[]
->>>>>>> 7ecd80b60ace8a5f447bdb45559014ad0aba1045
+
 
 for j in range(RUNS):
 

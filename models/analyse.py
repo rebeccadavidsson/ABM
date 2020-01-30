@@ -155,9 +155,6 @@ for i in indexes:
 print(totals)
 
 
->>>>>>> a2db2c0fc9e4975bf9beb1286bcf8ac26e5f77ec
-
-
 
 
 # x = np.random.rayleigh(50, size=5000)

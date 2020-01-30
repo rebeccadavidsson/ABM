@@ -100,9 +100,6 @@ class Themepark(Model):
             ideal[i] = self.N_cust/self.N_attr
             cust_in_row += self.get_attractions()[i].N_current_cust
 
-
-
-
         tot_difference = 0
         for i in range(len(self.get_attractions())):
 
