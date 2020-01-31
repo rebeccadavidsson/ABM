@@ -6,8 +6,8 @@ import pandas as pd
 sns.set()
 
 
-data = pickle.load(open('results/park_score_runs.p', 'rb'))
-data2 = pickle.load(open('results/hapiness_runs.p', 'rb'))
+data = pickle.load(open('../results/park_score_runs.p', 'rb'))
+data2 = pickle.load(open('../results/hapiness_runs.p', 'rb'))
 
 STRATEGIES = ["0.00", "0.25", "0.50", "0.75", "1.00"]
 x_pos = np.arange(len(STRATEGIES))

@@ -17,6 +17,7 @@ except:
 import pickle
 import matplotlib.pyplot as plt
 
+FRACTION_RANDOM = 1/6
 WIDTH = 36
 HEIGHT = 36
 RADIUS = int(WIDTH/2)
@@ -39,7 +40,7 @@ class Themepark(Model):
         self.adaptive = adaptive
         self.strategies = STRATEGIES
         self.x_list, self.y_list, self.positions = xlist, ylist, positions
-        # self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
+        self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
         self.happinesses = []
         self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
@@ -78,13 +79,24 @@ class Themepark(Model):
                                "length": attraction.attraction_duration,
                                "waiting_list": []})
 
-        self.datacollector = DataCollector(
-            {"0.00": lambda m: self.strategy_counter(self.strategies[0]),
-            "0.25": lambda m: self.strategy_counter(self.strategies[1]),
-            "0.50": lambda m: self.strategy_counter(self.strategies[2]),
-            "0.75": lambda m: self.strategy_counter(self.strategies[3]),
-            "1.00": lambda m: self.strategy_counter(self.strategies[4]),
-            })
+        if len(self.strategies) == 6:
+            self.datacollector = DataCollector(
+
+                {"Random": lambda m: self.strategy_counter(self.strategies[0]),
+                "0.00": lambda m: self.strategy_counter(self.strategies[1]),
+                "0.25": lambda m: self.strategy_counter(self.strategies[2]),
+                "0.50": lambda m: self.strategy_counter(self.strategies[3]),
+                "0.75": lambda m: self.strategy_counter(self.strategies[4]),
+                "1.00": lambda m: self.strategy_counter(self.strategies[5]),
+                })
+        else:
+            self.datacollector = DataCollector(
+                {"0.00": lambda m: self.strategy_counter(self.strategies[0]),
+                "0.25": lambda m: self.strategy_counter(self.strategies[1]),
+                "0.50": lambda m: self.strategy_counter(self.strategies[2]),
+                "0.75": lambda m: self.strategy_counter(self.strategies[3]),
+                "1.00": lambda m: self.strategy_counter(self.strategies[4]),
+                })
 
         self.datacollector2 = DataCollector(
             {"score": lambda m: self.make_score()})
@@ -136,8 +148,44 @@ class Themepark(Model):
         return counter
 
     def make_strategy_composition(self):
-        dict = {self.strategies[0]: 0.20, self.strategies[1]:0.20, self.strategies[2]:0.20,
-                        self.strategies[3]:0.20, self.strategies[4]:0.20}
+        if self.strategy == "Random_test_4":
+            self.strategies = ["Random_test_4", 0.0, 0.25, 0.50, 0.75, 1.0]
+            dict = {self.strategies[0]: 1/6, self.strategies[1]:0.20, self.strategies[2]:0.20,
+                            self.strategies[3]:0.20, self.strategies[4]:0.20, self.strategies[5]: 0.20}
+
+            composition_list = []
+            for i in range(len(self.strategies)):
+                if i == 0:
+                    dict[self.strategies[i]] = FRACTION_RANDOM
+                    continue
+                else:
+                    composition_list.append(random.randint(0,100))
+            sum_comp = sum(composition_list)
+
+            sum_comp = sum_comp - sum_comp * FRACTION_RANDOM
+            for i in range(len(self.strategies)):
+                if i == 0:
+                    continue
+                else:
+                    dict[self.strategies[i]] = composition_list[i-1] /sum_comp
+
+        else:
+            dict = {self.strategies[0]: 0.20, self.strategies[1]:0.20, self.strategies[2]:0.20,
+                            self.strategies[3]:0.20, self.strategies[4]:0.20}
+
+            composition_list = []
+            for i in range(len(self.strategies)):
+
+                composition_list.append(random.randint(0,100))
+
+            sum_comp = sum(composition_list)
+
+            sum_comp = sum_comp
+            for i in range(len(self.strategies)):
+
+                dict[self.strategies[i]] = composition_list[i-1] /sum_comp
+
+
 
         return dict
 
@@ -180,26 +228,26 @@ class Themepark(Model):
 
         weights_list = []
         if self.adaptive is True:
-            for i in range(round(N_cust*self.strategy_composition[0.0])):
-                weights_list.append(self.strategies[0])
 
-            for i in range(round(N_cust*self.strategy_composition[0.25])):
-                weights_list.append(self.strategies[1])
+            for j in self.strategy_composition.keys():
+                for i in range(round(N_cust*self.strategy_composition[j])):
+                    weights_list.append(j)
 
-            for i in range(round(N_cust*self.strategy_composition[0.5])):
-                weights_list.append(self.strategies[2])
+            if len(weights_list) < self.N_cust:
+                rand = random.choice(self.strategies)
+                weights_list.append(rand)
+            elif len(weights_list) > self.N_cust:
+                rand = random.choice(weights_list)
+                weights_list.remove(rand)
 
-            for i in range(round(N_cust*self.strategy_composition[0.75])):
-                weights_list.append(self.strategies[3])
 
-            for i in range(round(N_cust*self.strategy_composition[1.0])):
-                weights_list.append(self.strategies[4])
         else:
             if self.strategy is not "Random":
 
                 # do what normally is done
                 for i in range(round(N_cust)):
                     weights_list.append(self.weight)
+
 
         cust_list = []
         # weight_counter = 0
@@ -214,13 +262,21 @@ class Themepark(Model):
 
             if added is True:
                 i = self.cust_ids
+            if self.strategy == "Random_test_4":
+                if weights_list[i] == "Random_test_4":
+                    strategy = "Random_test_4"
+                else:
+                    strategy = "Closest_by"
+            else:
+                strategy = self.strategy
+
 
             # Deze if is omdat bij alleen random self.weight none is!
             if weights_list == []:
-                a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, None, self.adaptive)
+                weight = None
             else:
-                a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, self.strategy, weights_list[i], self.adaptive)
-                a.weight = weights_list[i]
+                weight = weights_list[i]
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
 
             self.schedule_Customer.add(a)
 
@@ -338,7 +394,7 @@ class Themepark(Model):
         randomstrat, closebystrat = 0, 0
 
         for customer in customers:
-            if customer.strategy == "Random":
+            if customer.strategy == "Random" or customer.strategy == "Random_test_4":
                 randomstrat += 1
             elif customer.strategy == "Closest_by":
                 closebystrat += 1
