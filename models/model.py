@@ -276,6 +276,7 @@ class Themepark(Model):
                 weight = None
             else:
                 weight = weights_list[i]
+
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
 
             self.schedule_Customer.add(a)
