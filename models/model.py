@@ -271,7 +271,6 @@ class Themepark(Model):
                 strategy = self.strategy
 
 
-            # print(weights_list)
             # Deze if is omdat bij alleen random self.weight none is!
             if weights_list == []:
                 weight = None
