@@ -20,6 +20,7 @@ adaptive = False
 
 cust_d, score_d, hapiness_d, hist_d, strategy_d, dict2 = [], [], [], [], [], []
 
+
 for run in range(RUNS):
     print("RUN ", run)
     park = Themepark(num_agents, N_cust, width, height, strategy, theme, steps, strategies, adaptive)
@@ -60,7 +61,6 @@ for run in range(RUNS):
         pickle.dump(hist_d, open("results/cust_history_clusterd_only_random.p", 'wb'))
         pickle.dump(strategy_d, open("results/strategy_history_clusterd_only_random.p", 'wb'))
         pickle.dump(dict2, open("results/eff_score_clust_main_rand.p", 'wb'))
-
     except:
         pickle.dump(cust_d, open("../results/customers_clusterd_only_random.p", 'wb'))
         pickle.dump(score_d, open("../results/park_score_clusterd_only_random.p", "wb"))

@@ -34,6 +34,10 @@ values = data.values()
 values2 = data2.values()
 values = list(values)
 values2 = list(values2)
+
+values = [float(i)/max(values) for i in values]
+values2 = [float(i)/max(values2) for i in values2]
+
 total = []
 total.append(values[0])
 total.append(values2[0])
@@ -45,6 +49,7 @@ total.append(values[3])
 total.append(values2[3])
 total.append(values[4])
 total.append(values2[4])
+
 
 # fill with colors
 colors = ["lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue"]
