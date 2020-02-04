@@ -73,8 +73,6 @@ def agent_draw(agent):
             portrayal["Color"] = "#add8e6"
 
 
-
-
         # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
         # portrayal["Shape"] = "starlight.png"
 
@@ -105,7 +103,7 @@ class HistogramModule(VisualizationElement):
 
 grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
 
-# try:
+
 chart = PieChartModule([
                     {"Label": "Random", "Color": "#add8e6"},
                     {"Label": "0.00", "Color": "#F6412D"},
@@ -122,21 +120,6 @@ linechart = ChartModule([
                     {"Label": "0.75", "Color": "#FFC100"},
                     {"Label": "1.00", "Color": "#FFEC19"},
                     ], data_collector_name='datacollector')
-# except:
-#     chart = PieChartModule([
-#                         {"Label": "0.00", "Color": "#F6412D"},
-#                         {"Label": "0.25", "Color": "#FF5607"},
-#                         {"Label": "0.50", "Color": "#FF9800"},
-#                         {"Label": "0.75", "Color": "#FFC100"},
-#                         {"Label": "1.00", "Color": "#FFEC19"},
-#                         ], data_collector_name='datacollector')
-#     linechart = ChartModule([
-#                         {"Label": "0.00", "Color": "#F6412D"},
-#                         {"Label": "0.25", "Color": "#FF5607"},
-#                         {"Label": "0.50", "Color": "#FF9800"},
-#                         {"Label": "0.75", "Color": "#FFC100"},
-#                         {"Label": "1.00", "Color": "#FFEC19"},
-#                         ], data_collector_name='datacollector')
 
 linechart_2 = ChartModule([
                     {"Label": "score", "Color": "#F6412D"},
@@ -162,7 +145,6 @@ model_params = {
 server = ModularServer(
     Themepark,
     [grid, histogram, chart, linechart, linechart_2],
-    # [grid, histogram],
     "Theme Park Model",
     model_params,
 )
