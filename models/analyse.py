@@ -31,16 +31,16 @@ sns.set()
 # plt.legend(["Theme park score", "Customer hapiness"])
 # plt.show()
 
-def plot_boxplots():
-    data = pickle.load(open('results/results_cust_all_only_strat31jan/cust_history_clust_all_only_strat.p', 'rb'))
-    df = pd.DataFrame(data)
-    print(df["Random"][0][0])
-    print(np.sum(df["Random"][0][0]))
-
-    for
-    quit()
-
-plot_boxplots()
+# def plot_boxplots():
+#     data = pickle.load(open('results/results_cust_all_only_strat31jan/cust_history_clust_all_only_strat.p', 'rb'))
+#     df = pd.DataFrame(data)
+#     print(df["Random"][0][0])
+#     print(np.sum(df["Random"][0][0]))
+#
+#     for
+#     quit()
+#
+# plot_boxplots()
 
 
 def plot_strategies():
@@ -48,12 +48,14 @@ def plot_strategies():
     Transform data and plot strategies
     """
     try:
-        file = pickle.load(open('res_cust_all_only/strategy_history_clust_all_only_strat.p', 'rb'))
-        file = pickle.load(open('data/strategy_history_clusterd_diff_strat.p', 'rb'))
-        file2 = pickle.load(open('data_all_only_strat/strategy_history.p', 'rb'))
+        # file = pickle.load(open('res_cust_all_only/strategy_history_clust_all_only_strat.p', 'rb'))
+        file = pickle.load(open('results_main_cluster_random_noise_30jan/strategy_history_clust_main_rand_noise.p', 'rb'))
+        file2 = pickle.load(open('data_main_cluster_ranodm_noise_30jan_kopie/stategy_history_circle.p', 'rb'))
     except:
-        file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
-        file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
+        # file = pickle.load(open('../data/stategy_history_cluster.p', 'rb'))
+        # file2 = pickle.load(open('../data/stategy_history_circle.p', 'rb'))
+        file = pickle.load(open('../results_main_cluster_random_noise_30jan/strategy_history_clust_main_rand_noise.p', 'rb'))
+        file2 = pickle.load(open('../data_main_cluster_ranodm_noise_30jan_kopie/stategy_history_circle.p', 'rb'))
     files = [file, file2]
 
     # for nr, file in enumerate(files):
@@ -66,8 +68,9 @@ def plot_strategies():
         print(df[0])
         print("------------------",len(df[0]))
         # means = {"0.00": [0] * 520, "0.25": [0] * 520, "0.50": [0] * 520, "0.75": [0] * 520, "1.00": [0] * 520}
-        means = {"0.00": [0] * 520, "0.25": [0] * 520, "0.50": [0] * 520, "0.75": [0] * 520, "1.00": [0] * 520}
+        means = {"0.00": [0] * 520, "0.25": [0] * 520, "0.50": [0] * 520, "0.75": [0] * 520, "1.00": [0] * 520, "Random": [0] * 520}
         # loop over all datasets in df
+        print(df[0])
         for i in range(len(df[0])):
 
             # show all cols in dataset (0.00, 0.25, 0.50, 0.75, 1.00)
@@ -90,7 +93,7 @@ def plot_strategies():
             # axs[nr].plot(means[str(key)])
             plt.plot(means[str(key)])
 
-    plt.title("Strategy adaptation over time", fontsize=16)
+    plt.title("Strategy adaptation over time with noise", fontsize=16)
     # plt.rc("figure", titlesize = 17)
     plt.xlabel("Time (steps)", fontsize=14)
     plt.ylabel("Amount of customers", fontsize=14
@@ -98,11 +101,11 @@ def plot_strategies():
 
 
     )
-    plt.legend(["0.00", "0.25", "0.50", "0.75", "1.00"])
+    plt.legend(["0.00", "0.25", "0.50", "0.75", "1.00", "Random"])
     plt.show()
 
 
-# plot_strategies(files)
+plot_strategies()
 
 
 
