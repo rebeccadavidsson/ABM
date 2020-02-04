@@ -51,9 +51,6 @@ def plot_strategies():
 
             # show all cols in dataset (0.00, 0.25, 0.50, 0.75, 1.00)
             for col in df[0][i]:
-                # print(df[0][i][str(col)])
-
-
 
                 # put data in matrix depending on their column
                 for k, val in enumerate(list(df[0][i][col])):
@@ -178,13 +175,6 @@ def plot_strategy_hist_clust():
     values = list(values)
 
     total = []
-    # total.append([float(i)/max(values[0]) for i in values[0]])
-    # total.append([float(i)/max(values[1]) for i in values[1]])
-    # total.append([float(i)/max(values[2]) for i in values[2]])
-    # total.append([float(i)/max(values[3]) for i in values[3]])
-    # total.append([float(i)/max(values[4]) for i in values[4]])
-
-
     total.append(values[0])
     total.append(values[1])
     total.append(values[2])
