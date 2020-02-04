@@ -1,29 +1,21 @@
 from mesa import Agent
 import random
 import math
+import numpy as np
+import math
 try:
     from .route import Route
 except:
     from route import Route
-import numpy as np
-import math
-# from model import calculate_people
 
-WIDTH = 36
-HEIGHT = 36
 MEMORY = 5
-starting_positions = [(int((WIDTH/2)-1), 0), (int(WIDTH/2), 0), (int((WIDTH/2)+1), 0)]
-
 
 class Customer(Agent):
     def __init__(self, unique_id, model, pos, x_list, y_list, positions, strategy, weight, adaptive):
         super().__init__(unique_id, model)
         self.pos = pos
         self.model = model
-        self.unique_id = unique_id
 
-        self.x_list = x_list
-        self.y_list = y_list
         self.positions = positions
         self.current_a = None
         self.strategy = strategy
@@ -39,9 +31,7 @@ class Customer(Agent):
                 self.destination = random.choice(positions)
 
         if self.strategy == 'Closest_by':
-
             self.destination = self.closest_by().pos
-
 
         self.changed_strategy = False
         self.waitingtime = None
@@ -49,30 +39,41 @@ class Customer(Agent):
         self.total_ever_waited = 0
         self.nmbr_attractions = 0
         self.waited_period = 0
-        self.sadness_score = 0
-        self.in_attraction = False
-        self.in_attraction_list = []
         self.strategy = strategy
         self.goals = self.get_goals()
         self.memory_strategy = MEMORY
         self.memory_succeses = []
-        self.changes_memory = []
-        self.strategy_choice = [0,0,0,0,0]
 
         self.prediction_strategies = self.prediction_all_strategies()
         self.strategy_swap_hist = 0
-        # self.several_weights = [0,0.25, 0.5, 0.75, 1]
+
+        # TODO: ALS HET GOED IS KUNNEN AL DEZE INITS WEG
+        # self.unique_id = unique_id
+        # self.x_list = x_list
+        # self.y_list = y_list
+        # self.sadness_score = 0
+        # self.in_attraction = False
+        # self.in_attraction_list = []
+        # self.changes_memory = []
+        # self.strategy_choice = [0, 0, 0, 0, 0]
 
 
     def get_goals(self):
-        """Set random goals."""
+        """
+        Set all attractions as goal for customer.
+        """
+
         goals = []
         attractions = self.model.get_attractions()
         for attr in attractions:
             goals.append(attr)
+
         return goals
 
     def make_history(self):
+        """
+        Initialize empty history.
+        """
         history = {}
         attractions = self.model.attractions
         for attraction in range(len(attractions)):
@@ -83,17 +84,16 @@ class Customer(Agent):
     def penalty(self, current_attraction):
         """
         This method calculates a penalty for attractions that were visited more
-        often than other attractions
+        often than other attractions.
         """
 
         total_difference_sum = 0
         if current_attraction == 0:
             return 0
+
         for i in range(len(self.model.attractions.values())):
             attraction = self.model.attractions[i]
-
             difference = self.history[current_attraction] - self.history[attraction]
-
             total_difference_sum += difference
 
         if total_difference_sum < 0:
@@ -103,11 +103,13 @@ class Customer(Agent):
 
         return penalty
 
+
+# TODO: HIER KUNNEN ALLE OBSTACLE DINGEN UIT NEEM IK AAN?
     def move(self):
-        '''
+        """
         This method should get the neighbouring cells (Moore's neighbourhood),
         select one, and move the agent to this cell.
-        '''
+        """
 
         possible_steps = self.model.grid.get_neighborhood(
             self.pos,
@@ -145,7 +147,7 @@ class Customer(Agent):
         if new_position == self.destination and self.waiting is False:
             self.model.grid.move_agent(self, new_position)
 
-            # Get object of current attraction
+            # Get current attraction
             attractions = self.model.get_attractions()
             for attraction in attractions:
                 if attraction.pos == new_position:
@@ -160,20 +162,14 @@ class Customer(Agent):
             self.model.grid.move_agent(self, new_position)
 
     def check_move(self):
-        """ Checks if a move can be done, given a new position."""
+        """
+        Checks if a move can be done, given a new position.
+        """
 
         if self.waitingtime is not None:
 
-            # set in ride to true false
-            if self.current_a is not None:
-                if self.waited_period == self.waitingtime - self.current_a.attraction_duration:
-                    self.in_attraction = True
-
-            # CHANGE DIRECTION if waitingtime is met
+            # Change direction if waitingtime is met
             if self.waitingtime <= self.waited_period:
-
-                # when attraction is left set self.attraction to false
-                self.in_attraction = False
 
                 # Update goals and attraction
                 for attraction in self.model.get_attractions():
@@ -194,17 +190,13 @@ class Customer(Agent):
                                 self.update_strategy()
 
                 # increment number of rides taken of attraction
-                # if self.current_a is not None:
                 self.current_a.rides_taken += 1
 
                 # increment number of rides taken of customer
                 self.nmbr_attractions += 1
+
                 self.total_ever_waited += self.waited_period
                 self.waited_period = 0
-
-                # Update memory
-                # if self.init_weight is None:
-                #     self.update_strategy()
 
                 # Set current attraction back to None when customer leaves.
                 self.current_a = None
@@ -220,20 +212,17 @@ class Customer(Agent):
 
         if self.pos == self.destination:
 
-            # if self.waited_period == 0:
-                # if self.init_weight is None:
-
             # Check which attraction
             attractions = self.model.get_attractions()
             for attraction in attractions:
                 if attraction.pos == self.pos:
                     self.current_a = attraction
 
-            # self.current_a. += 1
             self.waited_period += 1
 
         if self.waiting is False:
             return True
+
         return False
 
     def set_waiting_time(self):
@@ -426,13 +415,13 @@ class Customer(Agent):
         This method should move the customer using the `random_move()` method.
         """
 
-        if self.waiting is True:
-            self.sadness_score += 1
+        # if self.waiting is True:
+            # self.sadness_score += 1
 
-        if self.in_attraction is True:
-            self.in_attraction_list.append(1)
-        else:
-            self.in_attraction_list.append(0)
+        # if self.in_attraction is True:
+        #     self.in_attraction_list.append(1)
+        # else:
+        #     self.in_attraction_list.append(0)
 
         self.move()
 
