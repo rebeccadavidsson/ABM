@@ -37,7 +37,6 @@ def agent_draw(agent):
         portrayal["w"] = 1
         portrayal["h"] = 1
         portrayal["Layer"] = 0
-        # portrayal["r"] = 0.15
 
     elif type(agent) is Attraction:
         portrayal["Color"] = "purple"
@@ -46,6 +45,9 @@ def agent_draw(agent):
         portrayal["r"] = 1
         portrayal["text"] = str(agent.current_waitingtime)
         portrayal["text_color"] = "black"
+
+        # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
+        portrayal["Shape"] = "starlight.jpg"
 
     elif type(agent) is Customer:
 
@@ -70,10 +72,6 @@ def agent_draw(agent):
              portrayal["Color"] = "#FFEC19"
         elif agent.strategy == "Random" or agent.strategy == "Random_test_4":
             portrayal["Color"] = "#add8e6"
-
-
-        # UNCOMMENT THIS TO SEE SANNE'S HEAD AS CUSTOMER!
-        # portrayal["Shape"] = "starlight.png"
 
     return portrayal
 
