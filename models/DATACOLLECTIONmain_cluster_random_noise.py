@@ -12,8 +12,8 @@ pixel_ratio = 20
 num_agents = 12
 theme = "cluster"
 strategy = "Random_test_4"
-steps = 20
-RUNS = 2
+steps = 1000
+RUNS = 65
 strategies = [0, 0.25, 0.5, 0.75, 1]
 adaptive = True
 
