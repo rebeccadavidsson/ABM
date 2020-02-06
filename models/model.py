@@ -320,11 +320,8 @@ class Themepark(Model):
                 weight = None
             else:
                 weight = weights_list[i]
-<<<<<<< HEAD
 
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
-=======
->>>>>>> 6b88f6d699bca370f429d9b61ed0ea1c8bd842f8
+
 
             # Initialize customer and add customer to the model
             a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
