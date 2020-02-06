@@ -28,12 +28,14 @@ mesa runserver
 
 #### /models
 
+* ```analyse_data.py```: make plots and analyse data collected by DATACOLLECTION-files. 
 * ```attraction.py```: includes the agent Attraction.
 * ```customer.py```: includes the agent Customer and helper functions such as ```get_destination()```.
 * ```model.py```: includes the model Themepark and defines the Mesa grid and schedule.
 * ```monitor.py```: makes predictions of an agent's move based on distance and wating time.
 * ```route.py```: calculates coordinates of attractions and adds possible obstacles.
 * ```server.py```: launches the mesa visualization.
+* DATACOLLECTION-files, ready to run and collect data to analyse.
 
 ### Built with
 * [Mesa](https://github.com/projectmesa/mesa) - ABM Framework

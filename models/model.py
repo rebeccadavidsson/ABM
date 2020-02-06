@@ -4,6 +4,8 @@ from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 import random
 import numpy as np
+import pickle
+import matplotlib.pyplot as plt
 try:
     from .route import get_coordinates, get_attraction_coordinates, Route
     from .customer import Customer
@@ -14,8 +16,7 @@ except:
     from customer import Customer
     from attraction import Attraction
     from monitor import Monitor
-import pickle
-import matplotlib.pyplot as plt
+
 
 FRACTION_RANDOM = 1/6
 WIDTH = 36
@@ -32,7 +33,6 @@ xlist, ylist, positions = [12, 21, 26, 11, 9, 25, 25, 26, 20, 12, 11, 21], [17, 
 
 class Themepark(Model):
     def __init__(self, N_attr, N_cust, width, height, strategy, theme, max_time, weight, adaptive):
-        self.theme = theme
         self.max_time = max_time
         self.N_attr = N_attr
         self.penalty_per = PENALTY_PERCENTAGE
@@ -42,12 +42,8 @@ class Themepark(Model):
         self.x_list, self.y_list, self.positions = xlist, ylist, positions
         self.x_list, self.y_list, self.positions = get_attraction_coordinates(WIDTH, HEIGHT, self.N_attr, theme)
         self.happinesses = []
-        self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
         self.path_coordinates = get_coordinates(WIDTH, HEIGHT, NUM_OBSTACLES, self.N_attr, theme)
-        self.N_attr = N_attr    # num of attraction agents
         self.N_cust = N_cust    # num of customer agents
-        self.width = width
-        self.height = height
         self.total_steps = 0
         self.cust_ids = N_cust
         self.strategy = strategy
@@ -55,30 +51,42 @@ class Themepark(Model):
         self.schedule = BaseScheduler(self)
         self.schedule_Attraction = BaseScheduler(self)
         self.schedule_Customer = BaseScheduler(self)
-        self.totalTOTAL = 0
+        self.totalTOTAL = 0 #TODO: DEZE NAAM VERANDEREN
         self.attractions = self.make_attractions()
         self.attraction_history = self.make_attr_hist()
-        self.running = True
-        self.data = []
-        self.data_customers = []
         self.park_score = []
         self.data_dict = {}
         self.hist_random_strat = []
         self.hist_close_strat = []
         self.all_rides_list = []
         self.strategy_composition = self.make_strategy_composition()
-        self.memory = 5
-        self.customer_score = []
         self.customers = self.add_customers(self.N_cust)
-        self.only_random = False
+        self.monitor = Monitor(self.max_time, self.N_attr, self.positions)
+        self.running = True
 
 
+
+        # TODO: ALS HET GOED IS KUNNEN AL DEZE INITS WEG, MAAR DIT MOETEN WE WEL NOG EVEN DUBBEL CHECKEN
+        # --> dit is gecheckt op het runnen van main_cluster_random_noise
+        # self.theme = theme
+        # self.starting_positions = [[int((WIDTH/2)-1), 0], [int(WIDTH/2), 0], [int((WIDTH/2)+1), 0]]
+        # self.width = width
+        # self.height = height
+        # self.data = []
+        # self.data_customers = []
+        # self.memory = 5
+        # self.customer_score = []
+        # self.only_random = False
+        # self.total_waited_time = 0
+
+        # Initialize dictionary of attractions
         for attraction in self.get_attractions():
             self.data_dict[attraction.unique_id] = ({
                                "id": attraction.unique_id,
                                "length": attraction.attraction_duration,
                                "waiting_list": []})
 
+        # TODO ADD COMMENT (SNAP NIET WAT DE DATACOLLECTOR IS)
         if len(self.strategies) == 6:
             self.datacollector = DataCollector(
 
@@ -101,11 +109,12 @@ class Themepark(Model):
         self.datacollector2 = DataCollector(
             {"score": lambda m: self.make_score()})
 
-        self.total_waited_time = 0
 
-        self.monitor = Monitor(self.max_time, self.N_attr, self.positions)
 
     def make_score(self):
+        """
+        Get the efficiency score
+        """
         ideal = {}
         cust_in_row = 0
         for i in range(len(self.get_attractions())):
@@ -122,13 +131,20 @@ class Themepark(Model):
         return abs(1-(fraction_not_right)) * cust_in_row/self.N_cust
 
     def make_attr_hist(self):
+        """
+        Initialize a dictionary in which the history of the attractions can be
+        added in.
+        """
         attraction_history = {}
         for attraction in self.get_attractions():
-
             attraction_history[attraction] = [0] * (self.max_time + 1)
+
         return attraction_history
 
     def strategy_counter(self, strategy):
+        """
+        Count how many customers of different strategies are at the attractions
+        """
         counter_total = {}
 
         for attraction_pos in self.positions:
@@ -148,6 +164,9 @@ class Themepark(Model):
         return counter
 
     def make_strategy_composition(self):
+        """
+        TODO: ANNEMIJN KAN JIJ HIER COMMENTS BIJ DOEN? + RANDOM_TEST_4 WEGHALEN
+        """
         if self.strategy == "Random_test_4":
             self.strategies = ["Random_test_4", 0.0, 0.25, 0.50, 0.75, 1.0]
             dict = {self.strategies[0]: 1/6, self.strategies[1]:0.20, self.strategies[2]:0.20,
@@ -185,12 +204,12 @@ class Themepark(Model):
 
                 dict[self.strategies[i]] = composition_list[i-1] /sum_comp
 
-
-
         return dict
 
     def make_attractions(self):
-        """ Initialize attractions on fixed position."""
+        """
+        Initialize attractions on fixed position.
+        """
 
         attractions = {}
         for i in range(self.N_attr):
@@ -208,7 +227,7 @@ class Themepark(Model):
 
     def get_attractions(self):
         """
-        Get a list with all attractions
+        Get a list with all attractions.
         """
         agents = self.grid.get_neighbors(
             mid_point,
@@ -223,71 +242,10 @@ class Themepark(Model):
 
         return attractions
 
-    def add_customers(self, N_cust, added=False):
-        """ Initialize customers on random positions."""
-
-        weights_list = []
-        if self.adaptive is True:
-
-            for j in self.strategy_composition.keys():
-                for i in range(round(N_cust*self.strategy_composition[j])):
-                    weights_list.append(j)
-
-            if len(weights_list) < self.N_cust:
-                rand = random.choice(self.strategies)
-                weights_list.append(rand)
-            elif len(weights_list) > self.N_cust:
-                rand = random.choice(weights_list)
-                weights_list.remove(rand)
-
-
-        else:
-            if self.strategy is not "Random":
-
-                # do what normally is done
-                for i in range(round(N_cust)):
-                    weights_list.append(self.weight)
-
-
-        cust_list = []
-        # weight_counter = 0
-        # pick_weight = 0
-        for i in range(N_cust):
-
-            # pos_temp = random.choice(self.starting_positions)
-            pos_temp = [random.randint(0,WIDTH-1), random.randint(0,HEIGHT-1)]
-            rand_x, rand_y = pos_temp[0], pos_temp[1]
-
-            pos = (rand_x, rand_y)
-
-            if added is True:
-                i = self.cust_ids
-            if self.strategy == "Random_test_4":
-                if weights_list[i] == "Random_test_4":
-                    strategy = "Random_test_4"
-                else:
-                    strategy = "Closest_by"
-            else:
-                strategy = self.strategy
-
-
-            # Deze if is omdat bij alleen random self.weight none is!
-            if weights_list == []:
-                weight = None
-            else:
-                weight = weights_list[i]
-
-            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
-
-            self.schedule_Customer.add(a)
-
-            self.grid.place_agent(a, pos)
-            cust_list.append(a)
-
-        return cust_list
-
     def calculate_people(self):
-        """Calculate how many customers are in which attraction."""
+        """
+        Calculate how many customers are in which attraction.
+        """
 
         counter_total = {}
 
@@ -312,7 +270,74 @@ class Themepark(Model):
 
         return list(counter_total.values())
 
+
+    def add_customers(self, N_cust, added=False):
+        """
+        Initialize customers on random positions.
+        """
+
+        weights_list = []
+        if self.adaptive is True:
+
+            for j in self.strategy_composition.keys():
+                for i in range(round(N_cust*self.strategy_composition[j])):
+                    weights_list.append(j)
+
+            if len(weights_list) < self.N_cust:
+                rand = random.choice(self.strategies)
+                weights_list.append(rand)
+            elif len(weights_list) > self.N_cust:
+                rand = random.choice(weights_list)
+                weights_list.remove(rand)
+
+        else:
+
+            # if the strategy is not random add weights to weights_list
+            if self.strategy is not "Random":
+                for i in range(round(N_cust)):
+                    weights_list.append(self.weight)
+
+        cust_list = []
+        for i in range(N_cust):
+
+            pos_temp = [random.randint(0, WIDTH - 1), random.randint(0, HEIGHT - 1)]
+            rand_x, rand_y = pos_temp[0], pos_temp[1]
+
+            pos = (rand_x, rand_y)
+
+            if added is True:
+                i = self.cust_ids
+            if self.strategy == "Random_test_4":
+                if weights_list[i] == "Random_test_4":
+                    strategy = "Random_test_4"
+                else:
+                    strategy = "Closest_by"
+            else:
+                strategy = self.strategy
+
+            # Set weight
+            if weights_list == []:
+                weight = None
+            else:
+                weight = weights_list[i]
+<<<<<<< HEAD
+
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
+=======
+>>>>>>> 6b88f6d699bca370f429d9b61ed0ea1c8bd842f8
+
+            # Initialize customer and add customer to the model
+            a = Customer(i, self, pos, self.x_list, self.y_list, self.positions, strategy, weight, self.adaptive)
+            self.schedule_Customer.add(a)
+            self.grid.place_agent(a, pos)
+            cust_list.append(a)
+
+        return cust_list
+
     def calc_waiting_time(self):
+        """
+        Calculate the waitingtime per attraction
+        """
 
         counter_total = {}
 
@@ -353,10 +378,13 @@ class Themepark(Model):
             attraction.N_current_cust = counter
             self.attraction_history[attraction][self.totalTOTAL] = counter
             counter_total[attraction.unique_id] = counter
+
         return counter_total
 
     def make_route(self):
-        """Draw coordinates of a possible path."""
+        """
+        Draw coordinates of a possible path.
+        """
 
         for i in range(len(self.path_coordinates)):
             pos = self.path_coordinates[i]
@@ -369,11 +397,13 @@ class Themepark(Model):
 
                 self.grid.place_agent(path, pos)
 
+
+    # TODO: THEMEPARK SCORE GEBRUIKEN WE NIET MEER, DIT ALLEMAAL VERWIJDEREN OVERAL?
     def get_themepark_score(self):
         """
         Get score of a themepark based on:
             - A total of all waitingtimes for every customer
-            - TODO
+            - The total number of rides taken
         """
         attractions = self.get_attractions()
         total_wait, total_rides = 0, 0
@@ -389,7 +419,9 @@ class Themepark(Model):
         return (total_wait / total_rides)
 
     def get_strategy_history(self):
-        """ Update history with how many customers chose which strategy """
+        """
+        Update history with how many customers chose which strategy.
+        """
 
         customers = self.get_customers()
         randomstrat, closebystrat = 0, 0
@@ -404,6 +436,9 @@ class Themepark(Model):
         self.hist_close_strat.append(closebystrat)
 
     def get_customers(self):
+        """
+        Returns a list of all the customers in the themepark.
+        """
         agents = self.grid.get_neighbors(
             mid_point,
             moore=True,
@@ -412,14 +447,17 @@ class Themepark(Model):
 
         customers = []
 
-        # Count customer agents
+        # Add customers to list
         for agent in agents:
             if type(agent) == Customer:
                 customers.append(agent)
+
         return customers
 
     def get_data_customers(self):
-        """ Return dictionary with data of customers """
+        """
+        Return dictionary with data of customers.
+        """
 
         data = {}
         agents = self.grid.get_neighbors(
@@ -436,8 +474,11 @@ class Themepark(Model):
                 "strategy": agent.strategy,
                 "swapped_strat": agent.strategy_swap_hist
                 }
+
         return data
 
+
+# TODO: NET ALS THEMEPARK SCORE GEBRUIKEN WE DIT NEIT MEER TOCH????
     def calc_hapiness(self):
         """
         Calculate mean hapiness of all customers, based on:
@@ -450,8 +491,6 @@ class Themepark(Model):
 
         scores = []
 
-
-
         for customer in customers:
             history = customer.history
             values = list(history.values())
@@ -463,13 +502,15 @@ class Themepark(Model):
                 return None
 
         scores = np.interp(scores, (min(scores), max(scores)), (1, 10))
+
         return np.mean(scores)
 
     def get_history_list(self):
+        """
+        Create a list with the history of the customers.
+        """
 
         customers = self.get_customers()
-
-
         histories = {}
 
         for customer in customers:
@@ -479,7 +520,22 @@ class Themepark(Model):
         return histories
 
     def final(self):
-        """ Return data """
+        """
+        End run and return data.
+        """
+
+        # Create list with at every time step the amount of attractions that are active
+        attractions = self.get_attractions()
+        self.all_rides_list = [0] * len(attractions[0].in_attraction_list)
+        for attraction in attractions:
+            for i in range(len(attraction.in_attraction_list)):
+                self.all_rides_list[i] += attraction.in_attraction_list[i]
+
+        # Change the all_rides_list into fractions
+        for i in range(len(self.all_rides_list)):
+            self.all_rides_list[i] /= self.N_attr
+
+        # Initialize history list and get agents
         hist_list = []
         agents = self.grid.get_neighbors(
             mid_point,
@@ -487,16 +543,7 @@ class Themepark(Model):
             radius=RADIUS,
             include_center=True)
 
-        attractions = self.get_attractions()
-        self.all_rides_list = [0] * len(attractions[0].in_attraction_list)
-        for attraction in attractions:
-            for i in range(len(attraction.in_attraction_list)):
-                self.all_rides_list[i] += attraction.in_attraction_list[i]
-
-        for i in range(len(self.all_rides_list)):
-            self.all_rides_list[i] /= self.N_attr
-        print("ALL RIDES LIST", self.all_rides_list)
-
+        # Save history of all customers
         cust_data = self.get_data_customers()
         for agent in agents:
             if type(agent) is Customer:
@@ -505,15 +552,10 @@ class Themepark(Model):
                     hist_list.append(agent.strategy_swap_hist)
                 else:
                     hist_list.append(agent.strategy_swap_hist)
-                # print("swap:",agent.strategy_swap_hist , "sum:",sum_attr)
-
-
-        # plt.hist(hist_list)
-        # plt.show()
 
         histories = self.get_history_list()
 
-        # save data
+        # Save data
         try:
             pickle.dump(self.datacollector.get_model_vars_dataframe(), open("../data/strategy_history.p", 'wb'))
             pickle.dump(self.datacollector2.get_model_vars_dataframe(), open("../data/eff_score_history.p", 'wb'))
@@ -540,8 +582,9 @@ class Themepark(Model):
 
 
     def save_data(self):
-        """Save data of all attractions and customers."""
-
+        """
+        Save data of all attractions and customers.
+        """
         # Get info
         waitinglines = self.calc_waiting_time()
 
@@ -552,8 +595,11 @@ class Themepark(Model):
         self.happinesses.append(self.calc_hapiness())
 
     def step(self):
-        """Advance the model by one step."""
+        """
+        Advance the model by one step.
+        """
 
+        # Take a step if max steps is not reached
         if self.totalTOTAL < self.max_time:
             self.totalTOTAL += 1
             self.schedule.step()
@@ -561,21 +607,17 @@ class Themepark(Model):
             self.datacollector2.collect(self)
 
             self.schedule_Attraction.step()
-
             self.schedule_Customer.step()
-
-            # update memory of attractions
-            # attractions = self.get_attractions()
-            # for attraction in attractions:
-            #     attraction.update_memory()
 
             self.total_steps += 1
 
             self.save_data()
             self.get_strategy_history()
 
+        # Stop simulation
         else:
             for key in self.attraction_history.keys():
                 y = self.attraction_history[key]
                 x = list(range(0, self.max_time))
+
             self.final()
