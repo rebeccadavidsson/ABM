@@ -88,6 +88,69 @@ def plot_efficiency_score():
     plt.ylim(0.3,0.9)
     plt.show()
 
+def plot_efficiency_score2():
+    file3 = pickle.load(open('../results/results_cust_all_only_strat31jan/eff_score_clust_all_only_strat.p', 'rb'))
+    file = pickle.load(open('../results_main_cluster_random_noise_30jan/eff_score_clust_main_rand_noise.p', 'rb'))
+    file2 = pickle.load(open('../results/results_cust_all_only_strat31jan/eff_score_clusterd_diff_stratNU.p', 'rb'))
+
+
+    print(file)
+    # arrays = [np.array(x) for x in file["Random_test_4"]]
+    # means = [np.mean(k) for k in zip(*arrays)]
+    # arrays = [np.array(x) for x in file[0]]
+    # means2 = [np.mean(k) for k in zip(*arrays)]
+    # arrays = [np.array(x) for x in file[0.25]]
+    # means3 = [np.mean(k) for k in zip(*arrays)]
+    # arrays = [np.array(x) for x in file[0.5]]
+    # means4 = [np.mean(k) for k in zip(*arrays)]
+    # arrays = [np.array(x) for x in file[0.75]]
+    # means5 = [np.mean(k) for k in zip(*arrays)]
+    # arrays = [np.array(x) for x in file[1]]
+    # means6 = [np.mean(k) for k in zip(*arrays)]
+
+    arrays = [np.array(x) for x in file3["Random"]]
+    means = [np.mean(k) for k in zip(*arrays)]
+
+    array_effscorenoise = [np.array(x) for x in file]
+    means_effscorenoise = [np.mean(k) for k in zip(*array_effscorenoise)]
+
+    array_effscore = [np.array(x) for x in file2]
+    means_effscore = [np.mean(k) for k in zip(*array_effscore)]
+
+    print(array_effscore)
+
+    plt.title("Park efficiency score, adaptive with noise")
+    plt.plot(means_effscorenoise)
+    plt.plot(means)
+    plt.legend(["Adaptive agents with noise", "Random"])
+
+    plt.xlabel("Timestep")
+    plt.ylabel("Score")
+    # plt.ylim(0.3,1)
+
+    # plt.legend(STRATEGIES)
+    plt.show()
+
+    plt.title("Park efficiency score, adaptive")
+    plt.plot(means_effscore)
+    plt.plot(means)
+    plt.legend(["Adaptive agents", "Random"])
+
+    plt.xlabel("Timestep")
+    plt.ylabel("Score")
+    # plt.ylim(0.3,1)
+    # plt.legend(STRATEGIES)
+    plt.show()
+
+
+    # x_pos = np.arange(len(STRATEGIES))
+    # plt.title("Park efficiency")
+    # plt.ylabel("Score")
+    # plt.bar(STRATEGIES, [np.mean(means), np.mean(means2), np.mean(means3), np.mean(means4), np.mean(means5), np.mean(means6)])
+    # plt.xticks(x_pos, STRATEGIES)
+    # plt.ylim(0.3,0.9)
+    # plt.show()
+
 
 def plot_strategy_hist_clust():
     file = pickle.load(open('results/results_cust_all_only_strat31jan/strategy_history_clusterd_diff_strat.p', 'rb'))
@@ -155,7 +218,71 @@ def plot_strategy_hist_clust():
     plt.legend(STRATEGIES)
     plt.show()
 
+def plot_strategy_hist_clust2():
+    file = pickle.load(open('results/results_cust_all_only_strat31jan/strategy_history_clusterd_diff_strat.p', 'rb'))
 
+    STRATEGIES = ["0.00", "0.25", "0.50", "0.75", "1.00"]
+    data = {}
+    for strat in STRATEGIES:
+        data[strat] = []
+    for line in file:
+
+        for strat in STRATEGIES:
+
+            # Get last value in the list
+            data[strat].append(line.iloc[RUNS - 1][strat])
+
+    x_pos = np.arange(len(STRATEGIES))
+    values = data.values()
+    values = list(values)
+
+    total = []
+    # total.append([float(i)/max(values[0]) for i in values[0]])
+    # total.append([float(i)/max(values[1]) for i in values[1]])
+    # total.append([float(i)/max(values[2]) for i in values[2]])
+    # total.append([float(i)/max(values[3]) for i in values[3]])
+    # total.append([float(i)/max(values[4]) for i in values[4]])
+
+
+    total.append(values[0])
+    total.append(values[1])
+    total.append(values[2])
+    total.append(values[3])
+    total.append(values[4])
+
+    # fill with colors
+    colors = ["lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue", "lightgreen", "lightblue"]
+    ticks = STRATEGIES
+    fig, axes = plt.subplots()
+
+    boxplot = axes.boxplot(total, patch_artist=True, widths=0.8)
+    plt.xticks(x_pos + 1, STRATEGIES)
+    plt.yticks(np.arange(0, 100, 20))
+
+    colors = ['lightblue', 'lightblue', 'lightblue', "lightblue", "lightblue"]
+
+    for patch, color in zip(boxplot['boxes'], colors):
+        patch.set_facecolor(color)
+
+    # adding horizontal grid lines
+    axes.yaxis.grid(True)
+    axes.set_title("Ratio of people with a specific strategy at the end of a run")
+    axes.set_xlabel('Strategy')
+    axes.set_ylabel('Percentage of people')
+    plt.show()
+
+    total2 = []
+
+    total2.append(round(np.mean(values[0]), 1))
+    total2.append(round(np.mean(values[1]), 1))
+    total2.append(round(np.mean(values[2]), 1))
+    total2.append(round(np.mean(values[3]), 1))
+    total2.append(round(np.mean(values[4]), 1))
+
+    plt.title("Ratio of strategies at end of run")
+    plt.pie(total2, autopct='%1.1f%%')
+    plt.legend(STRATEGIES)
+    plt.show()
 
 def plot_eff():
     file = pickle.load(open('results/results_cust_all_only_strat31jan/eff_score_clust_all_only_strat.p', 'rb'))
@@ -271,7 +398,7 @@ def plot_strategy_hist():
 
 
 # plot_eff()
-plot_themepark_score()
-# plot_efficiency_score()
+# plot_themepark_score()
+plot_efficiency_score2()
 # plot_strategy_hist()
 # plot_strategy_hist_clust()
